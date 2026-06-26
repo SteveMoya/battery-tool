@@ -27,10 +27,14 @@ Implementación existente relevante:
 
 ### 🔴 Alta prioridad
 
-- [ ] **F1 — Custom Cell Input completo**
-  - Dimensiones cartesianas para celdas prismáticas (L×W×H mm) además de cilíndricas (D×L)
-  - Campo `c-pulse-amp` (descarga por pulsos, A) y `c-charge-amp` (corriente de carga, A) separados
-  - Toggle UI "Cilíndrica / Prismática" que cambia los inputs visibles
+- [x] **F1 — Custom Cell Input completo** ✅
+  - ✅ `Cell` interface actualizada con `pw`, `pd`, `pulseAmp`, `chargeAmp`, `formFactor`
+  - ✅ Toggle UI "Cilíndrica / Prismática" con inputs separados (`c-prism-w`, `c-prism-d`, `c-len-p`)
+  - ✅ `pack-builder.ts` — BoxGeometry para prismática, CylinderGeometry para cilíndrica
+  - ✅ Grid spacing usa `pw × pd` pitch para prismática vs `d × d` para cilíndrica
+  - ✅ Presets guardan `formFactor` y dimensiones correctas por tipo
+  - ✅ Simulación usa `pw` para strip resistance en prismáticas
+  - ✅ Reverse lookup maneja presets prismáticos
 
 - [x] **F2 — Chemistry Master Switch** ✅
   - ✅ `applyChemPreset()` en `ui.ts:272` — autocompleta min/nom/max por química (NMC 2.5/3.6/4.2V, LFP 2.5/3.2/3.65V, LTO 1.5/2.4/2.8V, Na-Ion 1.5/3.0/4.0V)
@@ -53,10 +57,11 @@ Implementación existente relevante:
   - ✅ Sincroniza campos bidireccionales `target-v` y `target-ah`
   - ✅ Feedback text mostrando resultado: "Generated Xs × Yp = Z cells (V, Ah)"
 
-- [ ] **F6 — Voltage Sag semafórico**
-  - Extender `simulation.ts` para comparar `vNet` vs `cutoffController` (input nuevo, ej. 3.0V×S)
-  - Semáforo: 🟢 OK / 🟡 LVC Cercano (dentro 10%) / 🔴 HIT LVC
-  - Indicador "Time-to-cutoff" bajo carga virtual inyectada
+- [x] **F6 — Voltage Sag semafórico** ✅
+  - ✅ `checkVoltageSag()` en `safety-indicators.ts:116` — compara `vNet` vs `cutoff × S`
+  - ✅ Semáforo: 🟢 OK / 🟡 LVC Cercano (dentro 10%) / 🔴 HIT LVC
+  - ✅ Indicador "Time-to-cutoff" con estimación vía binary search sobre OCV curve
+  - ✅ UI en `SafetyChecks` panel debajo deSimulationSection.astro
 
 - [ ] **F7 — Algoritmos Heurísticos 2D**
   - Modo actual: hex-mode (checkbox) + ladder — falta Fill Ratio explícito
@@ -65,16 +70,16 @@ Implementación existente relevante:
   - Auto-rotación 90° si fill ratio es mejor en la otra orientación
   - Mostrar "celdas fuera de límite" cuando el contenedor es insuficiente
 
-- [ ] **F10a — Tabla de Ampacity**
-  - Tabla empírica: `[(0.10×5), (0.10×7), (0.15×7), (0.15×8), (0.20×7), (0.30×7)]`
-  - Cada entrada: optimalA / acceptableMaxA / poorA
-  - Semáforo: 🟢 < optimal / 🟡 optimal..max / 🔴 > max
-  - Comparar contra corriente por segmento serie (I_total / P, no I_total)
+- [x] **F10a — Tabla de Ampacity** ✅
+  - ✅ Tabla empírica 6 entradas en `safety-indicators.ts:18-25`: `[(0.10×5), (0.10×7), (0.15×7), (0.15×8), (0.20×7), (0.30×7)]`
+  - ✅ Cada entrada: `optimalA` / `maxA` / `poorA`
+  - ✅ Semáforo: 🟢 < optimal / 🟡 optimal..max / 🔴 > max
+  - ✅ `checkAmpacity()` compara contra `I_total / P` (corriente por segmento serie)
 
-- [ ] **F10b — Regla de Micah Toll**
-  - Heurística fija: 0.15mm × 8mm = 5A continuos seguros
-  - Validar cada segmento de la topología SxP contra este baseline
-  - Si excede → activar alerta roja + F10c
+- [x] **F10b — Regla de Micah Toll** ✅
+  - ✅ Heurística: 0.15mm × 8mm = 5A continuos seguros en `safety-indicators.ts:74-76`
+  - ✅ `checkMicahToll()` deratea proporcionalmente por área del strip
+  - ✅ Alerta roja si ratio > 1.0, amarilla si > 0.8
 
 - [ ] **F11 — Selección BMS**
   - DB local de BMS: `[{name, sCount, chem[], maxA, balanceType, profiles[]}]`
@@ -202,8 +207,8 @@ Implementación existente relevante:
 
 1. **F2 + F3/F4** (consolidar motor eléctrico — base para todo lo demás) ✅ COMPLETADO
 2. **F5** (modo generativo — desbloquea uso real) ✅ COMPLETADO
-3. **F6 + F10a + F10b** (semáforos de seguridad — son el "cerebro de validación" del proyecto) ← SIGUIENTE
-4. **F1** (completar entrada de celda, incluyendo prismáticas)
+3. **F6 + F10a + F10b** (semáforos de seguridad — son el "cerebro de validación" del proyecto) ✅ COMPLETADO
+4. **F1** (completar entrada de celda, incluyendo prismáticas) ← SIGUIENTE
 5. **F11 + F12** (BMS recommendation con vectores)
 6. **F15a + F15b + F15c** (export 2D/PDF — output tangible para el taller)
 7. **F8a/F8b** (tolerancias reales — son detalle fino de calidad)

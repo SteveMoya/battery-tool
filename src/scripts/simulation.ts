@@ -1,4 +1,8 @@
 import { inputs, $ } from './dom';
+import {
+  checkVoltageSag, checkAmpacity, checkMicahToll,
+  renderVoltageSagIndicator, renderAmpacityIndicator, renderMicahTollIndicator,
+} from './safety-indicators';
 
 let simMaxVal = 100;
 let lastSimAmps = 0;
@@ -144,7 +148,10 @@ export function updateSimulation(e?: Event) {
   const rho = parseFloat(inputs['sim-strip-mat']?.value ?? '7') * 1e-8;
   const wStrip = parseFloat(inputs['sim-strip-w']?.value ?? '7') / 1000;
   const tStrip = parseFloat(inputs['sim-strip-t']?.value ?? '0.15') / 1000;
-  const d = parseFloat(inputs['c-diam']?.value ?? '18') / 1000;
+  const dRaw = parseFloat(inputs['c-diam']?.value ?? '18') / 1000;
+  const pwRaw = parseFloat(inputs['c-prism-w']?.value ?? '0') / 1000;
+  const isPrismatic = inputs['cell-type']?.value === 'prismatic';
+  const d = isPrismatic && pwRaw > 0 ? pwRaw : dRaw;
   const sp = parseFloat(inputs['c-spacing']?.value ?? '1') / 1000;
 
   const rCellsTotal = (S * irCell) / P;
@@ -276,6 +283,16 @@ export function updateSimulation(e?: Event) {
   }
   if (statusText) (statusText as HTMLElement).style.display = warn ? 'block' : 'none';
   if (outNet) (outNet as HTMLElement).style.color = warn ? '#d32f2f' : '#008cc9';
+
+  // F6 + F10a + F10b — Safety indicators
+  const sagResult = checkVoltageSag(vNet, I, soc, R_total, S, P, cellMin, cellMax, cellNom, cellAh, cutoff, mode);
+  renderVoltageSagIndicator(sagResult);
+
+  const ampResult = checkAmpacity(I, P);
+  renderAmpacityIndicator(ampResult);
+
+  const micahResult = checkMicahToll(I, P);
+  renderMicahTollIndicator(micahResult);
 
   renderCurrentStats();
 }
