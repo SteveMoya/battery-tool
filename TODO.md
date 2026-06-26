@@ -86,7 +86,7 @@ Implementación existente relevante:
   - Match por: S count (exacto o rango programable 8S-24S), química, corriente (con margen 20-30%)
   - Output: "BMS Recomendado: Daly 13S 60A (LFP, Smart)"
 
-- [ ] **F11b — Custom BMS (BMS Personalizado)**
+- [x] **F11b — Custom BMS (BMS Personalizado)**
   - Opción "Custom BMS" en el selector de BMS para crear hardware no listado en la DB
   - Inputs requeridos:
     - `bms-name` (texto libre, ej. "DIY JK-Pareo 14S")
@@ -109,7 +109,7 @@ Implementación existente relevante:
   - Vector 2: Exclusión electroquímica (BMS LFP 3.65V ↛ NMC 4.2V)
   - Vector 3: MOSFET 20-30% sobre I_max + recomendación balance activo (capacitivo/inductivo 2-5A) para pack > 20Ah
 
-- [ ] **F11b — Agregar BMS custom**
+- [x] **F11b — Agregar BMS custom**
   - Botón "+ Agregar BMS" en el selector de F11 abre un modal con formulario
   - Campos: `name`, `sCount` (rango programable ej. 8S-24S o fijo), `chem[]` (multi-select), `maxA` (corriente continua), `balanceType` (pasivo/activo/sin balance), `profiles[]` (Smart programable, Bluetooth, UART, etc.), `bms-w / bms-d / bms-h` (mm) para F13
   - Persistir en `localStorage` bajo namespace `bca:bms:custom` como array JSON
@@ -160,9 +160,10 @@ Implementación existente relevante:
   - Calcular `nickelMetersTotal = nickelInPack + ladderOverhead + wasteFactor (15%)`
   - Exportar a CSV/JSON en BOM modal
 
-- [ ] **F13 — Geometría BMS Bounding Box**
-  - Inputs `bms-w / bms-d / bms-h` (mm)
+- [x] **F13 — Geometría BMS Bounding Box**
+  - Inputs `bms-w / bms-d / bms-h / bms-pos-x / bms-pos-y / bms-pos-z / bms-offset-x / bms-offset-y / bms-offset-z` (mm)
   - Renderizar prisma translúcido en 3D junto al pack
+  - Posición relativa al pack (offset x,y,z)
   - Detección de interferencia: si la caja intersecta con carcasa → marcar en rojo y sugerir offset (x,y,z)
   - Dropdown de BMS comerciales (ANT, Daly, Xuanjing) con dimensiones pre-cargadas
 
@@ -208,10 +209,10 @@ Implementación existente relevante:
 1. **F2 + F3/F4** (consolidar motor eléctrico — base para todo lo demás) ✅ COMPLETADO
 2. **F5** (modo generativo — desbloquea uso real) ✅ COMPLETADO
 3. **F6 + F10a + F10b** (semáforos de seguridad — son el "cerebro de validación" del proyecto) ✅ COMPLETADO
-4. **F1** (completar entrada de celda, incluyendo prismáticas) ← SIGUIENTE
+4. ~~**F1** (completar entrada de celda, incluyendo prismáticas)~~
 5. ~~**F11 + F12** (BMS recommendation con vectores)~~
 6. **F15a + F15b + F15c** (export 2D/PDF — output tangible para el taller)
 7. **F8a/F8b** (tolerancias reales — son detalle fino de calidad)
 8. **F9 + F10c + F10d** (materiales y BOM)
-9. **F13 + F16** (visualización de BMS y monitor diagnóstico)
+9. ~~**F13** (BMS bounding box 3D)~~ + **F16** (monitor diagnóstico)
 10. **F15d** (STEP — nice-to-have para integración CAD)

@@ -651,6 +651,9 @@ export function updatePack() {
   const physHeight = (l * Layers) + (physLayerSpace * (Layers - 1));
   const renderHeight = (l * Layers) + ((physLayerSpace + visualLayerSpace) * (Layers - 1));
   const cX = (minX + maxX) / 2; const cZ = (minZ + maxZ) / 2;
+
+  // Store pack bounds for F13 BMS interference detection
+  lastPackBounds = { minX, maxX, minZ, maxZ, height: physHeight };
   packState.packGroup.position.set(-cX, 0, -cZ);
   addDimensions(bW, renderHeight, bD, cX, cZ, physHeight);
   calculateStats(bW, bD, physHeight, S_Total, P, Layers);
@@ -661,6 +664,96 @@ export function updatePack() {
   rescaleLoadSlider();
   updateSimulation();
   needsOcclusionUpdate = true;
+}
+
+/* ─────────────────────────────────────────────
+   F13 — BMS Bounding Box 3D
+   ───────────────────────────────────────────── */
+
+let bmsBoxMesh: THREE.Mesh | null = null;
+let bmsWireframe: THREE.LineSegments | null = null;
+let bmsLabelObj: CSS2DObject | null = null;
+
+export interface BmsBoxData {
+  w: number; d: number; h: number;
+  offsetX: number; offsetY: number; offsetZ: number;
+  name: string;
+}
+
+let lastPackBounds = { minX: 0, maxX: 0, minZ: 0, maxZ: 0, height: 0 };
+
+export function getPackBounds() { return lastPackBounds; }
+
+export function renderBmsBox(data: BmsBoxData | null) {
+  if (bmsBoxMesh) { packState.packGroup.remove(bmsBoxMesh); bmsBoxMesh.geometry.dispose(); bmsBoxMesh = null; }
+  if (bmsWireframe) { packState.packGroup.remove(bmsWireframe); bmsWireframe.geometry.dispose(); bmsWireframe = null; }
+  if (bmsLabelObj) {
+    if (bmsLabelObj.parent) bmsLabelObj.parent.remove(bmsLabelObj);
+    if (bmsLabelObj.element?.parentNode) bmsLabelObj.element.parentNode.removeChild(bmsLabelObj.element);
+    bmsLabelObj = null;
+  }
+
+  const interferenceEl = document.getElementById('bms-interference');
+  if (!data) { interferenceEl?.classList.add('hidden'); return; }
+
+  const pb = lastPackBounds;
+  const bmsX = pb.maxX + data.w / 2 + 10 + data.offsetX;
+  const bmsY = data.h / 2 + data.offsetY;
+  const bmsZ = (pb.minZ + pb.maxZ) / 2 + data.offsetZ;
+
+  const geo = new THREE.BoxGeometry(data.w, data.h, data.d);
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x3b82f6, transparent: true, opacity: 0.25, roughness: 0.5,
+    side: THREE.DoubleSide, depthWrite: false,
+  });
+  bmsBoxMesh = new THREE.Mesh(geo, mat);
+  bmsBoxMesh.position.set(bmsX, bmsY, bmsZ);
+  packState.packGroup.add(bmsBoxMesh);
+
+  const edges = new THREE.EdgesGeometry(geo);
+  bmsWireframe = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x3b82f6, opacity: 0.6, transparent: true }));
+  bmsWireframe.position.copy(bmsBoxMesh.position);
+  packState.packGroup.add(bmsWireframe);
+
+  const div = document.createElement('div');
+  div.className = 'label-tag';
+  div.style.color = '#3b82f6';
+  div.style.borderColor = '#3b82f6';
+  div.innerHTML = `BMS ${data.w}×${data.d}×${data.h}mm`;
+  bmsLabelObj = new CSS2DObject(div);
+  bmsLabelObj.position.set(bmsX, bmsY + data.h / 2 + 5, bmsZ);
+  packState.packGroup.add(bmsLabelObj);
+  packState.labels.push(bmsLabelObj);
+
+  // Interference detection
+  const bmsMinX = bmsX - data.w / 2;
+  const bmsMaxX = bmsX + data.w / 2;
+  const bmsMinZ = bmsZ - data.d / 2;
+  const bmsMaxZ = bmsZ + data.d / 2;
+  const bmsMinY = bmsY - data.h / 2;
+  const bmsMaxY = bmsY + data.h / 2;
+
+  const overlapsX = bmsMaxX > pb.minX && bmsMinX < pb.maxX;
+  const overlapsZ = bmsMaxZ > pb.minZ && bmsMinZ < pb.maxZ;
+  const overlapsY = bmsMaxY > 0 && bmsMinY < pb.height;
+  const interferes = overlapsX && overlapsZ && overlapsY;
+
+  if (interferes) {
+    mat.color.set(0xef4444);
+    mat.opacity = 0.35;
+    if (bmsWireframe) (bmsWireframe.material as THREE.LineBasicMaterial).color.set(0xef4444);
+    interferenceEl?.classList.remove('hidden');
+    const txt = document.getElementById('bms-interference-text');
+    if (txt) txt.textContent = 'BMS box intersects pack — adjust offset';
+  } else {
+    interferenceEl?.classList.add('hidden');
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('bca:bms-update', ((e: CustomEvent) => {
+    renderBmsBox(e.detail);
+  }) as EventListener);
 }
 
 export function animate(_time: number) {
