@@ -1,0 +1,87 @@
+---
+import HelpIcon from '../HelpIcon.astro';
+---
+
+<section class="group-box">
+  <h2 class="section-title">3. Pack Configuration</h2>
+
+  <div class="grid grid-cols-3 gap-1.5 mb-2 items-end">
+    <div class="flex flex-col">
+      <label class="control-label" for="s-count">Total Series</label>
+      <input id="s-count" type="number" value="10" min="1" class="control-input" />
+    </div>
+    <div class="flex flex-col">
+      <label class="control-label" for="p-count">Parallel (P)</label>
+      <input id="p-count" type="number" value="4" min="1" class="control-input" />
+    </div>
+    <div class="flex flex-col">
+      <label class="control-label">
+        Spacing (mm)
+        <HelpIcon position="right">
+          <svg width="100" height="40" class="mb-1">
+            <circle cx="20" cy="20" r="10" stroke="#fff" fill="none" />
+            <circle cx="80" cy="20" r="10" stroke="#fff" fill="none" />
+            <line x1="32" y1="20" x2="68" y2="20" stroke="#94a3b8" />
+            <text x="50" y="15" text-anchor="middle" fill="#94a3b8" font-size="9">Gap</text>
+          </svg>
+          <div>Distance between cells.</div>
+          <div class="text-slate-400 mt-1 text-[0.6rem]">This thickness is also applied to outer edges, increasing total dimensions.</div>
+        </HelpIcon>
+      </label>
+      <input id="c-spacing" type="number" value="1.0" min="0" step="0.5" class="control-input" />
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-2 mb-2 items-end">
+    <div class="flex flex-col">
+      <label class="control-label">
+        Layers
+        <HelpIcon variant="warn" position="right" width="250px" align="left">
+          <div class="mb-2 font-medium text-white">Total series count is divided across this many layers.</div>
+          <div class="bg-black/25 border-l-[3px] border-red-300 p-2 rounded text-[0.65rem] leading-snug">
+            <strong class="text-red-300 block mb-1 uppercase">⚠️ Experimental</strong>
+            Multi-layer busbar logic is complex. The visualization will output incorrect strip positions for certain configurations.
+            <div class="mt-1 text-white font-semibold">Always verify connections manually.</div>
+          </div>
+        </HelpIcon>
+      </label>
+      <div class="layer-control-wrap">
+        <div class="layer-input-group"><input id="pack-layers" type="number" value="1" min="1" /></div>
+        <div id="row-exploded" class="layer-check-group">
+          <input id="exploded-view" type="checkbox" disabled />
+          <label for="exploded-view" id="lbl-exploded" class="layer-check-label">Exploded<br />View</label>
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-col">
+      <label class="control-label" for="layer-spacing">Layer Spacing (mm)</label>
+      <input id="layer-spacing" type="number" value="3.0" step="0.5" min="0" class="control-input" />
+    </div>
+  </div>
+
+  <div class="control-item full-width mb-2">
+    <label class="control-label">Busbar Visualization</label>
+    <select id="bus-mode" class="control-input">
+      <option value="none">None</option>
+      <option value="geo">Strips Only</option>
+      <option value="bn">Strips + B-Numbers</option>
+      <option value="both" selected>Strips + Numbers + Voltages</option>
+    </select>
+  </div>
+
+  <div class="toggle-row">
+    <label for="hex-mode" class="cursor-pointer">Hexagonal Nesting</label>
+    <input id="hex-mode" type="checkbox" checked />
+  </div>
+
+  <div class="toggle-row">
+    <label for="calc-ladder" class="cursor-pointer">
+      Ladder / Wide Strip
+      <HelpIcon position="right" width="160px" align="left">
+        <strong>Roll Length Calculation</strong><br />
+        Assumes one wide sheet of nickel connects the parallel group, dividing the required linear roll length by P.
+      </HelpIcon>
+    </label>
+    <input id="calc-ladder" type="checkbox" />
+  </div>
+</section>

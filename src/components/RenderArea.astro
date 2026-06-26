@@ -1,0 +1,21 @@
+---
+---
+
+<div
+  id="render-area"
+  class="flex-grow h-full relative overflow-hidden bg-[#f4f6f9] max-md:h-[25vh] max-md:w-full max-md:border-t max-md:border-slate-200 max-md:border-b-0 max-md:order-2"
+>
+  <div id="watermark" class="overlay-text bottom-2.5 right-4 font-semibold opacity-60">Designed by Luke Formosa</div>
+  <div id="controls-hint" class="overlay-text bottom-2.5 left-4 flex flex-col gap-0.5 max-md:!hidden">
+    <span>🖱️ Left: Rotate</span>
+    <span>🖱️ Right: Pan</span>
+    <span>🖱️ Scroll: Zoom</span>
+  </div>
+  <div
+    id="perf-toast"
+    class="absolute top-[60px] left-1/2 -translate-x-1/2 bg-white/95 border border-app-yellow border-l-4 border-l-app-yellow py-2 px-4 rounded shadow-lg text-[0.75rem] text-app-amber-dark font-semibold hidden items-center gap-2 z-50 pointer-events-none"
+  >
+    <span>⚡ High Performance Mode Active</span>
+    <span class="font-normal">(Labels hidden to save FPS)</span>
+  </div>
+</div>

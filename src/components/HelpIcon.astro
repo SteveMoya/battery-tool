@@ -1,0 +1,29 @@
+---
+export interface Props {
+  variant?: 'default' | 'warn';
+  tip?: string;
+  position?: 'top' | 'right' | 'centered';
+  width?: string;
+  align?: 'left' | 'center';
+}
+
+const {
+  variant = 'default',
+  tip,
+  position = 'top',
+  width,
+  align = 'center',
+} = Astro.props;
+
+const variantClass = variant === 'warn' ? 'warn' : '';
+const positionClass = position === 'right' ? 'tip-right' : position === 'centered' ? 'tip-centered' : '';
+const alignClass = align === 'left' ? 'text-left' : '';
+const widthStyle = width ? `width:${width};` : '';
+---
+
+<span class:list={["help-icon", variantClass]}>
+  {variant === 'warn' ? '!' : '?'}
+  <div class:list={["tip-content", positionClass, alignClass]} style={widthStyle}>
+    <slot>{tip}</slot>
+  </div>
+</span>

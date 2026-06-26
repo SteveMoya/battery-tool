@@ -1,0 +1,52 @@
+---
+const materials = [
+  { id: 'cell', label: 'Cell', color: '#f0a3ff', met: 0.15 },
+  { id: 'cap', label: 'Cap', color: '#ffffff', met: 0.20 },
+  { id: 'bus', label: 'Busbar', color: '#ff8f00', met: 0.3 },
+  { id: 'inter', label: 'Inter-Layer', color: '#b87333', met: 0.8, rowId: 'row-inter' },
+  { id: 'spacer', label: 'Spacer', color: '#111111', met: 0.0 },
+  { id: 'bg', label: 'Background', color: '#f4f6f9', met: null, hideMet: true },
+];
+---
+
+<details>
+  <summary>Visual Settings</summary>
+  <div class="p-2.5">
+    <div class="grid grid-cols-[60px_1fr_55px] gap-2 text-[0.65rem] text-slate-400 font-bold mb-1.5 uppercase items-center">
+      <div>Element</div>
+      <div>Color</div>
+      <div class="text-center tracking-[-0.5px]">Metallic</div>
+    </div>
+    {materials.map((m) => (
+      <div id={m.rowId} class="grid grid-cols-[60px_1fr_55px] gap-2 items-center mb-1.5">
+        <div class="text-[0.75rem] font-semibold text-[#555]">{m.label}</div>
+        <div class="flex items-center gap-1 w-full">
+          <input
+            id={`col-${m.id}`}
+            type="color"
+            value={m.color}
+            class="border-none w-[22px] h-[22px] p-0 bg-none cursor-pointer"
+          />
+          {!m.hideMet && (
+            <input
+              id={`met-${m.id}`}
+              type="range"
+              min="0"
+              max="1"
+              step="0.1"
+              value={m.met}
+              class="flex-1 h-1 bg-slate-200"
+            />
+          )}
+        </div>
+        {!m.hideMet ? (
+          <div id={`val-met-${m.id}`} class="text-[0.65rem] text-[#999] text-center">
+            {Math.round((m.met ?? 0) * 100)}%
+          </div>
+        ) : (
+          <div></div>
+        )}
+      </div>
+    ))}
+  </div>
+</details>

@@ -1,0 +1,268 @@
+import { inputs, $ } from './dom';
+
+let simMaxVal = 100;
+let lastSimAmps = 0;
+let lastSimWatts = 0;
+
+export const getSimMax = () => simMaxVal;
+export const setSimMax = (v: number) => { simMaxVal = v; };
+export const getLastAmps = () => lastSimAmps;
+export const setLastAmps = (v: number) => { lastSimAmps = v; };
+export const getLastWatts = () => lastSimWatts;
+export const setLastWatts = (v: number) => { lastSimWatts = v; };
+
+export function getOpenCircuitVoltage(soc: number, min: number, max: number, nom: number): number {
+  const range = max - min;
+  let chem: 'li-ion' | 'lfp' | 'lto' | 'na-ion' = 'li-ion';
+  if (nom >= 3.15 && nom <= 3.45) chem = 'lfp';
+  else if (nom >= 2.0 && nom <= 2.8) chem = 'lto';
+  else if (nom >= 2.9 && nom <= 3.1) chem = 'na-ion';
+
+  if (chem === 'lfp') {
+    if (soc >= 0.9) {
+      const p = (soc - 0.9) / 0.1;
+      const platTop = min + range * 0.85;
+      return platTop + (max - platTop) * p;
+    } else if (soc >= 0.15) {
+      const p = (soc - 0.15) / 0.75;
+      const platBot = min + range * 0.70;
+      const platTop = min + range * 0.85;
+      return platBot + (platTop - platBot) * p;
+    } else {
+      const p = soc / 0.15;
+      const platBot = min + range * 0.70;
+      return min + (platBot - min) * p;
+    }
+  } else if (chem === 'lto') {
+    return min + range * Math.pow(soc, 0.9);
+  } else {
+    return min + range * soc;
+  }
+}
+
+export function rescaleLoadSlider() {
+  const slider = $('sim-load-slider') as HTMLInputElement | null;
+  const inputType = $('sim-load-type') as HTMLInputElement | null;
+  const mode = ($('sim-mode-val') as HTMLInputElement | null)?.value;
+  const numInput = $('sim-load-input') as HTMLInputElement | null;
+  if (!slider) return;
+  slider.max = '1000';
+
+  const S = parseInt(inputs['s-count']?.value ?? '1') || 1;
+  const P = parseInt(inputs['p-count']?.value ?? '1') || 1;
+  const cellAmp = parseFloat(inputs['c-amp']?.value ?? '20') || 20;
+  const cellMax = parseFloat(inputs['c-max-v']?.value ?? '4.2') || 4.2;
+  const cellMah = parseFloat(inputs['c-mah']?.value ?? '2500') || 2500;
+
+  const dischargeMaxA = (P * cellAmp) * 1.5;
+  const packAh = (P * cellMah) / 1000;
+  const chargeMaxA = packAh * 5.0;
+  const maxA = mode === 'discharge' ? dischargeMaxA : chargeMaxA;
+
+  const unit = $('sim-input-unit');
+  if (inputType?.value === 'cc') {
+    simMaxVal = maxA;
+    if (unit) unit.textContent = 'A';
+  } else {
+    const packVMax = S * cellMax;
+    simMaxVal = maxA * packVMax;
+    if (unit) unit.textContent = 'W';
+  }
+  if (numInput) numInput.max = simMaxVal.toFixed(1);
+}
+
+export function updateSimulation(e?: Event) {
+  const slider = $('sim-load-slider') as HTMLInputElement | null;
+  const numInput = $('sim-load-input') as HTMLInputElement | null;
+  const cellVoltInput = $('sim-cell-volt-input') as HTMLInputElement | null;
+  if (!slider || !numInput) return;
+
+  let val = 0;
+  if (e && e.target === numInput) {
+    val = parseFloat(numInput.value);
+    if (isNaN(val)) val = 0;
+    if (val > simMaxVal) val = simMaxVal;
+    slider.value = String(1000 * Math.sqrt(val / simMaxVal));
+  } else {
+    const sliderPos = parseFloat(slider.value);
+    const ratio = sliderPos / 1000;
+    val = simMaxVal * (ratio * ratio);
+    let decimals = 1;
+    if (val < 10) decimals = 2;
+    else if (val >= 100) decimals = 0;
+    if (document.activeElement !== numInput) numInput.value = val.toFixed(decimals);
+  }
+
+  let smartStep = 1.0;
+  if (val < 1) smartStep = 0.05;
+  else if (val < 10) smartStep = 0.5;
+  else if (val < 50) smartStep = 1.0;
+  else smartStep = 5.0;
+  numInput.step = String(smartStep);
+
+  const mode = ($('sim-mode-val') as HTMLInputElement | null)?.value ?? 'discharge';
+  const type = ($('sim-load-type') as HTMLInputElement | null)?.value ?? 'cc';
+  const soc = parseFloat(($('sim-soc') as HTMLInputElement | null)?.value ?? '100') / 100;
+
+  const S = parseInt(inputs['s-count']?.value ?? '1');
+  const P = parseInt(inputs['p-count']?.value ?? '1');
+  const cellMin = parseFloat(inputs['c-min-v']?.value ?? '2.5');
+  const cellMax = parseFloat(inputs['c-max-v']?.value ?? '4.2');
+  const cellNom = parseFloat(inputs['c-volts']?.value ?? '3.6');
+  const cellAh = parseFloat(inputs['c-mah']?.value ?? '2500') / 1000;
+  const cellAmp = parseFloat(inputs['c-amp']?.value ?? '20');
+
+  const cutoffEl = $('sys-cutoff') as HTMLInputElement | null;
+  let cutoff = parseFloat(cutoffEl?.value ?? '3');
+  if (cutoff < cellMin) { cutoff = cellMin; if (cutoffEl) cutoffEl.value = cellMin.toFixed(2); }
+  if (e && e.target === cutoffEl && e.type === 'change') { if (cutoffEl) cutoffEl.value = cutoff.toFixed(2); }
+
+  const rowLVC = $('row-lvc-inputs');
+  const rowUsable = $('row-usable-cap');
+  if (mode === 'charge') {
+    rowLVC?.classList.add('disabled');
+    rowUsable?.classList.add('disabled');
+    const lblRuntime = $('lbl-runtime'); if (lblRuntime) lblRuntime.textContent = 'Chg Time';
+  } else {
+    rowLVC?.classList.remove('disabled');
+    rowUsable?.classList.remove('disabled');
+    const lblRuntime = $('lbl-runtime'); if (lblRuntime) lblRuntime.textContent = 'Runtime';
+  }
+
+  const irCell = parseFloat(inputs['sim-cell-ir']?.value ?? '25') / 1000;
+  const rho = parseFloat(inputs['sim-strip-mat']?.value ?? '7') * 1e-8;
+  const wStrip = parseFloat(inputs['sim-strip-w']?.value ?? '7') / 1000;
+  const tStrip = parseFloat(inputs['sim-strip-t']?.value ?? '0.15') / 1000;
+  const d = parseFloat(inputs['c-diam']?.value ?? '18') / 1000;
+  const sp = parseFloat(inputs['c-spacing']?.value ?? '1') / 1000;
+
+  const rCellsTotal = (S * irCell) / P;
+  const rStripsTotal = ((S * ((rho * (d + sp)) / (wStrip * tStrip))) / P) * 1.2;
+  const R_total = rCellsTotal + rStripsTotal;
+
+  const cellVoc = getOpenCircuitVoltage(soc, cellMin, cellMax, cellNom);
+  const packVoc = cellVoc * S;
+  if (document.activeElement !== cellVoltInput && cellVoltInput) {
+    cellVoltInput.value = cellVoc.toFixed(2);
+  }
+
+  const socLbl = $('val-soc');
+  if (socLbl) {
+    socLbl.textContent = `${Math.round(soc * 100)}% (${packVoc.toFixed(1)}V)`;
+    (socLbl as HTMLElement).style.color = `hsl(${soc * 120}, 80%, 35%)`;
+  }
+
+  let I = 0;
+  let isCollapse = false;
+  if (type === 'cp') {
+    const P_target = val;
+    if (P_target > 0) {
+      if (mode === 'discharge') {
+        const a = R_total, b = -packVoc, c = P_target;
+        const disc = b * b - 4 * a * c;
+        if (disc < 0) { isCollapse = true; I = packVoc / (2 * R_total); }
+        else { I = (-b - Math.sqrt(disc)) / (2 * a); }
+      } else {
+        I = P_target / packVoc;
+      }
+    }
+  } else {
+    I = val;
+  }
+
+  const vDrop = I * R_total;
+  let vNet = mode === 'discharge' ? packVoc - vDrop : packVoc + vDrop;
+  if (vNet < 0) vNet = 0;
+  const heatCells = (I * I) * rCellsTotal;
+  const heatStrips = (I * I) * rStripsTotal;
+  const heatTotal = heatCells + heatStrips;
+
+  let pUseful = 0, pTotal = 0;
+  if (mode === 'discharge') { pUseful = vNet * I; pTotal = packVoc * I; }
+  else { pTotal = vNet * I; pUseful = packVoc * I; }
+  const eff = (pTotal > 0) ? (pUseful / pTotal) * 100 : 100;
+
+  lastSimAmps = I;
+  lastSimWatts = mode === 'discharge' ? pUseful : pTotal;
+
+  const fmtPwr = (v: number) => (v >= 1000) ? `${(v / 1000).toFixed(2)} kW` : `${Math.round(v)} W`;
+  const fmtHeat = (v: number) => {
+    if (v >= 100) return `${Math.round(v)} W`;
+    if (v >= 10) return `${v.toFixed(1)} W`;
+    return `${v.toFixed(2)} W`;
+  };
+
+  const lblSag = $('lbl-sim-sag');
+  if (mode === 'discharge') {
+    if (lblSag?.firstChild) lblSag.firstChild.nodeValue = 'Sag ';
+    const outSag = $('out-sim-sag'); if (outSag) outSag.textContent = `-${vDrop.toFixed(2)} V`;
+    const lblNet = $('lbl-sim-net'); if (lblNet) lblNet.textContent = 'Net Output';
+  } else {
+    if (lblSag?.firstChild) lblSag.firstChild.nodeValue = 'Rise ';
+    const outSag = $('out-sim-sag'); if (outSag) outSag.textContent = `+${vDrop.toFixed(2)} V`;
+    const lblNet = $('lbl-sim-net'); if (lblNet) lblNet.textContent = 'Req. Voltage';
+  }
+  const outNet = $('out-sim-netv'); if (outNet) outNet.textContent = `${vNet.toFixed(2)} V`;
+  const outAmps = $('out-sim-amps'); if (outAmps) outAmps.textContent = `${I.toFixed(1)} A`;
+
+  const packAh = P * cellAh;
+  const cRate = packAh > 0 ? I / packAh : 0;
+  const lblC = $('lbl-sim-c'); if (lblC) lblC.textContent = `${cRate.toFixed(2)}C`;
+  const ratedMaxAmps = P * cellAmp;
+  const loadPerc = ratedMaxAmps > 0 ? (I / ratedMaxAmps) * 100 : 0;
+  const percEl = $('lbl-load-perc');
+  if (percEl) {
+    percEl.textContent = `${Math.round(loadPerc)}% of max current`;
+    (percEl as HTMLElement).style.color = loadPerc > 100 ? '#ef4444' : loadPerc > 80 ? '#f59e0b' : '#94a3b8';
+  }
+
+  const outPT = $('out-sim-power-total'); if (outPT) outPT.textContent = fmtPwr(pTotal);
+  const outPU = $('out-sim-power-useful'); if (outPU) outPU.textContent = fmtPwr(pUseful);
+  const outHC = $('out-sim-heat-cell'); if (outHC) outHC.textContent = fmtHeat(heatCells);
+  const outHS = $('out-sim-heat-strip'); if (outHS) outHS.textContent = fmtHeat(heatStrips);
+  const outHT = $('out-sim-heat-total'); if (outHT) outHT.textContent = fmtHeat(heatTotal);
+  const outEff = $('out-sim-eff'); if (outEff) outEff.textContent = `${eff.toFixed(1)}%`;
+
+  let cutoffSoC = 0;
+  const cutoffCompare = cutoff * S;
+  if (mode === 'discharge') {
+    const vCellSag = (I * R_total) / S;
+    const vCellCutoff = cutoff;
+    const vCellOpenNeeded = vCellCutoff + vCellSag;
+    let low = 0, high = 1;
+    for (let k = 0; k < 8; k++) {
+      const mid = (low + high) / 2;
+      if (getOpenCircuitVoltage(mid, cellMin, cellMax, cellNom) < vCellOpenNeeded) low = mid; else high = mid;
+    }
+    cutoffSoC = (low + high) / 2;
+  }
+
+  const usablePerc = Math.max(0, 100 - (cutoffSoC * 100));
+  const outUsable = $('out-sim-usable'); if (outUsable) outUsable.textContent = `${Math.round(usablePerc)}%`;
+
+  const elRuntime = $('out-sim-runtime');
+  if (elRuntime) {
+    if (I > 0.01) {
+      if (mode === 'discharge') {
+        const hrs = (packAh * Math.max(0, soc - cutoffSoC)) / I;
+        const h = Math.floor(hrs); const m = Math.round((hrs - h) * 60);
+        elRuntime.textContent = h > 99 ? '>99h' : `${h}h ${m}m`;
+      } else {
+        const hrs = (packAh * (1.0 - soc)) / I;
+        const h = Math.floor(hrs); const m = Math.round((hrs - h) * 60);
+        elRuntime.textContent = h > 99 ? '>99h' : `~${h}h ${m}m`;
+      }
+    } else { elRuntime.textContent = '--'; }
+  }
+
+  const statusText = $('status-text');
+  let warn = false;
+  if (mode === 'discharge') {
+    if (isCollapse) { warn = true; if (statusText) statusText.textContent = '⚠️ COLLAPSE'; }
+    else if (vNet < cutoffCompare) { warn = true; if (statusText) statusText.textContent = '⚠️ HIT LVC'; }
+  } else {
+    if (vNet > (cellMax * S)) { warn = true; if (statusText) statusText.textContent = '⚠️ OVER V'; }
+  }
+  if (statusText) (statusText as HTMLElement).style.display = warn ? 'block' : 'none';
+  if (outNet) (outNet as HTMLElement).style.color = warn ? '#d32f2f' : '#008cc9';
+}

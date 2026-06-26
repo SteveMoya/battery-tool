@@ -1,0 +1,20 @@
+---
+---
+
+<div id="modal-overlay" class="modal-base-overlay">
+  <div
+    id="comp-modal"
+    class="bg-white w-[95%] max-w-[900px] max-h-[90vh] rounded-lg shadow-[0_10px_25px_rgba(0,0,0,0.1)] flex flex-col"
+  >
+    <div class="modal-header">
+      <h3 class="m-0 text-slate-800">Comparison Matrix</h3>
+      <button id="btn-close-compare" class="border-none bg-none text-[1.5rem] cursor-pointer text-slate-500 leading-none">×</button>
+    </div>
+    <div class="modal-body">
+      <table class="comp-table">
+        <thead><tr id="comp-head-row"><th>Parameter</th></tr></thead>
+        <tbody id="comp-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>

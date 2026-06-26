@@ -1,0 +1,68 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import RenderArea from '../components/RenderArea.astro';
+import SnapshotArea from '../components/SnapshotArea.astro';
+import StatsPanel from '../components/StatsPanel.astro';
+import CellSpecsSection from '../components/sidebar/CellSpecsSection.astro';
+import ChemistrySection from '../components/sidebar/ChemistrySection.astro';
+import PackConfigSection from '../components/sidebar/PackConfigSection.astro';
+import SimulationSection from '../components/sidebar/SimulationSection.astro';
+import VisualSettingsSection from '../components/sidebar/VisualSettingsSection.astro';
+import AboutSection from '../components/sidebar/AboutSection.astro';
+import DisclaimerModal from '../components/modals/DisclaimerModal.astro';
+import LicenseModal from '../components/modals/LicenseModal.astro';
+import FeedbackModal from '../components/modals/FeedbackModal.astro';
+import CommercialModal from '../components/modals/CommercialModal.astro';
+import ExportModal from '../components/modals/ExportModal.astro';
+import CompareModal from '../components/modals/CompareModal.astro';
+---
+
+<Layout
+  title="Battery Pack Architect | 3D Design & Calculation Tool"
+  description="Free 3D Battery Pack Simulator and Designer. Calculate voltage sag, heat, and efficiency for 18650/21700 packs. Export to STL for 3D printing."
+>
+  <aside
+    id="sidebar"
+    class="w-[380px] h-full bg-white border-r border-slate-200 flex flex-col shadow-[4px_0_20px_rgba(0,0,0,0.03)] z-20 flex-shrink-0 max-md:w-full max-md:h-[75vh] max-md:order-1 max-md:border-r-0"
+  >
+    <div id="controls-container" class="flex-1 overflow-y-auto">
+      <Header />
+
+      <div class="px-[15px] pt-2.5">
+        <label class="control-label" for="pack-name">Configuration Name</label>
+        <input
+          id="pack-name"
+          type="text"
+          value="My Custom Pack"
+          placeholder="e.g. Long Range V1"
+          class="control-input"
+        />
+      </div>
+
+      <CellSpecsSection />
+      <ChemistrySection />
+      <PackConfigSection />
+      <SimulationSection />
+      <VisualSettingsSection />
+      <AboutSection />
+    </div>
+
+    <SnapshotArea />
+    <StatsPanel />
+  </aside>
+
+  <RenderArea />
+
+  <CompareModal />
+  <LicenseModal />
+  <DisclaimerModal />
+  <FeedbackModal />
+  <CommercialModal />
+  <ExportModal />
+
+  <script>
+    import { initApp } from '../scripts/app';
+    initApp();
+  </script>
+</Layout>

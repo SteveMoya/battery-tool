@@ -1,0 +1,20 @@
+---
+---
+
+<div id="snapshot-area" class="border-t border-slate-200 bg-slate-50 p-2 px-3 flex flex-col gap-2 flex-shrink-0">
+  <div class="snap-controls flex gap-1.5">
+    <button
+      id="btn-snap"
+      class="btn-action flex-1 py-1.5 rounded text-[0.75rem] font-semibold cursor-pointer text-center bg-app-blue text-white border border-app-blue-dark"
+    >
+      + Add to Compare
+    </button>
+    <button
+      id="btn-compare"
+      class="btn-action flex-1 py-1.5 rounded text-[0.75rem] font-semibold cursor-pointer text-center bg-white border border-slate-300 text-slate-700"
+    >
+      Compare All (<span id="snap-count">0</span>)
+    </button>
+  </div>
+  <div id="snap-list" class="flex flex-col gap-1 max-h-[120px] overflow-y-auto"></div>
+</div>

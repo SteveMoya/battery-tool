@@ -1,0 +1,70 @@
+---
+import '../styles/global.css';
+
+export interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  canonical?: string;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description = 'Free 3D Battery Pack Simulator and Designer. Calculate voltage sag, heat, and efficiency for 18650/21700 packs. Export to STL for 3D printing.',
+  image = 'https://lmf5000.github.io/battery-pack-architect/preview.jpg',
+  canonical = 'https://lmf5000.github.io/battery-pack-architect/',
+  noindex = false,
+} = Astro.props;
+
+const siteUrl = canonical;
+const siteName = 'Battery Pack Architect';
+const author = 'Luke Formosa';
+const keywords = 'battery pack designer, 18650 calculator, 21700 designer, battery visualization, DIY battery pack, battery series parallel, battery pack architect';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="keywords" content={keywords} />
+    <meta name="author" content={author} />
+    <link rel="canonical" href={siteUrl} />
+    {noindex && <meta name="robots" content="noindex,nofollow" />}
+
+    <meta name="google-site-verification" content="b0jXxeymRk3QwID_-c3mRkYiOUdeD-RAZqVG166e6Kk" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={siteUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+    <meta property="og:site_name" content={siteName} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={`${title} — Design lithium battery packs in 3D with real-time electrical and physical stats.`} />
+    <meta name="twitter:image" content={image} />
+
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: siteName,
+      operatingSystem: 'Web',
+      applicationCategory: 'DesignApplication',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      description,
+      featureList: '3D Visualization, Voltage Sag Simulation, STL Export, 18650 Calculator, Mobile Support',
+    })} />
+
+    <slot name="head" />
+  </head>
+  <body class="bg-[#f0f2f5] text-slate-700">
+    <slot />
+  </body>
+</html>

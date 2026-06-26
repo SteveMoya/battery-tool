@@ -1,0 +1,28 @@
+---
+---
+
+<section class="group-box">
+  <h2 class="section-title">2. Chemistry &amp; Voltage</h2>
+  <div class="control-item full-width mb-2">
+    <label class="control-label">Chemistry</label>
+    <div class="flex gap-1">
+      <select id="chem-selector" class="control-input flex-1"><option value="custom">Custom Voltage</option></select>
+      <button id="btn-save-preset-chem" class="btn-icon" title="Save">💾</button>
+      <button id="btn-del-preset-chem" class="btn-icon" title="Delete" disabled>🗑️</button>
+    </div>
+  </div>
+  <div class="grid grid-cols-3 gap-1.5 items-end">
+    <div class="flex flex-col">
+      <label class="control-label" for="c-min-v">Min (V)</label>
+      <input id="c-min-v" type="number" value="2.5" step="0.1" class="control-input" />
+    </div>
+    <div class="flex flex-col">
+      <label class="control-label" for="c-volts">Nom (V)</label>
+      <input id="c-volts" type="number" value="3.6" step="0.1" class="control-input" />
+    </div>
+    <div class="flex flex-col">
+      <label class="control-label" for="c-max-v">Max (V)</label>
+      <input id="c-max-v" type="number" value="4.2" step="0.1" class="control-input" />
+    </div>
+  </div>
+</section>

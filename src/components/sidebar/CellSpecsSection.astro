@@ -1,0 +1,72 @@
+---
+import HelpIcon from '../HelpIcon.astro';
+---
+
+<section class="group-box mt-[15px]">
+  <h2 class="section-title">1. Cell Specifications</h2>
+
+  <div id="db-search-wrap" class="control-item full-width relative mb-2">
+    <label class="control-label">
+      Search Cell Database (100+ Models)
+      <HelpIcon variant="warn" position="centered">
+        <strong>⚠️ Data Warning</strong><br />
+        Database values are static snapshots and may be outdated.<br /><br />
+        Always verify Capacity, Price, and especially Amps with official datasheets/vendors.
+      </HelpIcon>
+    </label>
+    <input
+      id="db-search-input"
+      type="text"
+      placeholder="Type to search (e.g. '26J', 'Molicel', '5000mAh')..."
+      class="control-input border-app-blue"
+    />
+    <div
+      id="db-results"
+      class="absolute top-full left-0 w-full bg-white border border-slate-300 rounded shadow-lg z-50 max-h-[200px] overflow-y-auto hidden"
+    ></div>
+  </div>
+
+  <div class="control-item full-width mb-2">
+    <label class="control-label">Or Use Generic Preset</label>
+    <div class="flex gap-1">
+      <select id="preset-selector" class="control-input flex-1"><option value="custom">Custom Cell</option></select>
+      <button id="btn-save-preset-size" class="btn-icon" title="Save">💾</button>
+      <button id="btn-del-preset-size" class="btn-icon del" title="Delete" disabled>🗑️</button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-2 mb-2 items-end">
+    <div class="flex flex-col">
+      <label class="control-label" for="c-diam">Diameter (mm)</label>
+      <input id="c-diam" type="number" value="18.4" class="control-input" />
+    </div>
+    <div class="flex flex-col">
+      <label class="control-label" for="c-len">Length (mm)</label>
+      <input id="c-len" type="number" value="65" class="control-input" />
+    </div>
+  </div>
+  <div class="grid grid-cols-2 gap-2 mb-2 items-end">
+    <div class="flex flex-col">
+      <label class="control-label" for="c-weight">Weight (g)</label>
+      <input id="c-weight" type="number" value="45" class="control-input" />
+    </div>
+    <div class="flex flex-col">
+      <label class="control-label" for="c-cost">Cost (Unit)</label>
+      <input id="c-cost" type="text" value="€4.50" class="control-input" />
+    </div>
+  </div>
+  <div class="grid grid-cols-2 gap-2 items-end">
+    <div class="flex flex-col">
+      <label class="control-label" for="c-mah">Capacity (mAh)</label>
+      <input id="c-mah" type="number" value="2500" step="100" class="control-input" />
+    </div>
+    <div class="flex flex-col">
+      <label class="control-label" for="c-amp">Max Current (A)</label>
+      <input id="c-amp" type="number" value="20" class="control-input" />
+    </div>
+    <div class="flex flex-col col-span-2">
+      <label class="control-label" for="sim-cell-ir">Cell IR (mΩ)</label>
+      <input id="sim-cell-ir" type="number" value="25" class="control-input" />
+    </div>
+  </div>
+</section>
