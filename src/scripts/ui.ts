@@ -14,6 +14,7 @@ import {
   rescaleLoadSlider, updateSimulation,
   getOpenCircuitVoltage, getLastAmps, getLastWatts, getSimMax,
 } from './simulation';
+import { BMS_DB, recommendBms, validateBms, type BmsEntry, type CellType as BmsCellType } from './bms-database';
 
 export const snapshots: { id: number; inputs: Record<string, any>; data: any }[] = [];
 
@@ -293,6 +294,142 @@ export function setupPresetEvents() {
     setUserChemPresets((getUserChemPresets() as ChemPreset[]).filter((p) => p.name !== name && !txt.startsWith(p.name)));
     sel.value = 'custom';
     populatePresets();
+  });
+
+  // F11+F12: BMS Selector
+  setupBmsSelector();
+}
+
+// F11+F12: BMS Selector
+function setupBmsSelector() {
+  const sel = $sel('bms-selector');
+  if (!sel) return;
+
+  // Populate BMS dropdown from DB
+  const groups: Record<string, BmsEntry[]> = {};
+  BMS_DB.forEach((bms) => {
+    const g = bms.brand;
+    if (!groups[g]) groups[g] = [];
+    groups[g].push(bms);
+  });
+  sel.innerHTML = '<option value="auto">Auto-Recommend</option><option value="none">No BMS (manual)</option>';
+  for (const gName in groups) {
+    const grp = document.createElement('optgroup');
+    grp.label = gName;
+    groups[gName].forEach((bms) => {
+      const opt = document.createElement('option');
+      opt.value = bms.name;
+      opt.text = `${bms.name} (${bms.maxA}A, ${bms.smart ? 'Smart' : 'Fixed'})`;
+      (opt as any).dataset.brand = bms.brand;
+      grp.appendChild(opt);
+    });
+    sel.appendChild(grp);
+  }
+
+  sel.addEventListener('change', () => updateBmsDisplay());
+}
+
+export function updateBmsDisplay() {
+  const sel = $sel('bms-selector');
+  const infoCard = $('bms-info');
+  const valPanel = $('bms-validation');
+  const recPanel = $('bms-recommendation');
+  const warnPanel = $('bms-warning');
+  if (!sel) return;
+
+  const packS = parseInt($inp('s-count')?.value ?? '1') || 1;
+  const packP = parseInt($inp('p-count')?.value ?? '1') || 1;
+  const chemId = ($inp('chem-selector')?.value !== 'custom'
+    ? JSON.parse($inp('chem-selector')?.value ?? '{}')?.id
+    : null) ?? 'li-ion';
+  const packIMax = parseFloat($inp('c-amp')?.value ?? '20') * packP;
+  const packAh = parseFloat($inp('c-mah')?.value ?? '2500') * packP / 1000;
+
+  const selected = sel.value;
+
+  if (selected === 'none') {
+    infoCard?.classList.add('hidden');
+    valPanel?.classList.add('hidden');
+    recPanel?.classList.add('hidden');
+    warnPanel?.classList.remove('hidden');
+    const warnText = $('bms-warning-text');
+    if (warnText) warnText.textContent = 'No BMS — ensure external protection circuitry is installed';
+    return;
+  }
+
+  if (selected === 'auto') {
+    const recs = recommendBms(packS, chemId as BmsCellType, packIMax, packAh);
+    if (recs.length > 0) {
+      showBmsInfo(recs[0].bms);
+      showBmsValidation(recs[0].validation);
+      recPanel?.classList.remove('hidden');
+      warnPanel?.classList.add('hidden');
+      const recText = $('bms-rec-text');
+      if (recText) recText.textContent = `Recommended: ${recs[0].bms.name}`;
+    } else {
+      infoCard?.classList.add('hidden');
+      valPanel?.classList.add('hidden');
+      recPanel?.classList.add('hidden');
+      warnPanel?.classList.remove('hidden');
+      const warnText = $('bms-warning-text');
+      if (warnText) warnText.textContent = 'No compatible BMS found — verify pack configuration';
+    }
+    return;
+  }
+
+  // Specific BMS selected
+  const bms = BMS_DB.find((b) => b.name === selected);
+  if (!bms) return;
+
+  showBmsInfo(bms);
+  const validation = validateBms(bms, packS, chemId as BmsCellType, packIMax, packAh);
+  showBmsValidation(validation);
+  valPanel?.classList.remove('hidden');
+  recPanel?.classList.add('hidden');
+  warnPanel?.classList.add('hidden');
+}
+
+function showBmsInfo(bms: BmsEntry) {
+  const infoCard = $('bms-info');
+  infoCard?.classList.remove('hidden');
+
+  const name = $('bms-name'); if (name) name.textContent = bms.name;
+  const badge = $('bms-badge');
+  if (badge) {
+    badge.textContent = bms.smart ? 'Smart' : 'Fixed';
+    badge.className = `text-[0.55rem] font-bold px-1.5 py-0.5 rounded ${bms.smart ? 'bg-app-blue-light text-app-blue-dark' : 'bg-slate-200 text-slate-600'}`;
+  }
+  const sRange = $('bms-s-range'); if (sRange) sRange.textContent = bms.sMin === bms.sMax ? `${bms.sMin}S` : `${bms.sMin}S-${bms.sMax}S`;
+  const chem = $('bms-chem'); if (chem) chem.textContent = bms.chem.length > 0 ? bms.chem.map(c => c.toUpperCase()).join(', ') : 'Any';
+  const maxA = $('bms-max-a'); if (maxA) maxA.textContent = `${bms.maxA}A`;
+  const balance = $('bms-balance'); if (balance) balance.textContent = bms.balanceType.replace('-', ' ');
+  const protocol = $('bms-protocol'); if (protocol) protocol.textContent = bms.protocol;
+  const dims = $('bms-dims'); if (dims) dims.textContent = `${bms.w}×${bms.d}×${bms.h}mm`;
+}
+
+function showBmsValidation(v: { sMatch: any; chemMatch: any; currentMatch: any; overall: string }) {
+  const valPanel = $('bms-validation');
+  valPanel?.classList.remove('hidden');
+
+  const colorMap: Record<string, string> = { green: '#22c55e', yellow: '#eab308', red: '#ef4444', neutral: '#94a3b8' };
+  const emojiMap: Record<string, string> = { green: '🟢', yellow: '🟡', red: '🔴', neutral: '⚪' };
+
+  const rows = [
+    { id: 'bms-val-s', result: v.sMatch },
+    { id: 'bms-val-chem', result: v.chemMatch },
+    { id: 'bms-val-current', result: v.currentMatch },
+  ];
+
+  rows.forEach(({ id, result }) => {
+    const el = $(id);
+    if (!el) return;
+    const color = colorMap[result.level] ?? colorMap.neutral;
+    el.style.color = color;
+    el.style.borderColor = color;
+    const emoji = el.querySelector('.bms-val-emoji');
+    if (emoji) emoji.textContent = emojiMap[result.level] ?? '⚪';
+    const text = el.querySelector('.bms-val-text');
+    if (text) text.textContent = result.msg;
   });
 }
 
@@ -601,6 +738,8 @@ export function setupMetallicSliders() {
 
 // === INPUT WIRING ===
 export function attachAllInputs() {
+  // F11+F12: BMS display updates on simulation changes
+  window.addEventListener('bca:sim-update', () => updateBmsDisplay());
   INPUT_IDS.forEach((id) => {
     const el = $inp(id);
     if (!el) return;

@@ -81,7 +81,7 @@ Implementación existente relevante:
   - ✅ `checkMicahToll()` deratea proporcionalmente por área del strip
   - ✅ Alerta roja si ratio > 1.0, amarilla si > 0.8
 
-- [ ] **F11 — Selección BMS**
+- [x] **F11 — Selección BMS**
   - DB local de BMS: `[{name, sCount, chem[], maxA, balanceType, profiles[]}]`
   - Match por: S count (exacto o rango programable 8S-24S), química, corriente (con margen 20-30%)
   - Output: "BMS Recomendado: Daly 13S 60A (LFP, Smart)"
@@ -104,7 +104,7 @@ Implementación existente relevante:
   - Botón "Guardar como preset reutilizable" en la misma fila de la DB estándar
   - Exportar/importar JSON de la DB custom (compartir setups entre usuarios)
 
-- [ ] **F12 — Vectores de Validación BMS**
+- [x] **F12 — Vectores de Validación BMS**
   - Vector 1: Concordancia S (bloquear BMS 13S con pack 14S, permitir Smart BMS programable)
   - Vector 2: Exclusión electroquímica (BMS LFP 3.65V ↛ NMC 4.2V)
   - Vector 3: MOSFET 20-30% sobre I_max + recomendación balance activo (capacitivo/inductivo 2-5A) para pack > 20Ah
@@ -209,7 +209,7 @@ Implementación existente relevante:
 2. **F5** (modo generativo — desbloquea uso real) ✅ COMPLETADO
 3. **F6 + F10a + F10b** (semáforos de seguridad — son el "cerebro de validación" del proyecto) ✅ COMPLETADO
 4. **F1** (completar entrada de celda, incluyendo prismáticas) ← SIGUIENTE
-5. **F11 + F12** (BMS recommendation con vectores)
+5. ~~**F11 + F12** (BMS recommendation con vectores)~~
 6. **F15a + F15b + F15c** (export 2D/PDF — output tangible para el taller)
 7. **F8a/F8b** (tolerancias reales — son detalle fino de calidad)
 8. **F9 + F10c + F10d** (materiales y BOM)
