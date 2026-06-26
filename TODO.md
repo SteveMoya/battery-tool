@@ -12,8 +12,14 @@ Implementación existente relevante:
 - `src/scripts/pack-builder.ts` — Motor 3D con InstancedMesh, hex/square grid, multi-layer, exploded view, OCC
 - `src/scripts/simulation.ts` — Voltage Sag, Joule Heat, SoC, runtime, OCV curve por química, LVC cutoff
 - `src/scripts/stl-export.ts` — Export STL con checkboxes (cells/spacers/busbars)
+- `src/scripts/electrical-engine.ts` — Motor bidireccional S↔V, P↔Ah (NUEVO - F3/F4)
+- `src/scripts/ui.ts` — UI handlers, `applyChemPreset()`, `showChemWarning()` (F2)
 - `src/components/sidebar/` — CellSpecs, Chemistry, PackConfig, Simulation, VisualSettings, About
 - `src/components/modals/` — Disclaimer, License, Feedback, Commercial, Export, Compare
+
+### Bugs corregidos (26-06-2026)
+1. **Hamburger menu no abría dropdown**: `<script>` eliminado de `index.astro` dejó CERO entry points para `app.ts`. Fix: restaurar `<script>` en `index.astro` + eliminar auto-execute de `app.ts` (había double-call).
+2. **Bidirectional engine invertido**: `sInp.addEventListener` llamaba `vToS` en vez de `sToV`, así que cambiar series sobreescribía el valor. Fix: swap correcto de las 4 funciones en listeners.
 
 ---
 
@@ -26,15 +32,19 @@ Implementación existente relevante:
   - Campo `c-pulse-amp` (descarga por pulsos, A) y `c-charge-amp` (corriente de carga, A) separados
   - Toggle UI "Cilíndrica / Prismática" que cambia los inputs visibles
 
-- [ ] **F2 — Chemistry Master Switch**
-  - Al cambiar química, autocompletar min/nom/max con valores seguros por defecto (NMC 2.5/3.6/4.2V, LFP 2.5/3.2/3.65V, LTO 1.5/2.4/2.8V, Na-Ion 1.5/3.0/4.0V)
-  - Advertir si el BMS target o cargador externo no respeta el voltaje máximo
-  - Usar `chemistry.chargeMax` para fijar el campo `c-max-v` automáticamente
+- [x] **F2 — Chemistry Master Switch** ✅
+  - ✅ `applyChemPreset()` en `ui.ts:272` — autocompleta min/nom/max por química (NMC 2.5/3.6/4.2V, LFP 2.5/3.2/3.65V, LTO 1.5/2.4/2.8V, Na-Ion 1.5/3.0/4.0V)
+  - ✅ `showChemWarning()` en `ui.ts:302` — banner `#chem-warning` en ChemistrySection.astro:28-31
+  - ✅ `sys-cutoff` se clampa si queda fuera del rango de la química seleccionada
+  - Pendiente: BMS target validation (F11)
 
-- [ ] **F3/F4 — Motor Bidireccional**
-  - Inputs que actualizan en tiempo real: cambiar V objetivo → recalcula S; cambiar S → actualiza V
-  - Aplicar Ley de Ohm y leyes de nodos en cada cambio de P o configuración
-  - Mostrar nodo de corriente por segmento (S1, S2...SN) en el panel eléctrico
+- [x] **F3/F4 — Motor Bidireccional** ✅
+  - ✅ Nuevo módulo `electrical-engine.ts` — S↔V y P↔Ah sync en tiempo real
+  - ✅ Anti-loop via `activeField` tracking + `setTimeout(150ms)` reset
+  - ✅ Inputs `target-v` y `target-ah` en PackConfigSection.astro (sección "Target Mode (bidirectional)")
+  - ✅ "Pack Current" y "Cell Current (I/P)" en StatsPanel.astro:32-46
+  - ✅ `getI()`, `getCellI()`, `renderCurrentStats()` en simulation.ts:14-22
+  - Corregido: funciones estaban invertidas en listeners (sInp → vToS en vez de sToV)
 
 - [ ] **F5 — Modo Generativo por Objetivo**
   - Input "Target Voltage" (V) + "Target Capacity" (Ah)
@@ -189,8 +199,8 @@ Implementación existente relevante:
 
 ## Orden de implementación sugerido
 
-1. **F2 + F3/F4** (consolidar motor eléctrico — base para todo lo demás)
-2. **F5** (modo generativo — desbloquea uso real)
+1. **F2 + F3/F4** (consolidar motor eléctrico — base para todo lo demás) ✅ COMPLETADO
+2. **F5** (modo generativo — desbloquea uso real) ← SIGUIENTE
 3. **F6 + F10a + F10b** (semáforos de seguridad — son el "cerebro de validación" del proyecto)
 4. **F1** (completar entrada de celda, incluyendo prismáticas)
 5. **F11 + F12** (BMS recommendation con vectores)

@@ -38,9 +38,3 @@ export function initApp() {
   updatePack();
   requestAnimationFrame(animate);
 }
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initApp);
-} else {
-  initApp();
-}

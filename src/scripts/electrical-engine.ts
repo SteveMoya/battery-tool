@@ -52,10 +52,10 @@ export function setupElectricalEngine() {
   const cAh = $inp('c-mah');
   if (!sInp || !vInp || !pInp || !ahInp) return;
 
-  sInp.addEventListener('input', () => { setActive('s-count'); vToS(sInp, vInp); });
-  vInp.addEventListener('input', () => { setActive('target-v'); sToV(sInp, vInp); });
-  pInp.addEventListener('input', () => { setActive('p-count'); ahToP(pInp, ahInp); });
-  ahInp.addEventListener('input', () => { setActive('target-ah'); pToAh(pInp, ahInp); });
+  sInp.addEventListener('input', () => { setActive('s-count'); sToV(sInp, vInp); });
+  vInp.addEventListener('input', () => { setActive('target-v'); vToS(sInp, vInp); });
+  pInp.addEventListener('input', () => { setActive('p-count'); pToAh(pInp, ahInp); });
+  ahInp.addEventListener('input', () => { setActive('target-ah'); ahToP(pInp, ahInp); });
 
   cNom?.addEventListener('change', () => {
     if (activeField === 'target-v') vToS(sInp, vInp);
