@@ -248,6 +248,10 @@ export function calculateStats(w: number, dep: number, h: number, S_Total: numbe
 
 export function updatePack() {
   const d = parseFloat(inputs['c-diam']?.value ?? '18');
+  const cellType = (inputs['cell-type'] as HTMLInputElement | null)?.value ?? 'cylindrical';
+  const isPrismatic = cellType === 'prismatic';
+  const pw = parseFloat(inputs['c-prism-w']?.value ?? '148');  // prismatic width (mm)
+  const pd = parseFloat(inputs['c-prism-d']?.value ?? '27');   // prismatic depth (mm)
   const stripWidth = parseFloat(inputs['sim-strip-w']?.value ?? '') || (d * 0.4);
   const stripThick = parseFloat(inputs['sim-strip-t']?.value ?? '') || 0.3;
 
@@ -277,12 +281,18 @@ export function updatePack() {
   while (packState.dimGroup.children.length > 0) packState.dimGroup.remove(packState.dimGroup.children[0]);
   document.querySelectorAll('.label-tag, .dim-tag').forEach((el) => el.remove());
 
-  const l = parseFloat(inputs['c-len']?.value ?? '65');
+  const l = isPrismatic
+    ? parseFloat(inputs['c-len-p']?.value ?? '91')
+    : parseFloat(inputs['c-len']?.value ?? '65');
   const S_Total = parseInt(inputs['s-count']?.value ?? '10');
   const P = parseInt(inputs['p-count']?.value ?? '1');
   let Layers = parseInt(inputs['pack-layers']?.value ?? '1') || 1;
   const spacing = parseFloat(inputs['c-spacing']?.value ?? '1');
   const effectiveD = d + spacing;
+  const cellW = isPrismatic ? pw : d;
+  const cellD = isPrismatic ? pd : d;
+  const effectiveW = cellW + spacing;
+  const effectiveDepth = cellD + spacing;
   const isHex = (inputs['hex-mode'] as HTMLInputElement | null)?.checked ?? false;
   const isLadder = (inputs['calc-ladder'] as HTMLInputElement | null)?.checked ?? false;
   const nomV = parseFloat(inputs['c-volts']?.value ?? '3.6');
@@ -376,10 +386,16 @@ export function updatePack() {
   packState.busMat.color.set(busColor);
   packState.busMat.metalness = parseFloat((inputs['met-bus'] as HTMLInputElement)?.value ?? '0.3');
 
-  const cellGeo = new THREE.CylinderGeometry(d / 2, d / 2, l, segs);
-  const capGeo = new THREE.CylinderGeometry(d / 2 * 0.7, d / 2 * 0.7, 0.5, Math.max(8, segs / 2));
+  const cellGeo = isPrismatic
+    ? new THREE.BoxGeometry(cellW, l, cellD)
+    : new THREE.CylinderGeometry(d / 2, d / 2, l, segs);
+  const capGeo = isPrismatic
+    ? new THREE.BoxGeometry(cellW * 0.7, 0.5, cellD * 0.7)
+    : new THREE.CylinderGeometry(d / 2 * 0.7, d / 2 * 0.7, 0.5, Math.max(8, segs / 2));
   const edgesGeo = !highPerf ? new THREE.EdgesGeometry(cellGeo, 20) : null;
-  const spacerGeo = new THREE.CylinderGeometry(effectiveD / 2, effectiveD / 2, 2.0, segs);
+  const spacerGeo = isPrismatic
+    ? new THREE.BoxGeometry(effectiveW, 2.0, effectiveDepth)
+    : new THREE.CylinderGeometry(effectiveD / 2, effectiveD / 2, 2.0, segs);
 
   const meshCells = new THREE.InstancedMesh(cellGeo, packState.cellMat, totalInstances);
   (meshCells as any).name = 'cells';
@@ -440,15 +456,15 @@ export function updatePack() {
     for (let s = 0; s < currentLayerS; s++) {
       const colData: any[] = [];
       for (let p = 0; p < P; p++) {
-        let x = currentXSlot * effectiveD;
-        let z = p * effectiveD;
+        let x = currentXSlot * (isPrismatic ? effectiveW : effectiveD);
+        let z = p * (isPrismatic ? effectiveDepth : effectiveD);
         if (isHex) {
-          z = p * (effectiveD * 0.866);
-          if (isLadder) x += (p * 0.5 * effectiveD);
-          else if (p % 2 !== 0) x += effectiveD * 0.5;
+          z = p * ((isPrismatic ? effectiveDepth : effectiveD) * 0.866);
+          if (isLadder) x += (p * 0.5 * (isPrismatic ? effectiveW : effectiveD));
+          else if (p % 2 !== 0) x += (isPrismatic ? effectiveW : effectiveD) * 0.5;
         }
-        minX = Math.min(minX, x - d / 2); maxX = Math.max(maxX, x + d / 2);
-        minZ = Math.min(minZ, z - d / 2); maxZ = Math.max(maxZ, z + d / 2);
+        minX = Math.min(minX, x - cellW / 2); maxX = Math.max(maxX, x + cellW / 2);
+        minZ = Math.min(minZ, z - cellD / 2); maxZ = Math.max(maxZ, z + cellD / 2);
         const cellY = layerYBase + l / 2;
         colData.push({ x, y: cellY, z });
         dummy.position.set(x, cellY, z);

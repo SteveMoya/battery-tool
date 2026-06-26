@@ -1,4 +1,4 @@
-import type { Cell } from './cell-database';
+import type { Cell, CellFormFactor } from './cell-database';
 
 export type CellType = Cell['type'];
 
@@ -9,11 +9,16 @@ export interface SizePreset {
     d: number;
     l: number;
     w: number;
+    pw?: number;
+    pd?: number;
     cost: string;
     cap: number;
     amp: number;
+    pulseAmp?: number;
+    chargeAmp?: number;
     type: CellType;
     ir: number;
+    formFactor?: CellFormFactor;
   };
 }
 

@@ -35,7 +35,16 @@ import HelpIcon from '../HelpIcon.astro';
     </div>
   </div>
 
-  <div class="grid grid-cols-2 gap-2 mb-2 items-end">
+  <div class="control-item full-width mb-2">
+    <label class="control-label">Form Factor</label>
+    <div id="toggle-cell-type" class="inline-toggle">
+      <span class="it-opt active" data-val="cylindrical">Cylindrical</span>
+      <span class="it-opt" data-val="prismatic">Prismatic</span>
+    </div>
+  </div>
+
+  <!-- Cylindrical dimensions (default) -->
+  <div id="cell-dims-cylindrical" class="grid grid-cols-2 gap-2 mb-2 items-end">
     <div class="flex flex-col">
       <label class="control-label" for="c-diam">Diameter (mm)</label>
       <input id="c-diam" type="number" value="18.4" class="control-input" />
@@ -45,6 +54,25 @@ import HelpIcon from '../HelpIcon.astro';
       <input id="c-len" type="number" value="65" class="control-input" />
     </div>
   </div>
+
+  <!-- Prismatic dimensions (hidden by default) -->
+  <div id="cell-dims-prismatic" class="hidden">
+    <div class="grid grid-cols-3 gap-2 mb-2 items-end">
+      <div class="flex flex-col">
+        <label class="control-label" for="c-prism-w">Width (mm)</label>
+        <input id="c-prism-w" type="number" value="148" class="control-input" />
+      </div>
+      <div class="flex flex-col">
+        <label class="control-label" for="c-prism-d">Depth (mm)</label>
+        <input id="c-prism-d" type="number" value="27" class="control-input" />
+      </div>
+      <div class="flex flex-col">
+        <label class="control-label" for="c-len-p">Height (mm)</label>
+        <input id="c-len-p" type="number" value="91" class="control-input" />
+      </div>
+    </div>
+  </div>
+
   <div class="grid grid-cols-2 gap-2 mb-2 items-end">
     <div class="flex flex-col">
       <label class="control-label" for="c-weight">Weight (g)</label>
@@ -61,8 +89,16 @@ import HelpIcon from '../HelpIcon.astro';
       <input id="c-mah" type="number" value="2500" step="100" class="control-input" />
     </div>
     <div class="flex flex-col">
-      <label class="control-label" for="c-amp">Max Current (A)</label>
+      <label class="control-label" for="c-amp">Continuous (A)</label>
       <input id="c-amp" type="number" value="20" class="control-input" />
+    </div>
+    <div class="flex flex-col">
+      <label class="control-label" for="c-pulse-amp">Pulse (A)</label>
+      <input id="c-pulse-amp" type="number" value="" step="1" class="control-input" placeholder="Optional" />
+    </div>
+    <div class="flex flex-col">
+      <label class="control-label" for="c-charge-amp">Charge (A)</label>
+      <input id="c-charge-amp" type="number" value="" step="1" class="control-input" placeholder="Optional" />
     </div>
     <div class="flex flex-col col-span-2">
       <label class="control-label" for="sim-cell-ir">Cell IR (mΩ)</label>

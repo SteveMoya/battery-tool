@@ -4,7 +4,8 @@ export const inputs = new Proxy(
 ) as unknown as Record<string, HTMLInputElement | null>;
 
 export const INPUT_IDS = [
-  'c-diam','c-len','c-volts','c-mah','c-amp','c-min-v','c-max-v','c-weight','c-cost',
+  'c-diam','c-len','c-volts','c-mah','c-amp','c-pulse-amp','c-charge-amp','c-min-v','c-max-v','c-weight','c-cost',
+  'c-prism-w','c-prism-d','c-len-p',
   's-count','p-count','target-v','target-ah','c-spacing','hex-mode','pack-layers','layer-spacing',
   'exploded-view','pack-name','calc-ladder',
   'gen-target-v','gen-target-ah',

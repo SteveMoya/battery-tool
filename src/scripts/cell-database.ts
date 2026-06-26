@@ -1,14 +1,21 @@
+export type CellFormFactor = 'cylindrical' | 'prismatic';
+
 export interface Cell {
   name: string;
-  d: number;
-  l: number;
-  w: number;
-  cap: number;
-  amp: number;
-  v: number;
+  d: number;         // diameter mm (cylindrical) — 0 for prismatic
+  l: number;         // length/height mm (both form factors)
+  w: number;         // weight g
+  pw?: number;       // prismatic width mm (base X)
+  pd?: number;       // prismatic depth mm (base Z)
+  cap: number;       // capacity mAh
+  amp: number;       // continuous discharge A
+  pulseAmp?: number; // pulse discharge A (optional)
+  chargeAmp?: number;// charge current A (optional)
+  v: number;         // nominal voltage
   type: 'li-ion' | 'lfp' | 'na-ion' | 'nimh' | 'lto' | 'lipo' | 'alk';
-  ir: number;
+  ir: number;        // internal resistance mΩ
   cost?: string;
+  formFactor?: CellFormFactor; // defaults to 'cylindrical'
 }
 
 export const CELL_DB: Cell[] = [

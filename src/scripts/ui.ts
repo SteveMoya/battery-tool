@@ -179,8 +179,32 @@ export function setupPresetEvents() {
     const v = (e.target as HTMLSelectElement).value;
     if (v === 'custom') return;
     const d = JSON.parse(v);
-    const cDiam = $inp('c-diam'); if (cDiam) cDiam.value = d.d;
-    const cLen = $inp('c-len'); if (cLen) cLen.value = d.l;
+    const isPrism = d.formFactor === 'prismatic' || (d.pw != null && d.pd != null && d.d === 0);
+
+    // Sync cell type toggle
+    const inputCellType = $inp('cell-type');
+    const toggleCellType = $('toggle-cell-type');
+    if (inputCellType) inputCellType.value = isPrism ? 'prismatic' : 'cylindrical';
+    if (toggleCellType) {
+      toggleCellType.querySelectorAll('.it-opt').forEach((el) => el.classList.remove('active'));
+      const target = isPrism
+        ? toggleCellType.querySelector('[data-val="prismatic"]')
+        : toggleCellType.querySelector('[data-val="cylindrical"]');
+      target?.classList.add('active');
+    }
+    const cylDims = $('cell-dims-cylindrical');
+    const prismDims = $('cell-dims-prismatic');
+    if (cylDims) cylDims.classList.toggle('hidden', isPrism);
+    if (prismDims) prismDims.classList.toggle('hidden', !isPrism);
+
+    if (isPrism) {
+      const cPrismW = $inp('c-prism-w'); if (cPrismW && d.pw) cPrismW.value = d.pw;
+      const cPrismD = $inp('c-prism-d'); if (cPrismD && d.pd) cPrismD.value = d.pd;
+      const cLenP = $inp('c-len-p'); if (cLenP) cLenP.value = d.l;
+    } else {
+      const cDiam = $inp('c-diam'); if (cDiam) cDiam.value = d.d;
+      const cLen = $inp('c-len'); if (cLen) cLen.value = d.l;
+    }
     const cWeight = $inp('c-weight'); if (cWeight) cWeight.value = d.w;
     const cCost = $inp('c-cost'); if (cCost) cCost.value = d.cost;
     if (d.cap) { const cMah = $inp('c-mah'); if (cMah) cMah.value = d.cap; }
@@ -202,9 +226,10 @@ export function setupPresetEvents() {
   document.getElementById('btn-save-preset-size')?.addEventListener('click', () => {
     const name = prompt('Name for Cell preset:');
     if (!name) return;
-    const newData = {
+    const isPrism = $inp('cell-type')?.value === 'prismatic';
+    const newData: any = {
       d: parseFloat($inp('c-diam')?.value ?? '0'),
-      l: parseFloat($inp('c-len')?.value ?? '0'),
+      l: parseFloat(isPrism ? ($inp('c-len-p')?.value ?? '91') : ($inp('c-len')?.value ?? '65')),
       w: parseFloat($inp('c-weight')?.value ?? '0'),
       cost: $inp('c-cost')?.value ?? '',
       cap: parseFloat($inp('c-mah')?.value ?? '0'),
@@ -212,6 +237,12 @@ export function setupPresetEvents() {
       type: 'li-ion' as const,
       ir: parseFloat($inp('sim-cell-ir')?.value ?? '25'),
     };
+    if (isPrism) {
+      newData.pw = parseFloat($inp('c-prism-w')?.value ?? '148');
+      newData.pd = parseFloat($inp('c-prism-d')?.value ?? '27');
+      newData.d = 0;
+      newData.formFactor = 'prismatic';
+    }
     const updated: SizePreset[] = [...(getUserSizePresets() as SizePreset[]), { name, group: 'My Saved Presets', data: newData } as SizePreset];
     setUserSizePresets(updated);
     populatePresets();
@@ -388,8 +419,34 @@ export function setupCellDbSearch() {
 }
 
 export function applyCellData(data: Cell) {
-  const cDiam = $inp('c-diam'); if (cDiam) cDiam.value = String(data.d);
-  const cLen = $inp('c-len'); if (cLen) cLen.value = String(data.l);
+  const isPrism = data.formFactor === 'prismatic' || (data.pw != null && data.pd != null && data.d === 0);
+
+  // Set cell type toggle
+  const inputCellType = $inp('cell-type');
+  const toggleCellType = $('toggle-cell-type');
+  if (inputCellType) inputCellType.value = isPrism ? 'prismatic' : 'cylindrical';
+  if (toggleCellType) {
+    toggleCellType.querySelectorAll('.it-opt').forEach((el) => el.classList.remove('active'));
+    const target = isPrism
+      ? toggleCellType.querySelector('[data-val="prismatic"]')
+      : toggleCellType.querySelector('[data-val="cylindrical"]');
+    target?.classList.add('active');
+  }
+  const cylDims = $('cell-dims-cylindrical');
+  const prismDims = $('cell-dims-prismatic');
+  if (cylDims) cylDims.classList.toggle('hidden', isPrism);
+  if (prismDims) prismDims.classList.toggle('hidden', !isPrism);
+
+  if (isPrism) {
+    const cPrismW = $inp('c-prism-w'); if (cPrismW && data.pw) cPrismW.value = String(data.pw);
+    const cPrismD = $inp('c-prism-d'); if (cPrismD && data.pd) cPrismD.value = String(data.pd);
+    const cLenP = $inp('c-len-p'); if (cLenP) cLenP.value = String(data.l);
+    const cDiam = $inp('c-diam'); if (cDiam) cDiam.value = '0';
+  } else {
+    const cDiam = $inp('c-diam'); if (cDiam) cDiam.value = String(data.d);
+    const cLen = $inp('c-len'); if (cLen) cLen.value = String(data.l);
+  }
+
   const cWeight = $inp('c-weight'); if (cWeight) cWeight.value = String(data.w);
   const cCost = $inp('c-cost');
   if (data.cost && cCost) cCost.value = data.cost;
@@ -401,6 +458,8 @@ export function applyCellData(data: Cell) {
   }
   const cMah = $inp('c-mah'); if (cMah) cMah.value = String(data.cap);
   const cAmp = $inp('c-amp'); if (cAmp) cAmp.value = String(data.amp);
+  const cPulse = $inp('c-pulse-amp'); if (cPulse) cPulse.value = data.pulseAmp != null ? String(data.pulseAmp) : '';
+  const cCharge = $inp('c-charge-amp'); if (cCharge) cCharge.value = data.chargeAmp != null ? String(data.chargeAmp) : '';
   const ir = $inp('sim-cell-ir'); if (ir) ir.value = String(data.ir || 25);
 
   const sel = $sel('preset-selector');
@@ -431,7 +490,7 @@ export function applyCellData(data: Cell) {
 }
 
 // === REVERSE LOOKUP (Poka-yoke) ===
-const identityFields = ['c-diam', 'c-len', 'c-mah', 'c-amp', 'c-volts', 'c-weight', 'c-cost'];
+const identityFields = ['c-diam', 'c-len', 'c-mah', 'c-amp', 'c-volts', 'c-weight', 'c-cost', 'c-prism-w', 'c-prism-d', 'c-len-p'];
 
 function attemptReverseLookup() {
   const current = {
@@ -453,7 +512,17 @@ function attemptReverseLookup() {
     if (opt.dataset.user === 'true' && opt.value.trim().startsWith('{')) {
       try {
         const p = JSON.parse(opt.value);
-        if (Math.abs(p.d - current.d) < 0.05 &&
+        const isPrismPreset = p.formFactor === 'prismatic' || (p.pw != null && p.pd != null && p.d === 0);
+        const isPrismCurrent = current.formFactor === 'prismatic' || (current.pw != null && current.pd != null && current.d === 0);
+        let dimMatch = false;
+        if (isPrismPreset && isPrismCurrent) {
+          dimMatch = current.pw != null && current.pd != null &&
+            Math.abs((p.pw ?? 0) - current.pw) < 1.0 &&
+            Math.abs((p.pd ?? 0) - current.pd) < 1.0;
+        } else if (!isPrismPreset && !isPrismCurrent) {
+          dimMatch = Math.abs(p.d - current.d) < 0.05;
+        }
+        if (dimMatch &&
           Math.abs(p.l - current.l) < 0.5 &&
           Math.abs(p.cap - current.cap) < 1 &&
           Math.abs(p.amp - current.amp) < 0.1 &&
@@ -545,6 +614,34 @@ export function attachAllInputs() {
 
   // F5: Generative Mode button
   $('gen-pack-btn')?.addEventListener('click', generatePack);
+
+  // F1: Cell type toggle (Cylindrical / Prismatic)
+  const toggleCellType = $('toggle-cell-type');
+  const inputCellType = $inp('cell-type') ?? (() => {
+    // Create hidden input if not present in DOM
+    const hidden = document.createElement('input');
+    hidden.type = 'hidden'; hidden.id = 'cell-type'; hidden.value = 'cylindrical';
+    $('toggle-cell-type')?.parentElement?.appendChild(hidden);
+    return hidden;
+  })();
+  const cylDims = $('cell-dims-cylindrical');
+  const prismDims = $('cell-dims-prismatic');
+  function syncCellTypeUI() {
+    const isPrism = inputCellType?.value === 'prismatic';
+    if (cylDims) cylDims.classList.toggle('hidden', isPrism);
+    if (prismDims) prismDims.classList.toggle('hidden', !isPrism);
+  }
+  syncCellTypeUI();
+  toggleCellType?.addEventListener('click', (e) => {
+    const t = e.target as HTMLElement;
+    if (!t.classList.contains('it-opt')) return;
+    toggleCellType.querySelectorAll('.it-opt').forEach((el) => el.classList.remove('active'));
+    t.classList.add('active');
+    const val = (t as any).dataset.val as string;
+    if (inputCellType) inputCellType.value = val;
+    syncCellTypeUI();
+    updatePack();
+  });
 
   ['sim-soc', 'sys-cutoff'].forEach((id) => {
     const el = $(id); el?.addEventListener('input', () => updateSimulation());
