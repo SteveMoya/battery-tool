@@ -31,6 +31,20 @@ import HelpIcon from './HelpIcon.astro';
     </div>
     <div class="stat-divider border-t border-dashed border-slate-200 my-0.5"></div>
     <div class="stat-row flex justify-between items-baseline text-[0.75rem] leading-snug text-slate-500 font-semibold">
+      <span>
+        Pack Current
+        <HelpIcon position="right" align="left" width="180px">Total current through the series string (I). Equal at every series node S1, S2, … SN.</HelpIcon>
+      </span>
+      <span id="out-pack-current" class="val font-bold text-right font-mono tracking-[-0.3px] ml-2 c-blue">--</span>
+    </div>
+    <div class="stat-row flex justify-between items-baseline text-[0.75rem] leading-snug text-slate-500 font-semibold">
+      <span>
+        Cell Current (I/P)
+        <HelpIcon position="right" align="left" width="180px">Current through a single cell — total pack current divided by parallel count. Used for cell thermal limits and ampacity.</HelpIcon>
+      </span>
+      <span id="out-cell-current" class="val font-bold text-right font-mono tracking-[-0.3px] ml-2 c-blue">--</span>
+    </div>
+    <div class="stat-row flex justify-between items-baseline text-[0.75rem] leading-snug text-slate-500 font-semibold">
       <span>Total Energy</span>
       <span id="out-wh" class="val font-bold text-right font-mono tracking-[-0.3px] ml-2 c-purp">--</span>
     </div>

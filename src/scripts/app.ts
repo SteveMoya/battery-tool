@@ -6,6 +6,7 @@ import {
   renderSnapList, setupExportOverlay, populatePresets, selectInitialPresets,
   importStateFromFile, updateDeleteButtons,
 } from './ui';
+import { setupElectricalEngine } from './electrical-engine';
 
 export function initApp() {
   const container = document.getElementById('render-area') as HTMLElement | null;
@@ -26,6 +27,7 @@ export function initApp() {
   setupCellDbSearch();
   setupMetallicSliders();
   attachAllInputs();
+  setupElectricalEngine();
   setupSnapshots();
   setupExportOverlay();
   renderSnapList();

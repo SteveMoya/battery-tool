@@ -3,6 +3,7 @@ import { inputs, $ } from './dom';
 let simMaxVal = 100;
 let lastSimAmps = 0;
 let lastSimWatts = 0;
+let lastSimP = 1;
 
 export const getSimMax = () => simMaxVal;
 export const setSimMax = (v: number) => { simMaxVal = v; };
@@ -10,6 +11,15 @@ export const getLastAmps = () => lastSimAmps;
 export const setLastAmps = (v: number) => { lastSimAmps = v; };
 export const getLastWatts = () => lastSimWatts;
 export const setLastWatts = (v: number) => { lastSimWatts = v; };
+export const getI = () => lastSimAmps;
+export const getCellI = () => lastSimP > 0 ? lastSimAmps / lastSimP : 0;
+
+export function renderCurrentStats() {
+  const outPackI = $('out-pack-current');
+  const outCellI = $('out-cell-current');
+  if (outPackI) outPackI.textContent = `${lastSimAmps.toFixed(1)} A`;
+  if (outCellI) outCellI.textContent = `${getCellI().toFixed(2)} A`;
+}
 
 export function getOpenCircuitVoltage(soc: number, min: number, max: number, nom: number): number {
   const range = max - min;
@@ -106,6 +116,7 @@ export function updateSimulation(e?: Event) {
 
   const S = parseInt(inputs['s-count']?.value ?? '1');
   const P = parseInt(inputs['p-count']?.value ?? '1');
+  lastSimP = P;
   const cellMin = parseFloat(inputs['c-min-v']?.value ?? '2.5');
   const cellMax = parseFloat(inputs['c-max-v']?.value ?? '4.2');
   const cellNom = parseFloat(inputs['c-volts']?.value ?? '3.6');
@@ -265,4 +276,6 @@ export function updateSimulation(e?: Event) {
   }
   if (statusText) (statusText as HTMLElement).style.display = warn ? 'block' : 'none';
   if (outNet) (outNet as HTMLElement).style.color = warn ? '#d32f2f' : '#008cc9';
+
+  renderCurrentStats();
 }

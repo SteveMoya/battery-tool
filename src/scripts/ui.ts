@@ -235,9 +235,7 @@ export function setupPresetEvents() {
     const v = (e.target as HTMLSelectElement).value;
     if (v === 'custom') return;
     const d = JSON.parse(v);
-    const cVolts = $inp('c-volts'); if (cVolts) cVolts.value = d.nom;
-    const cMinV = $inp('c-min-v'); if (cMinV) cMinV.value = d.min;
-    const cMaxV = $inp('c-max-v'); if (cMaxV) cMaxV.value = d.max;
+    applyChemPreset(d);
     updatePack();
   });
 
@@ -265,6 +263,54 @@ export function setupPresetEvents() {
     sel.value = 'custom';
     populatePresets();
   });
+}
+
+// === F2: CHEMISTRY MASTER SWITCH ===
+export interface ChemData { nom: number; min: number; max: number; }
+export interface ChemApplyResult { warnings: string[]; clampedCutoff: boolean; }
+
+export function applyChemPreset(data: ChemData, opts: { silent?: boolean } = {}): ChemApplyResult {
+  const warnings: string[] = [];
+  const cVolts = $inp('c-volts'); if (cVolts) cVolts.value = String(data.nom);
+  const cMinV = $inp('c-min-v'); if (cMinV) cMinV.value = String(data.min);
+  const cMaxV = $inp('c-max-v'); if (cMaxV) cMaxV.value = String(data.max);
+
+  let clampedCutoff = false;
+  const cutoffEl = $('sys-cutoff') as HTMLInputElement | null;
+  if (cutoffEl) {
+    const cutoff = parseFloat(cutoffEl.value);
+    if (!isNaN(cutoff) && cutoff < data.min) {
+      cutoffEl.value = data.min.toFixed(2);
+      clampedCutoff = true;
+      warnings.push(`LVC ajustado a ${data.min.toFixed(2)}V (mínimo seguro de la química).`);
+    } else if (!isNaN(cutoff) && cutoff > data.max) {
+      cutoffEl.value = data.max.toFixed(2);
+      warnings.push(`LVC estaba por encima del voltaje máximo (${data.max.toFixed(2)}V); se ajustó.`);
+    }
+  }
+
+  const cellNom = parseFloat($inp('c-volts')?.value ?? String(data.nom));
+  if (!isNaN(cellNom) && Math.abs(cellNom - data.nom) > 0.5) {
+    warnings.push(`La celda actual (${cellNom}V nominal) no coincide con esta química; verificá.`);
+  }
+
+  if (!opts.silent && warnings.length) showChemWarning(warnings.join(' '));
+  return { warnings, clampedCutoff };
+}
+
+let chemWarnTimer: number | null = null;
+export function showChemWarning(msg: string) {
+  const el = $('chem-warning');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  if (chemWarnTimer) window.clearTimeout(chemWarnTimer);
+  chemWarnTimer = window.setTimeout(() => el.classList.add('hidden'), 6000);
+}
+export function clearChemWarning() {
+  const el = $('chem-warning');
+  if (el) el.classList.add('hidden');
+  if (chemWarnTimer) { window.clearTimeout(chemWarnTimer); chemWarnTimer = null; }
 }
 
 // === CELL DB SEARCH ===

@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CELL_DB } from './cell-database';
 import { DEFAULT_SIZE_PRESETS, DEFAULT_CHEM_PRESETS } from './presets';
 import { inputs, $ } from './dom';
-import { getOpenCircuitVoltage, rescaleLoadSlider, updateSimulation } from './simulation';
+import { getOpenCircuitVoltage, rescaleLoadSlider, updateSimulation, renderCurrentStats } from './simulation';
 
 let userSizePresets: any[] = JSON.parse(localStorage.getItem('batt_vis_presets_size_v40') || '[]');
 let userChemPresets: any[] = JSON.parse(localStorage.getItem('batt_vis_presets_chem_v40') || '[]');
@@ -232,6 +232,8 @@ export function calculateStats(w: number, dep: number, h: number, S_Total: numbe
     ? packCost.toLocaleString('en-US', { maximumFractionDigits: 0 })
     : packCost.toFixed(2);
   const outCost = $('out-cost'); if (outCost) outCost.textContent = `${costSym}${costDisplay}`;
+
+  renderCurrentStats();
 
   setCurrentStats({
     name: inputs['pack-name']?.value ?? '',
