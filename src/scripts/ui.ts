@@ -15,7 +15,6 @@ import {
   getOpenCircuitVoltage, getLastAmps, getLastWatts, getSimMax,
 } from './simulation';
 import { BMS_DB, recommendBms, validateBms, type BmsEntry, type CellType as BmsCellType } from './bms-database';
-import { getAllCustomBms, addCustomBms, updateCustomBms, deleteCustomBms, duplicateCustomBms, type CustomBmsEntry } from './customBms';
 
 export const snapshots: { id: number; inputs: Record<string, any>; data: any }[] = [];
 
@@ -302,20 +301,18 @@ export function setupPresetEvents() {
 }
 
 // F11+F12: BMS Selector
-function populateBmsDropdown() {
+function setupBmsSelector() {
   const sel = $sel('bms-selector');
   if (!sel) return;
-  const prev = sel.value;
 
-  sel.innerHTML = '<option value="auto">Auto-Recommend</option><option value="none">No BMS (manual)</option>';
-
-  // Commercial BMS
+  // Populate BMS dropdown from DB
   const groups: Record<string, BmsEntry[]> = {};
   BMS_DB.forEach((bms) => {
     const g = bms.brand;
     if (!groups[g]) groups[g] = [];
     groups[g].push(bms);
   });
+  sel.innerHTML = '<option value="auto">Auto-Recommend</option><option value="none">No BMS (manual)</option>';
   for (const gName in groups) {
     const grp = document.createElement('optgroup');
     grp.label = gName;
@@ -329,205 +326,7 @@ function populateBmsDropdown() {
     sel.appendChild(grp);
   }
 
-  // Custom BMS
-  const custom = getAllCustomBms();
-  if (custom.length > 0) {
-    const grp = document.createElement('optgroup');
-    grp.label = 'Custom';
-    custom.forEach((bms) => {
-      const opt = document.createElement('option');
-      opt.value = `custom:${bms.id}`;
-      opt.text = `${bms.name} (${bms.maxA}A, ${bms.smart ? 'Smart' : 'Fixed'})`;
-      (opt as any).dataset.brand = 'Custom';
-      (opt as any).dataset.customId = bms.id;
-      grp.appendChild(opt);
-    });
-    sel.appendChild(grp);
-  }
-
-  // Restore selection
-  if (prev) sel.value = prev;
-}
-
-function setupBmsSelector() {
-  const sel = $sel('bms-selector');
-  if (!sel) return;
-
-  populateBmsDropdown();
   sel.addEventListener('change', () => updateBmsDisplay());
-
-  // F13: Offset inputs re-dispatch BMS box
-  ['bms-offset-x', 'bms-offset-y', 'bms-offset-z'].forEach((id) => {
-    $(id)?.addEventListener('input', () => updateBmsDisplay());
-  });
-
-  // F11b: Custom BMS modal
-  setupCustomBmsModal();
-}
-
-let editingCustomBmsId: string | null = null;
-
-function setupCustomBmsModal() {
-  const overlay = $('bms-modal-overlay');
-  const title = $('bms-modal-title');
-  const btnAdd = $('btn-add-custom-bms');
-  const btnEdit = $('btn-edit-custom-bms');
-  const btnDup = $('btn-dup-custom-bms');
-  const btnDel = $('btn-del-custom-bms');
-  const btnClose = $('bms-modal-close');
-  const btnCancel = $('bms-modal-cancel');
-  const btnSave = $('bms-modal-save');
-  if (!overlay || !btnAdd || !btnClose || !btnCancel || !btnSave) return;
-
-  const openModal = (editId?: string) => {
-    editingCustomBmsId = editId ?? null;
-    if (title) title.textContent = editId ? 'Edit Custom BMS' : 'Add Custom BMS';
-    if (editId) {
-      const existing = getAllCustomBms().find((b) => b.id === editId);
-      if (existing) fillForm(existing);
-    } else {
-      clearForm();
-    }
-    overlay.classList.remove('hidden');
-    overlay.style.display = 'flex';
-  };
-
-  const closeModal = () => {
-    overlay.classList.add('hidden');
-    overlay.style.display = 'none';
-    editingCustomBmsId = null;
-  };
-
-  btnAdd.addEventListener('click', () => openModal());
-  btnClose.addEventListener('click', closeModal);
-  btnCancel.addEventListener('click', closeModal);
-  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
-
-  btnEdit?.addEventListener('click', () => {
-    const sel = $sel('bms-selector');
-    if (!sel) return;
-    const val = sel.value;
-    if (val.startsWith('custom:')) openModal(val.replace('custom:', ''));
-  });
-
-  btnDup?.addEventListener('click', () => {
-    const sel = $sel('bms-selector');
-    if (!sel) return;
-    const val = sel.value;
-    if (val.startsWith('custom:')) {
-      const id = val.replace('custom:', '');
-      duplicateCustomBms(id);
-      populateBmsDropdown();
-      updateBmsCustomButtons();
-    }
-  });
-
-  btnDel?.addEventListener('click', () => {
-    const sel = $sel('bms-selector');
-    if (!sel) return;
-    const val = sel.value;
-    if (val.startsWith('custom:')) {
-      if (!confirm('Delete this custom BMS?')) return;
-      deleteCustomBms(val.replace('custom:', ''));
-      sel.value = 'auto';
-      populateBmsDropdown();
-      updateBmsDisplay();
-      updateBmsCustomButtons();
-    }
-  });
-
-  btnSave.addEventListener('click', () => {
-    const data = collectFormData();
-    if (!data) return;
-    if (editingCustomBmsId) {
-      updateCustomBms(editingCustomBmsId, data);
-    } else {
-      addCustomBms(data);
-    }
-    populateBmsDropdown();
-    updateBmsCustomButtons();
-    closeModal();
-  });
-
-  // Update custom buttons visibility on dropdown change
-  sel?.addEventListener('change', updateBmsCustomButtons);
-  updateBmsCustomButtons();
-}
-
-function updateBmsCustomButtons() {
-  const sel = $sel('bms-selector');
-  const btnEdit = $('btn-edit-custom-bms');
-  const btnDup = $('btn-dup-custom-bms');
-  const btnDel = $('btn-del-custom-bms');
-  const isCustom = sel?.value.startsWith('custom:') ?? false;
-  btnEdit?.classList.toggle('hidden', !isCustom);
-  btnDup?.classList.toggle('hidden', !isCustom);
-  btnDel?.classList.toggle('hidden', !isCustom);
-}
-
-function clearForm() {
-  const setVal = (id: string, v: string) => { const el = $inp(id); if (el) el.value = v; };
-  setVal('bms-f-name', '');
-  setVal('bms-f-brand', 'Custom');
-  setVal('bms-f-smin', '8');
-  setVal('bms-f-smax', '24');
-  setVal('bms-f-maxa', '60');
-  setVal('bms-f-vcharge', '4.2');
-  setVal('bms-f-vdischarge', '2.8');
-  setVal('bms-f-w', '50');
-  setVal('bms-f-d', '30');
-  setVal('bms-f-h', '12');
-  const bal = $('bms-f-balance') as HTMLSelectElement | null;
-  if (bal) bal.value = 'pasivo';
-  const proto = $('bms-f-protocol') as HTMLSelectElement | null;
-  if (proto) proto.value = 'Bluetooth';
-  const smart = $('bms-f-smart') as HTMLInputElement | null;
-  if (smart) smart.checked = true;
-  document.querySelectorAll('.bms-chem-check').forEach((cb) => { (cb as HTMLInputElement).checked = false; });
-}
-
-function fillForm(bms: CustomBmsEntry) {
-  const setVal = (id: string, v: string) => { const el = $inp(id); if (el) el.value = v; };
-  setVal('bms-f-name', bms.name);
-  setVal('bms-f-brand', bms.brand);
-  setVal('bms-f-smin', String(bms.sMin));
-  setVal('bms-f-smax', String(bms.sMax));
-  setVal('bms-f-maxa', String(bms.maxA));
-  setVal('bms-f-vcharge', '4.2');
-  setVal('bms-f-vdischarge', '2.8');
-  setVal('bms-f-w', String(bms.w));
-  setVal('bms-f-d', String(bms.d));
-  setVal('bms-f-h', String(bms.h));
-  const bal = $('bms-f-balance') as HTMLSelectElement | null;
-  if (bal) bal.value = bms.balanceType;
-  const proto = $('bms-f-protocol') as HTMLSelectElement | null;
-  if (proto) proto.value = bms.protocol;
-  const smart = $('bms-f-smart') as HTMLInputElement | null;
-  if (smart) smart.checked = bms.smart;
-  document.querySelectorAll('.bms-chem-check').forEach((cb) => {
-    (cb as HTMLInputElement).checked = bms.chem.includes((cb as HTMLInputElement).value as any);
-  });
-}
-
-function collectFormData(): Omit<CustomBmsEntry, 'id' | 'createdAt'> | null {
-  const name = ($inp('bms-f-name')?.value ?? '').trim();
-  if (!name) { alert('BMS name is required'); return null; }
-  const brand = ($inp('bms-f-brand')?.value ?? 'Custom').trim() || 'Custom';
-  const sMin = parseInt($inp('bms-f-smin')?.value ?? '1') || 1;
-  const sMax = parseInt($inp('bms-f-smax')?.value ?? '1') || 1;
-  const maxA = parseFloat($inp('bms-f-maxa')?.value ?? '0') || 0;
-  if (maxA <= 0) { alert('Max current must be > 0'); return null; }
-  const balanceType = ($('bms-f-balance') as HTMLSelectElement | null)?.value as any ?? 'pasivo';
-  const chem: BmsCellType[] = [];
-  document.querySelectorAll('.bms-chem-check:checked').forEach((cb) => {
-    chem.push((cb as HTMLInputElement).value as BmsCellType);
-  });
-  const w = parseFloat($inp('bms-f-w')?.value ?? '50') || 50;
-  const d = parseFloat($inp('bms-f-d')?.value ?? '30') || 30;
-  const h = parseFloat($inp('bms-f-h')?.value ?? '12') || 12;
-  const protocol = ($('bms-f-protocol') as HTMLSelectElement | null)?.value ?? 'Bluetooth';
-  const smart = ($('bms-f-smart') as HTMLInputElement | null)?.checked ?? true;
-  return { name, brand, sMin, sMax, chem, maxA, balanceType, balanceCurrent: 0, protocol, smart, w, d, h };
 }
 
 export function updateBmsDisplay() {
@@ -553,23 +352,18 @@ export function updateBmsDisplay() {
     valPanel?.classList.add('hidden');
     recPanel?.classList.add('hidden');
     warnPanel?.classList.remove('hidden');
-    $('bms-offset-row')?.classList.add('hidden');
-    dispatchBmsBox(null);
     const warnText = $('bms-warning-text');
     if (warnText) warnText.textContent = 'No BMS — ensure external protection circuitry is installed';
     return;
   }
 
   if (selected === 'auto') {
-    const customBms = getAllCustomBms();
-    const recs = recommendBms(packS, chemId as BmsCellType, packIMax, packAh, customBms);
+    const recs = recommendBms(packS, chemId as BmsCellType, packIMax, packAh);
     if (recs.length > 0) {
       showBmsInfo(recs[0].bms);
       showBmsValidation(recs[0].validation);
       recPanel?.classList.remove('hidden');
       warnPanel?.classList.add('hidden');
-      $('bms-offset-row')?.classList.remove('hidden');
-      dispatchBmsBox(recs[0].bms);
       const recText = $('bms-rec-text');
       if (recText) recText.textContent = `Recommended: ${recs[0].bms.name}`;
     } else {
@@ -577,8 +371,6 @@ export function updateBmsDisplay() {
       valPanel?.classList.add('hidden');
       recPanel?.classList.add('hidden');
       warnPanel?.classList.remove('hidden');
-      $('bms-offset-row')?.classList.add('hidden');
-      dispatchBmsBox(null);
       const warnText = $('bms-warning-text');
       if (warnText) warnText.textContent = 'No compatible BMS found — verify pack configuration';
     }
@@ -586,13 +378,7 @@ export function updateBmsDisplay() {
   }
 
   // Specific BMS selected
-  let bms: BmsEntry | undefined;
-  if (selected.startsWith('custom:')) {
-    const cid = selected.replace('custom:', '');
-    bms = getAllCustomBms().find((b) => b.id === cid);
-  } else {
-    bms = BMS_DB.find((b) => b.name === selected);
-  }
+  const bms = BMS_DB.find((b) => b.name === selected);
   if (!bms) return;
 
   showBmsInfo(bms);
@@ -601,20 +387,6 @@ export function updateBmsDisplay() {
   valPanel?.classList.remove('hidden');
   recPanel?.classList.add('hidden');
   warnPanel?.classList.add('hidden');
-
-  // F13: Show offset inputs + dispatch BMS box update
-  $('bms-offset-row')?.classList.remove('hidden');
-  dispatchBmsBox(bms);
-}
-
-function dispatchBmsBox(bms: BmsEntry | null) {
-  if (!bms) { window.dispatchEvent(new CustomEvent('bca:bms-update', { detail: null })); return; }
-  const ox = parseFloat($inp('bms-offset-x')?.value ?? '0') || 0;
-  const oy = parseFloat($inp('bms-offset-y')?.value ?? '0') || 0;
-  const oz = parseFloat($inp('bms-offset-z')?.value ?? '0') || 0;
-  window.dispatchEvent(new CustomEvent('bca:bms-update', {
-    detail: { w: bms.w, d: bms.d, h: bms.h, offsetX: ox, offsetY: oy, offsetZ: oz, name: bms.name },
-  }));
 }
 
 function showBmsInfo(bms: BmsEntry) {

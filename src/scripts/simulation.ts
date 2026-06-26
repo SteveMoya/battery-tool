@@ -295,4 +295,7 @@ export function updateSimulation(e?: Event) {
   renderMicahTollIndicator(micahResult);
 
   renderCurrentStats();
+
+  // Notify BMS selector to update (F11+F12)
+  window.dispatchEvent(new CustomEvent('bca:sim-update'));
 }

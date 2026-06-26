@@ -11,6 +11,7 @@ export const INPUT_IDS = [
   'gen-target-v','gen-target-ah',
   'sim-cell-ir','sim-strip-mat','sim-strip-w','sim-strip-t','sim-load-slider',
   'col-cell','col-bg','met-cell','col-cap','col-spacer','col-bus','col-inter','met-inter','met-cap','met-bus','met-spacer',
+  'bms-selector',
 ];
 
 export function $<T extends HTMLElement = HTMLElement>(id: string): T | null {
