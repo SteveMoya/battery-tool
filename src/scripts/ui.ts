@@ -389,10 +389,12 @@ function setupCustomBmsModal() {
       clearForm();
     }
     overlay.classList.remove('hidden');
+    overlay.style.display = 'flex';
   };
 
   const closeModal = () => {
     overlay.classList.add('hidden');
+    overlay.style.display = 'none';
     editingCustomBmsId = null;
   };
 
