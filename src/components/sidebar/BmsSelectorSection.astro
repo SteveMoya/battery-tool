@@ -16,6 +16,13 @@ import HelpIcon from '../HelpIcon.astro';
     </select>
   </div>
 
+  <!-- Custom BMS Actions (shown when custom BMS selected) -->
+  <div id="bms-custom-actions" class="flex gap-1.5 mt-1.5 hidden">
+    <button id="btn-edit-custom-bms" type="button" class="flex-1 bg-slate-100 text-slate-600 border border-slate-300 py-1 rounded text-[0.65rem] font-semibold cursor-pointer hover:bg-slate-200 transition-colors">Edit</button>
+    <button id="btn-dup-custom-bms" type="button" class="flex-1 bg-slate-100 text-slate-600 border border-slate-300 py-1 rounded text-[0.65rem] font-semibold cursor-pointer hover:bg-slate-200 transition-colors">Duplicate</button>
+    <button id="btn-del-custom-bms" type="button" class="flex-1 bg-red-50 text-red-600 border border-red-200 py-1 rounded text-[0.65rem] font-semibold cursor-pointer hover:bg-red-100 transition-colors">Delete</button>
+  </div>
+
   <!-- BMS Info Card -->
   <div id="bms-info" class="bg-slate-50 border border-slate-200 rounded-md p-2 mt-2 hidden">
     <div class="flex justify-between items-center mb-1">

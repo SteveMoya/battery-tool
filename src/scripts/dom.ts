@@ -12,6 +12,10 @@ export const INPUT_IDS = [
   'sim-cell-ir','sim-strip-mat','sim-strip-w','sim-strip-t','sim-load-slider',
   'col-cell','col-bg','met-cell','col-cap','col-spacer','col-bus','col-inter','met-inter','met-cap','met-bus','met-spacer',
   'bms-selector',
+  // F11b: Custom BMS modal inputs
+  'bms-name-input', 'bms-protocol-input', 'bms-s-min', 'bms-s-max', 'bms-smart',
+  'bms-max-a-input', 'bms-v-cutoff-charge', 'bms-v-cutoff-discharge',
+  'bms-dim-w', 'bms-dim-d', 'bms-dim-h',
 ];
 
 export function $<T extends HTMLElement = HTMLElement>(id: string): T | null {

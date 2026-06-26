@@ -15,6 +15,7 @@ import {
   getOpenCircuitVoltage, getLastAmps, getLastWatts, getSimMax,
 } from './simulation';
 import { BMS_DB, recommendBms, validateBms, type BmsEntry, type CellType as BmsCellType } from './bms-database';
+import { getCustomBms, addCustomBms, updateCustomBms, removeCustomBms, duplicateCustomBms, exportCustomBms, importCustomBms } from './bms-database';
 
 export const snapshots: { id: number; inputs: Record<string, any>; data: any }[] = [];
 
@@ -300,19 +301,43 @@ export function setupPresetEvents() {
   setupBmsSelector();
 }
 
-// F11+F12: BMS Selector
+// F11+F12+F11b: BMS Selector
 function setupBmsSelector() {
   const sel = $sel('bms-selector');
   if (!sel) return;
 
-  // Populate BMS dropdown from DB
+  // Populate BMS dropdown from DB + custom
+  repopulateBmsDropdown(sel);
+
+  sel.addEventListener('change', () => {
+    if (sel.value === 'custom-add') {
+      openCustomBmsModal();
+      sel.value = 'auto'; // reset to auto after opening
+      return;
+    }
+    updateBmsDisplay();
+    updateCustomBmsActions();
+  });
+
+  // Setup custom BMS modal
+  setupCustomBmsModal();
+  setupCustomBmsActions();
+}
+
+function repopulateBmsDropdown(sel: HTMLSelectElement) {
+  const currentVal = sel.value;
   const groups: Record<string, BmsEntry[]> = {};
+
+  // Commercial BMS
   BMS_DB.forEach((bms) => {
     const g = bms.brand;
     if (!groups[g]) groups[g] = [];
     groups[g].push(bms);
   });
+
   sel.innerHTML = '<option value="auto">Auto-Recommend</option><option value="none">No BMS (manual)</option>';
+
+  // Commercial groups
   for (const gName in groups) {
     const grp = document.createElement('optgroup');
     grp.label = gName;
@@ -326,7 +351,36 @@ function setupBmsSelector() {
     sel.appendChild(grp);
   }
 
-  sel.addEventListener('change', () => updateBmsDisplay());
+  // Custom BMS group
+  const customList = getCustomBms();
+  if (customList.length > 0) {
+    const grp = document.createElement('optgroup');
+    grp.label = 'Custom BMS';
+    customList.forEach((bms, idx) => {
+      const opt = document.createElement('option');
+      opt.value = bms.name;
+      opt.text = `${bms.name} (${bms.maxA}A, ${bms.smart ? 'Smart' : 'Fixed'})`;
+      (opt as any).dataset.brand = 'Custom';
+      (opt as any).dataset.customIdx = String(idx);
+      grp.appendChild(opt);
+    });
+    sel.appendChild(grp);
+  }
+
+  // "Add Custom BMS" option at the bottom
+  const addOpt = document.createElement('option');
+  addOpt.value = 'custom-add';
+  addOpt.text = '+ Add Custom BMS';
+  addOpt.style.fontWeight = 'bold';
+  addOpt.style.color = '#2563eb';
+  sel.appendChild(addOpt);
+
+  // Restore selection if possible
+  if (currentVal) {
+    for (let i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === currentVal) { sel.selectedIndex = i; break; }
+    }
+  }
 }
 
 export function updateBmsDisplay() {
@@ -377,8 +431,8 @@ export function updateBmsDisplay() {
     return;
   }
 
-  // Specific BMS selected
-  const bms = BMS_DB.find((b) => b.name === selected);
+  // Specific BMS selected — search commercial then custom
+  const bms = BMS_DB.find((b) => b.name === selected) ?? getCustomBms().find((b) => b.name === selected);
   if (!bms) return;
 
   showBmsInfo(bms);
@@ -1108,4 +1162,305 @@ export function selectInitialPresets() {
   for (let i = 0; i < selChem.options.length; i++) {
     if ((selChem.options[i] as any).dataset.id === defType) { selChem.selectedIndex = i; break; }
   }
+}
+
+// === F11b: CUSTOM BMS MODAL ===
+let editingCustomBmsIdx: number | null = null;
+
+function openCustomBmsModal(idx: number | null = null) {
+  editingCustomBmsIdx = idx;
+  const overlay = $('custom-bms-overlay');
+  if (!overlay) return;
+
+  const title = $('custom-bms-title');
+  if (title) title.textContent = idx !== null ? 'Edit Custom BMS' : 'Add Custom BMS';
+
+  // Clear or populate form
+  if (idx !== null) {
+    const bms = getCustomBms()[idx];
+    if (bms) populateCustomBmsForm(bms);
+  } else {
+    resetCustomBmsForm();
+  }
+
+  updateCustomBmsValidation();
+  (overlay as HTMLElement).style.display = 'flex';
+}
+
+function closeCustomBmsModal() {
+  const overlay = $('custom-bms-overlay');
+  if (overlay) (overlay as HTMLElement).style.display = 'none';
+  editingCustomBmsIdx = null;
+}
+
+function resetCustomBmsForm() {
+  const setVal = (id: string, v: string) => { const el = $inp(id); if (el) el.value = v; };
+  const setChecked = (id: string, v: boolean) => { const el = $inp(id); if (el) el.checked = v; };
+
+  setVal('bms-name-input', '');
+  setVal('bms-protocol-input', 'Bluetooth');
+  setVal('bms-s-min', '8');
+  setVal('bms-s-max', '24');
+  setChecked('bms-smart', true);
+  setVal('bms-max-a-input', '60');
+  setVal('bms-v-cutoff-charge', '4.2');
+  setVal('bms-v-cutoff-discharge', '2.8');
+  setVal('bms-dim-w', '56');
+  setVal('bms-dim-d', '32');
+  setVal('bms-dim-h', '14');
+  setChecked('bms-chem-nmc', true);
+  setChecked('bms-chem-lfp', true);
+  setChecked('bms-chem-lto', false);
+  setChecked('bms-chem-naion', false);
+  setChecked('bms-chem-nimh', false);
+
+  const pasivo = document.querySelector<HTMLInputElement>('input[name="bms-balance"][value="pasivo"]');
+  if (pasivo) pasivo.checked = true;
+}
+
+function populateCustomBmsForm(bms: BmsEntry) {
+  const setVal = (id: string, v: string) => { const el = $inp(id); if (el) el.value = v; };
+  const setChecked = (id: string, v: boolean) => { const el = $inp(id); if (el) el.checked = v; };
+
+  setVal('bms-name-input', bms.name);
+  setVal('bms-protocol-input', bms.protocol);
+  setVal('bms-s-min', String(bms.sMin));
+  setVal('bms-s-max', String(bms.sMax));
+  setChecked('bms-smart', bms.smart);
+  setVal('bms-max-a-input', String(bms.maxA));
+  setVal('bms-v-cutoff-charge', String(bms.vCutoffCharge ?? 4.2));
+  setVal('bms-v-cutoff-discharge', String(bms.vCutoffDischarge ?? 2.8));
+  setVal('bms-dim-w', String(bms.w));
+  setVal('bms-dim-d', String(bms.d));
+  setVal('bms-dim-h', String(bms.h));
+
+  setChecked('bms-chem-nmc', bms.chem.includes('li-ion'));
+  setChecked('bms-chem-lfp', bms.chem.includes('lfp'));
+  setChecked('bms-chem-lto', bms.chem.includes('lto'));
+  setChecked('bms-chem-naion', bms.chem.includes('na-ion'));
+  setChecked('bms-chem-nimh', bms.chem.includes('nimh'));
+
+  const balanceRadio = document.querySelector<HTMLInputElement>(`input[name="bms-balance"][value="${bms.balanceType}"]`);
+  if (balanceRadio) balanceRadio.checked = true;
+}
+
+function collectCustomBmsForm(): BmsEntry | null {
+  const name = $inp('bms-name-input')?.value.trim();
+  if (!name) { alert('BMS name is required.'); return null; }
+
+  const chem: BmsCellType[] = [];
+  if ($inp('bms-chem-nmc')?.checked) chem.push('li-ion');
+  if ($inp('bms-chem-lfp')?.checked) chem.push('lfp');
+  if ($inp('bms-chem-lto')?.checked) chem.push('lto');
+  if ($inp('bms-chem-naion')?.checked) chem.push('na-ion');
+  if ($inp('bms-chem-nimh')?.checked) chem.push('nimh');
+
+  const balanceRadio = document.querySelector<HTMLInputElement>('input[name="bms-balance"]:checked');
+  const balanceType = (balanceRadio?.value || 'pasivo') as BmsEntry['balanceType'];
+
+  return {
+    name,
+    brand: 'Custom',
+    sMin: parseInt($inp('bms-s-min')?.value ?? '8') || 8,
+    sMax: parseInt($inp('bms-s-max')?.value ?? '24') || 24,
+    chem,
+    maxA: parseFloat($inp('bms-max-a-input')?.value ?? '60') || 60,
+    balanceType,
+    balanceCurrent: 0,
+    protocol: $inp('bms-protocol-input')?.value ?? 'Bluetooth',
+    smart: $inp('bms-smart')?.checked ?? true,
+    w: parseFloat($inp('bms-dim-w')?.value ?? '56') || 56,
+    d: parseFloat($inp('bms-dim-d')?.value ?? '32') || 32,
+    h: parseFloat($inp('bms-dim-h')?.value ?? '14') || 14,
+    vCutoffCharge: parseFloat($inp('bms-v-cutoff-charge')?.value ?? '4.2') || 4.2,
+    vCutoffDischarge: parseFloat($inp('bms-v-cutoff-discharge')?.value ?? '2.8') || 2.8,
+    custom: true,
+  };
+}
+
+function updateCustomBmsValidation() {
+  const validationEl = $('custom-bms-validation');
+  if (!validationEl) return;
+  validationEl.classList.remove('hidden');
+
+  const packS = parseInt($inp('s-count')?.value ?? '1') || 1;
+  const chemId = ($inp('chem-selector')?.value !== 'custom'
+    ? JSON.parse($inp('chem-selector')?.value ?? '{}')?.id
+    : null) ?? 'li-ion';
+  const packIMax = parseFloat($inp('c-amp')?.value ?? '20') * (parseInt($inp('p-count')?.value ?? '1') || 1);
+
+  const sMin = parseInt($inp('bms-s-min')?.value ?? '8') || 1;
+  const sMax = parseInt($inp('bms-s-max')?.value ?? '24') || 1;
+  const maxA = parseFloat($inp('bms-max-a-input')?.value ?? '60') || 0;
+
+  const chem: BmsCellType[] = [];
+  if ($inp('bms-chem-nmc')?.checked) chem.push('li-ion');
+  if ($inp('bms-chem-lfp')?.checked) chem.push('lfp');
+  if ($inp('bms-chem-lto')?.checked) chem.push('lto');
+  if ($inp('bms-chem-naion')?.checked) chem.push('na-ion');
+  if ($inp('bms-chem-nimh')?.checked) chem.push('nimh');
+
+  // Validate S count
+  const sEl = $('custom-bms-val-s');
+  if (sEl) {
+    const emoji = sEl.querySelector('.custom-val-emoji');
+    const text = sEl.querySelector('.custom-val-text');
+    if (packS >= sMin && packS <= sMax) {
+      if (emoji) emoji.textContent = '🟢';
+      if (text) text.textContent = `S Count: ${packS}S fits in ${sMin}-${sMax}S range`;
+    } else if (packS < sMin) {
+      if (emoji) emoji.textContent = '🟡';
+      if (text) text.textContent = `S Count: ${packS}S is below min ${sMin}S`;
+    } else {
+      if (emoji) emoji.textContent = '🔴';
+      if (text) text.textContent = `S Count: ${packS}S exceeds max ${sMax}S`;
+    }
+  }
+
+  // Validate Chemistry
+  const chemEl = $('custom-bms-val-chem');
+  if (chemEl) {
+    const emoji = chemEl.querySelector('.custom-val-emoji');
+    const text = chemEl.querySelector('.custom-val-text');
+    if (chem.length === 0 || chem.includes(chemId as BmsCellType)) {
+      if (emoji) emoji.textContent = '🟢';
+      if (text) text.textContent = 'Chemistry: Compatible';
+    } else {
+      if (emoji) emoji.textContent = '🟡';
+      if (text) text.textContent = `Chemistry: May not support ${chemId.toUpperCase()}`;
+    }
+  }
+
+  // Validate MOSFET current
+  const curEl = $('custom-bms-val-current');
+  if (curEl) {
+    const emoji = curEl.querySelector('.custom-val-emoji');
+    const text = curEl.querySelector('.custom-val-text');
+    if (packIMax <= maxA) {
+      if (emoji) emoji.textContent = '🟢';
+      if (text) text.textContent = `MOSFET: ${packIMax}A draw ≤ ${maxA}A rating`;
+    } else if (packIMax <= maxA * 1.2) {
+      if (emoji) emoji.textContent = '🟡';
+      if (text) text.textContent = `MOSFET: ${packIMax}A draw slightly exceeds ${maxA}A rating`;
+    } else {
+      if (emoji) emoji.textContent = '🔴';
+      if (text) text.textContent = `MOSFET: ${packIMax}A draw far exceeds ${maxA}A rating`;
+    }
+  }
+}
+
+function setupCustomBmsModal() {
+  const overlay = $('custom-bms-overlay');
+  const closeBtn = $('btn-close-custom-bms');
+  const cancelBtn = $('btn-cancel-custom-bms');
+  const saveBtn = $('btn-save-custom-bms');
+  const exportBtn = $('btn-export-custom-bms');
+  const importBtn = $('btn-import-custom-bms');
+  const fileInput = $('bms-import-file') as HTMLInputElement | null;
+
+  // Close handlers
+  closeBtn?.addEventListener('click', closeCustomBmsModal);
+  cancelBtn?.addEventListener('click', closeCustomBmsModal);
+  overlay?.addEventListener('click', (e) => { if (e.target === overlay) closeCustomBmsModal(); });
+
+  // Live validation on key inputs
+  ['bms-s-min', 'bms-s-max', 'bms-max-a-input', 'bms-chem-nmc', 'bms-chem-lfp', 'bms-chem-lto', 'bms-chem-naion', 'bms-chem-nimh'].forEach((id) => {
+    const el = $(id);
+    if (el) el.addEventListener('input', updateCustomBmsValidation);
+    if (el) el.addEventListener('change', updateCustomBmsValidation);
+  });
+
+  // Save
+  saveBtn?.addEventListener('click', () => {
+    const entry = collectCustomBmsForm();
+    if (!entry) return;
+    if (editingCustomBmsIdx !== null) {
+      updateCustomBms(editingCustomBmsIdx, entry);
+    } else {
+      addCustomBms(entry);
+    }
+    closeCustomBmsModal();
+    refreshBmsDropdown(entry.name);
+  });
+
+  // Export
+  exportBtn?.addEventListener('click', () => {
+    const json = exportCustomBms();
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'custom_bms.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  // Import
+  importBtn?.addEventListener('click', () => fileInput?.click());
+  fileInput?.addEventListener('change', (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const result = importCustomBms(String(ev.target?.result));
+      if (result.ok) {
+        refreshBmsDropdown();
+        alert(`Imported ${result.count} custom BMS entries.`);
+      } else {
+        alert(`Import failed: ${result.error}`);
+      }
+    };
+    reader.readAsText(file);
+    if (fileInput) fileInput.value = '';
+  });
+}
+
+function refreshBmsDropdown(selectName?: string) {
+  const sel = $sel('bms-selector');
+  if (!sel) return;
+  repopulateBmsDropdown(sel);
+  if (selectName) {
+    for (let i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === selectName) { sel.selectedIndex = i; break; }
+    }
+  }
+  updateBmsDisplay();
+  updateCustomBmsActions();
+}
+
+function setupCustomBmsActions() {
+  $('btn-edit-custom-bms')?.addEventListener('click', () => {
+    const idx = getSelectedCustomBmsIdx();
+    if (idx !== null) openCustomBmsModal(idx);
+  });
+
+  $('btn-dup-custom-bms')?.addEventListener('click', () => {
+    const idx = getSelectedCustomBmsIdx();
+    if (idx !== null) {
+      duplicateCustomBms(idx);
+      refreshBmsDropdown();
+    }
+  });
+
+  $('btn-del-custom-bms')?.addEventListener('click', () => {
+    const idx = getSelectedCustomBmsIdx();
+    if (idx !== null && confirm('Delete this custom BMS?')) {
+      removeCustomBms(idx);
+      refreshBmsDropdown('auto');
+    }
+  });
+}
+
+function getSelectedCustomBmsIdx(): number | null {
+  const sel = $sel('bms-selector');
+  if (!sel) return null;
+  const opt = sel.options[sel.selectedIndex] as any;
+  if (opt?.dataset.customIdx != null) return parseInt(opt.dataset.customIdx);
+  return null;
+}
+
+function updateCustomBmsActions() {
+  const actionsEl = $('bms-custom-actions');
+  if (!actionsEl) return;
+  const idx = getSelectedCustomBmsIdx();
+  actionsEl.classList.toggle('hidden', idx === null);
 }

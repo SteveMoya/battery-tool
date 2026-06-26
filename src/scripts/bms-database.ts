@@ -1,6 +1,6 @@
 /* ─────────────────────────────────────────────
-   F11 + F12 — BMS Database & Recommendation
-   Common BMS models with validation vectors
+   F11 + F11b + F12 — BMS Database & Recommendation
+   Common BMS models with validation vectors + custom BMS CRUD
    ───────────────────────────────────────────── */
 
 export type CellType = 'li-ion' | 'lfp' | 'na-ion' | 'lto' | 'nimh' | 'alk' | 'lipo';
@@ -21,6 +21,9 @@ export interface BmsEntry {
   w: number;             // Width mm
   d: number;             // Depth mm
   h: number;             // Height mm
+  vCutoffCharge?: number;  // Per-cell charge cutoff V (F11b)
+  vCutoffDischarge?: number; // Per-cell discharge cutoff V (F11b)
+  custom?: boolean;        // Flag: user-created BMS (F11b)
 }
 
 export const BMS_DB: BmsEntry[] = [
@@ -208,4 +211,100 @@ export function recommendBms(
   }).filter(Boolean) as BmsRecommendation[];
 
   return scored.sort((a, b) => b.score - a.score);
+}
+
+/* ─────────────────────────────────────────────
+   F11b — Custom BMS CRUD
+   localStorage persistence + export/import
+   ───────────────────────────────────────────── */
+
+const CUSTOM_BMS_KEY = 'bca:bms:custom';
+
+interface CustomBmsStorage {
+  version: 1;
+  entries: BmsEntry[];
+}
+
+function loadCustomBms(): BmsEntry[] {
+  try {
+    const raw = localStorage.getItem(CUSTOM_BMS_KEY);
+    if (!raw) return [];
+    const data: CustomBmsStorage = JSON.parse(raw);
+    return Array.isArray(data.entries) ? data.entries : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCustomBms(entries: BmsEntry[]): void {
+  const data: CustomBmsStorage = { version: 1, entries };
+  localStorage.setItem(CUSTOM_BMS_KEY, JSON.stringify(data));
+}
+
+let customBmsCache: BmsEntry[] | null = null;
+
+export function getCustomBms(): BmsEntry[] {
+  if (customBmsCache === null) customBmsCache = loadCustomBms();
+  return customBmsCache;
+}
+
+export function addCustomBms(entry: BmsEntry): void {
+  const list = getCustomBms();
+  entry.custom = true;
+  list.push(entry);
+  saveCustomBms(list);
+  customBmsCache = list;
+}
+
+export function updateCustomBms(index: number, entry: BmsEntry): void {
+  const list = getCustomBms();
+  if (index < 0 || index >= list.length) return;
+  entry.custom = true;
+  list[index] = entry;
+  saveCustomBms(list);
+  customBmsCache = list;
+}
+
+export function removeCustomBms(index: number): void {
+  const list = getCustomBms();
+  if (index < 0 || index >= list.length) return;
+  list.splice(index, 1);
+  saveCustomBms(list);
+  customBmsCache = list;
+}
+
+export function duplicateCustomBms(index: number): void {
+  const list = getCustomBms();
+  if (index < 0 || index >= list.length) return;
+  const copy = { ...list[index], name: `[Copy] ${list[index].name}`, custom: true };
+  list.push(copy);
+  saveCustomBms(list);
+  customBmsCache = list;
+}
+
+export function exportCustomBms(): string {
+  return JSON.stringify({ version: 1, entries: getCustomBms() }, null, 2);
+}
+
+export function importCustomBms(json: string): { ok: boolean; count: number; error?: string } {
+  try {
+    const data: CustomBmsStorage = JSON.parse(json);
+    if (!data.entries || !Array.isArray(data.entries)) {
+      return { ok: false, count: 0, error: 'Invalid format: missing entries array' };
+    }
+    const valid = data.entries.filter((e) => e.name && typeof e.sMin === 'number');
+    saveCustomBms(valid);
+    customBmsCache = valid;
+    return { ok: true, count: valid.length };
+  } catch (e) {
+    return { ok: false, count: 0, error: `Parse error: ${e}` };
+  }
+}
+
+/**
+ * Get all BMS entries: built-in + custom.
+ * Used by recommendation engine and dropdown population.
+ */
+export function getAllBms(): BmsEntry[] {
+  return [...BMS_DB, ...getCustomBms()];
 }
