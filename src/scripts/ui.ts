@@ -313,6 +313,50 @@ export function clearChemWarning() {
   if (chemWarnTimer) { window.clearTimeout(chemWarnTimer); chemWarnTimer = null; }
 }
 
+// === F5: GENERATIVE MODE ===
+export function generatePack() {
+  const targetV = parseFloat($inp('gen-target-v')?.value ?? '');
+  const targetAh = parseFloat($inp('gen-target-ah')?.value ?? '');
+  if (isNaN(targetV) || isNaN(targetAh) || targetV <= 0 || targetAh <= 0) return;
+
+  const cellNomV = parseFloat($inp('c-volts')?.value ?? '3.6');
+  const cellMinV = parseFloat($inp('c-min-v')?.value ?? '2.5');
+  const cellMah = parseFloat($inp('c-mah')?.value ?? '2500');
+  const cellAh = cellMah / 1000;
+  const lvcEl = $('sys-cutoff') as HTMLInputElement | null;
+  const lvcCell = lvcEl ? parseFloat(lvcEl.value) : cellMinV;
+
+  if (cellAh <= 0 || cellNomV <= 0) return;
+
+  let S = Math.ceil(targetV / cellNomV);
+  let P = Math.ceil(targetAh / cellAh);
+
+  // Conservative fallback: +1S if cell min voltage would drop below LVC under load
+  if (cellMinV < lvcCell) S += 1;
+
+  S = Math.max(1, S);
+  P = Math.max(1, P);
+
+  const sInput = $inp('s-count');
+  const pInput = $inp('p-count');
+  if (sInput) sInput.value = String(S);
+  if (pInput) pInput.value = String(P);
+
+  // Sync bidirectional target fields
+  const tV = $inp('target-v');
+  const tAh = $inp('target-ah');
+  if (tV) tV.value = (S * cellNomV).toFixed(1);
+  if (tAh) tAh.value = (P * cellAh).toFixed(1);
+
+  updatePack();
+
+  const fb = $('gen-pack-feedback');
+  if (fb) {
+    fb.textContent = `Generated ${S}S × ${P}P = ${S * P} cells (${(S * cellNomV).toFixed(1)}V, ${(P * cellAh).toFixed(1)}Ah)`;
+    fb.classList.remove('hidden');
+  }
+}
+
 // === CELL DB SEARCH ===
 export function setupCellDbSearch() {
   const searchInput = $inp('db-search-input');
@@ -498,6 +542,9 @@ export function attachAllInputs() {
     });
     if (id !== 'sim-load-slider') el.addEventListener('change', () => updatePack());
   });
+
+  // F5: Generative Mode button
+  $('gen-pack-btn')?.addEventListener('click', generatePack);
 
   ['sim-soc', 'sys-cutoff'].forEach((id) => {
     const el = $(id); el?.addEventListener('input', () => updateSimulation());

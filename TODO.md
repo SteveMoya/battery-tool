@@ -46,11 +46,12 @@ Implementación existente relevante:
   - ✅ `getI()`, `getCellI()`, `renderCurrentStats()` en simulation.ts:14-22
   - Corregido: funciones estaban invertidas en listeners (sInp → vToS en vez de sToV)
 
-- [ ] **F5 — Modo Generativo por Objetivo**
-  - Input "Target Voltage" (V) + "Target Capacity" (Ah)
-  - Algoritmo: `S = ceil(targetV / cellNomV)`, `P = ceil(targetAh / cellAh)`, fallback conservador (+1S si cellMin < LVC controller)
-  - Botón "Generar Configuración" que escribe en `s-count` y `p-count` y dispara `updatePack()`
-  - Ubicación: nueva sub-sección dentro de `PackConfigSection.astro`
+- [x] **F5 — Modo Generativo por Objetivo** ✅
+  - ✅ Inputs `gen-target-v` y `gen-target-ah` en Generative Mode subsection de PackConfigSection.astro
+  - ✅ Algoritmo: `S = ceil(targetV / cellNomV)`, `P = ceil(targetAh / cellAh)`, fallback +1S si cellMin < LVC
+  - ✅ Botón "Generate Configuration" que escribe en `s-count` y `p-count` y dispara `updatePack()`
+  - ✅ Sincroniza campos bidireccionales `target-v` y `target-ah`
+  - ✅ Feedback text mostrando resultado: "Generated Xs × Yp = Z cells (V, Ah)"
 
 - [ ] **F6 — Voltage Sag semafórico**
   - Extender `simulation.ts` para comparar `vNet` vs `cutoffController` (input nuevo, ej. 3.0V×S)
@@ -200,8 +201,8 @@ Implementación existente relevante:
 ## Orden de implementación sugerido
 
 1. **F2 + F3/F4** (consolidar motor eléctrico — base para todo lo demás) ✅ COMPLETADO
-2. **F5** (modo generativo — desbloquea uso real) ← SIGUIENTE
-3. **F6 + F10a + F10b** (semáforos de seguridad — son el "cerebro de validación" del proyecto)
+2. **F5** (modo generativo — desbloquea uso real) ✅ COMPLETADO
+3. **F6 + F10a + F10b** (semáforos de seguridad — son el "cerebro de validación" del proyecto) ← SIGUIENTE
 4. **F1** (completar entrada de celda, incluyendo prismáticas)
 5. **F11 + F12** (BMS recommendation con vectores)
 6. **F15a + F15b + F15c** (export 2D/PDF — output tangible para el taller)
