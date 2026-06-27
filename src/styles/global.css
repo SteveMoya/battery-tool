@@ -206,4 +206,9 @@
   .comp-table th { @apply bg-slate-50 text-slate-600 font-semibold sticky top-0; }
   .best-val { @apply bg-green-100 text-green-800 px-1 py-px rounded font-bold; }
   .row-group { @apply bg-slate-50 font-bold text-slate-500 text-[0.7rem] uppercase; }
+
+  /* F16 — Diagnostic panel: hide on small screens */
+  @media (max-width: 900px) {
+    #diagnostic-panel { display: none !important; }
+  }
 }

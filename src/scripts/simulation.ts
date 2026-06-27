@@ -1,8 +1,12 @@
 import { inputs, $ } from './dom';
 import {
-  checkVoltageSag, checkAmpacity, checkMicahToll, checkSteelThermal,
-  renderVoltageSagIndicator, renderAmpacityIndicator, renderMicahTollIndicator, renderSteelThermalIndicator,
+  checkVoltageSag, checkAmpacity, checkMicahToll, checkStripThermal,
+  renderVoltageSagIndicator, renderAmpacityIndicator, renderMicahTollIndicator, renderStripThermalIndicator,
 } from './safety-indicators';
+import {
+  checkJouleHeat, renderJouleHeatIndicator,
+  computeDiagnostic, renderDiagnosticGlobal,
+} from './diagnostic';
 
 let simMaxVal = 100;
 let lastSimAmps = 0;
@@ -294,8 +298,14 @@ export function updateSimulation(e?: Event) {
   const micahResult = checkMicahToll(I, P);
   renderMicahTollIndicator(micahResult);
 
-  const steelResult = checkSteelThermal(I, P);
-  renderSteelThermalIndicator(steelResult);
+  const stripResult = checkStripThermal(I, P);
+  renderStripThermalIndicator(stripResult);
+
+  // F16 — Joule Heat thermal estimation + diagnostic global
+  const jouleResult = checkJouleHeat(heatTotal, S, P);
+  renderJouleHeatIndicator(jouleResult);
+  const diagReport = computeDiagnostic(jouleResult);
+  renderDiagnosticGlobal(diagReport);
 
   renderCurrentStats();
 

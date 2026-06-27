@@ -27,6 +27,7 @@ import HelpIcon from '../HelpIcon.astro';
           <option value="7.0">Nickel (7.0×10⁻⁸ Ωm)</option>
           <option value="14.0">Steel (1.4×10⁻⁷ Ωm)</option>
           <option value="1.7">Copper (1.7×10⁻⁸ Ωm)</option>
+          <option value="2.4">Gold-plated Cu (2.4×10⁻⁸ Ωm)</option>
         </select>
       </div>
       <div class="grid grid-cols-2 gap-2 mt-1.5 items-end">
@@ -202,52 +203,5 @@ import HelpIcon from '../HelpIcon.astro';
     </div>
   </div>
 
-  <!-- Safety Indicators (F6 + F10a + F10b) -->
-  <div id="safety-panel" class="bg-slate-50 border border-slate-200 rounded-md p-2 mt-2">
-    <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-1.5 border-b border-slate-200 pb-1">Safety Checks</div>
 
-    <div id="safety-voltage-sag" class="safety-row flex items-start gap-1.5 mb-1.5 p-1.5 rounded border border-slate-200 bg-white" style="color: #94a3b8; border-color: #94a3b8;">
-      <span class="safety-emoji text-[0.75rem] leading-none mt-px">⚪</span>
-      <div class="flex-1 min-w-0">
-        <div class="flex justify-between items-baseline">
-          <span class="text-[0.68rem] font-bold text-slate-700">Voltage Sag</span>
-          <span class="text-[0.65rem] font-mono text-slate-400">TTC: <span id="safety-time-to-cutoff">--</span></span>
-        </div>
-        <span class="safety-text text-[0.65rem] font-semibold leading-tight">N/A (charge/idle)</span>
-      </div>
-    </div>
-
-    <div id="safety-ampacity" class="safety-row flex items-start gap-1.5 mb-1.5 p-1.5 rounded border border-slate-200 bg-white" style="color: #94a3b8; border-color: #94a3b8;">
-      <span class="safety-emoji text-[0.75rem] leading-none mt-px">⚪</span>
-      <div class="flex-1 min-w-0">
-        <span class="text-[0.68rem] font-bold text-slate-700">Ampacity (strip)</span>
-        <span class="safety-text text-[0.65rem] font-semibold leading-tight block">N/A</span>
-        <div id="safety-ampacity-recs" class="mt-0.5" style="display:none;"></div>
-      </div>
-    </div>
-
-    <div id="safety-micah" class="safety-row flex items-start gap-1.5 p-1.5 rounded border border-slate-200 bg-white" style="color: #94a3b8; border-color: #94a3b8;">
-      <span class="safety-emoji text-[0.75rem] leading-none mt-px">⚪</span>
-      <div class="flex-1 min-w-0">
-        <span class="text-[0.68rem] font-bold text-slate-700">Micah Toll Rule</span>
-        <span class="safety-text text-[0.65rem] font-semibold leading-tight block">N/A</span>
-      </div>
-    </div>
-
-    <div id="safety-steel-thermal" class="safety-row flex items-start gap-1.5 p-1.5 rounded border border-slate-200 bg-white" style="color: #94a3b8; border-color: #94a3b8;">
-      <span class="safety-emoji text-[0.75rem] leading-none mt-px">⚪</span>
-      <div class="flex-1 min-w-0">
-        <span class="text-[0.68rem] font-bold text-slate-700">Steel Thermal</span>
-        <span class="safety-text text-[0.65rem] font-semibold leading-tight block">N/A (not steel)</span>
-      </div>
-    </div>
-
-    <div id="safety-packing" class="safety-row flex items-start gap-1.5 p-1.5 rounded border border-slate-200 bg-white" style="color: #94a3b8; border-color: #94a3b8;">
-      <span class="safety-emoji text-[0.75rem] leading-none mt-px">⚪</span>
-      <div class="flex-1 min-w-0">
-        <span class="text-[0.68rem] font-bold text-slate-700">Packing Efficiency</span>
-        <span class="safety-text text-[0.65rem] font-semibold leading-tight block">N/A</span>
-      </div>
-    </div>
-  </div>
 </section>

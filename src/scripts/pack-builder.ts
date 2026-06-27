@@ -543,7 +543,8 @@ export function updatePack() {
   const matRho = parseFloat((inputs['sim-strip-mat'] as unknown as HTMLSelectElement)?.value ?? '7');
   let busColor = (inputs['col-bus'] as HTMLInputElement)?.value ?? '#ff8f00';
   if (!userHasTouchedBusColor) {
-    if (matRho <= 2.0) busColor = '#b87333';
+    if (matRho <= 1.8) busColor = '#b87333';
+    else if (matRho <= 2.5) busColor = '#FFD700';
     else if (matRho >= 13.0) busColor = '#475569';
     else busColor = '#d1d5db';
     if (inputs['col-bus']) (inputs['col-bus'] as HTMLInputElement).value = busColor;

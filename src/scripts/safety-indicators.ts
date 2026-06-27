@@ -99,47 +99,89 @@ export function checkMicahToll(packCurrentA: number, P: number): MicahTollResult
 }
 
 /* ─────────────────────────────────────────────
-   F9 — Steel Thermal Risk Check
-   Steel (ρ=14×10⁻⁸ Ωm) has high resistivity.
-   If pack current per segment > 30A → thermal risk.
+   F9 — Strip Thermal Risk Check (generalized)
+   Works for any strip material: Ni, Cu, Steel, Au-plated Cu.
+   Calculates actual heat generation via I²R and estimates
+   temperature rise via natural convection (h ≈ 25 W/m²·K).
    ───────────────────────────────────────────── */
 
-const STEEL_THERMAL_THRESHOLD_A = 30;
+const T_AMB = 25;
+const H_CONVECTION = 25;
 
-export interface SteelThermalResult {
+const MATERIAL_T_MAX: Record<number, number> = {
+  1.7: 150,   // Copper
+  2.4: 120,   // Gold-plated Copper
+  7.0: 200,   // Nickel
+  14.0: 80,   // Steel
+};
+
+export interface StripThermalResult {
   level: SafetyLevel;
   currentPerSegment: number;
-  threshold: number;
-  isSteel: boolean;
+  heatPerSeg: number;
+  tStrip: number;
+  tMax: number;
+  pct: number;
+  matLabel: string;
 }
 
-export function checkSteelThermal(packCurrentA: number, P: number): SteelThermalResult {
-  const rho = parseFloat(inputs['sim-strip-mat']?.value ?? '7');
-  const isSteel = rho >= 13.0;
+function getMaterialLabel(rhoRaw: number): string {
+  if (rhoRaw <= 1.8) return 'Copper';
+  if (rhoRaw <= 2.5) return 'Au-plated Cu';
+  if (rhoRaw <= 8.0) return 'Nickel';
+  return 'Steel';
+}
+
+export function checkStripThermal(packCurrentA: number, P: number): StripThermalResult {
+  const rhoRaw = parseFloat(inputs['sim-strip-mat']?.value ?? '7');
+  const rho = rhoRaw * 1e-8;
   const perSeg = P > 0 ? packCurrentA / P : packCurrentA;
 
-  let level: SafetyLevel = 'neutral';
-  if (isSteel) {
-    if (perSeg > STEEL_THERMAL_THRESHOLD_A) level = 'red';
-    else if (perSeg > STEEL_THERMAL_THRESHOLD_A * 0.8) level = 'yellow';
-    else level = 'green';
-  }
+  const dRaw = parseFloat(inputs['c-diam']?.value ?? '18') / 1000;
+  const pwRaw = parseFloat(inputs['c-prism-w']?.value ?? '0') / 1000;
+  const isPrismatic = inputs['cell-type']?.value === 'prismatic';
+  const d = isPrismatic && pwRaw > 0 ? pwRaw : dRaw;
+  const sp = parseFloat(inputs['c-spacing']?.value ?? '1') / 1000;
+  const wStrip = parseFloat(inputs['sim-strip-w']?.value ?? '7') / 1000;
+  const tStrip = parseFloat(inputs['sim-strip-t']?.value ?? '0.15') / 1000;
 
-  return { level, currentPerSegment: perSeg, threshold: STEEL_THERMAL_THRESHOLD_A, isSteel };
+  const L_seg = d + sp;
+  const R_seg = (rho * L_seg) / (wStrip * tStrip);
+  const Q_seg = perSeg * perSeg * R_seg;
+  const A_surface = 2 * (wStrip + tStrip) * L_seg;
+  const dT = A_surface > 0 ? Q_seg / (H_CONVECTION * A_surface) : 0;
+  const T_strip = T_AMB + dT;
+
+  const tMax = MATERIAL_T_MAX[rhoRaw] ?? 150;
+  const range = tMax - T_AMB;
+  const pct = range > 0 ? Math.max(0, Math.min(100, ((T_strip - T_AMB) / range) * 100)) : 0;
+
+  let level: SafetyLevel = 'green';
+  if (pct >= 80) level = 'red';
+  else if (pct >= 50) level = 'yellow';
+
+  return {
+    level,
+    currentPerSegment: perSeg,
+    heatPerSeg: Q_seg,
+    tStrip: T_strip,
+    tMax,
+    pct,
+    matLabel: getMaterialLabel(rhoRaw),
+  };
 }
 
-export function renderSteelThermalIndicator(r: SteelThermalResult) {
+export function renderStripThermalIndicator(r: StripThermalResult) {
   let text: string;
-  if (!r.isSteel) {
-    text = 'N/A (not steel)';
-  } else if (r.level === 'red') {
-    text = `THERMAL RISK — ${r.currentPerSegment.toFixed(1)}A > ${r.threshold}A limit`;
+  if (r.level === 'red') {
+    text = `THERMAL RISK — ${r.tStrip.toFixed(1)}°C ≥ ${r.tMax}°C limit`;
   } else if (r.level === 'yellow') {
-    text = `APPROACHING — ${r.currentPerSegment.toFixed(1)}A near ${r.threshold}A limit`;
+    text = `WARM — ${r.tStrip.toFixed(1)}°C (${r.matLabel}, ${r.pct.toFixed(0)}% of limit)`;
   } else {
-    text = `OK — ${r.currentPerSegment.toFixed(1)}A ≤ ${r.threshold}A`;
+    const heatStr = r.heatPerSeg >= 0.01 ? `${r.heatPerSeg.toFixed(2)}W` : `${(r.heatPerSeg * 1000).toFixed(1)}mW`;
+    text = `OK — ${r.tStrip.toFixed(1)}°C (${heatStr})`;
   }
-  setSafetyEl('safety-steel-thermal', EMOJI[r.level], text, COLOR[r.level]);
+  setSafetyEl('safety-strip-thermal', EMOJI[r.level], text, COLOR[r.level]);
 }
 
 /* ─────────────────────────────────────────────

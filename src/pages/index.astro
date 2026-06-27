@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import RenderArea from '../components/RenderArea.astro';
+import DiagnosticPanel from '../components/DiagnosticPanel.astro';
 import SnapshotArea from '../components/SnapshotArea.astro';
 import StatsPanel from '../components/StatsPanel.astro';
 import CellSpecsSection from '../components/sidebar/CellSpecsSection.astro';
@@ -60,6 +61,8 @@ import BomModal from '../components/modals/BomModal.astro';
   </aside>
 
   <RenderArea />
+
+  <DiagnosticPanel />
 
   <CompareModal />
   <LicenseModal />

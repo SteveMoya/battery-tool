@@ -1828,3 +1828,21 @@ export function setupBmsBox() {
   // Offset input
   offsetInput?.addEventListener('input', () => debouncedUpdate());
 }
+
+/* ── F16 — Diagnostic Panel toggle ── */
+
+export function setupDiagnosticPanel() {
+  const panel = document.getElementById('diagnostic-panel');
+  const toggleBtn = document.getElementById('diag-toggle-btn');
+  const saved = localStorage.getItem('bca:diag-collapsed');
+
+  if (saved === 'true' && panel) {
+    panel.classList.add('collapsed');
+  }
+
+  toggleBtn?.addEventListener('click', () => {
+    if (!panel) return;
+    panel.classList.toggle('collapsed');
+    localStorage.setItem('bca:diag-collapsed', String(panel.classList.contains('collapsed')));
+  });
+}
