@@ -1,0 +1,32 @@
+---
+---
+
+<div id="step-export-overlay" class="modal-base-overlay">
+  <div
+    id="step-export-box"
+    class="bg-white w-[90%] max-w-[400px] rounded-lg p-5 shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+  >
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="m-0 text-slate-800">Export CAD Model (STEP)</h3>
+      <button id="btn-close-step-export" class="border-none bg-none text-[1.5rem] cursor-pointer leading-none">&times;</button>
+    </div>
+    <p class="text-[0.8rem] text-slate-500 mt-0 mb-3">
+      Export spacer geometry as STEP AP214 for Fusion 360 / SolidWorks.
+    </p>
+    <div class="flex flex-col gap-2.5 mb-5">
+      <label class="flex items-center gap-2.5 cursor-pointer">
+        <input id="step-spacers" type="checkbox" checked />
+        <span class="text-[0.9rem] font-semibold">Spacers (Holders)</span>
+      </label>
+    </div>
+    <p class="text-[0.7rem] text-slate-400 mt-0 mb-4">
+      Only spacers are exported as STEP. Cells and busbars are available via STL export.
+    </p>
+    <button
+      id="btn-do-step-export"
+      class="w-full bg-app-blue text-white border-none py-2.5 rounded-md font-bold cursor-pointer"
+    >
+      Download .STEP File
+    </button>
+  </div>
+</div>

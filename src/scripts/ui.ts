@@ -1,6 +1,7 @@
 import { CELL_DB, type Cell } from './cell-database';
 import { DEFAULT_SIZE_PRESETS, DEFAULT_CHEM_PRESETS, type SizePreset, type ChemPreset } from './presets';
 import { exportSTL } from './stl-export';
+import { exportStep } from './step-export';
 import { exportSvg, exportPdf, type PaperSize, type PaperOrientation } from './svg-export';
 import { INPUT_IDS, $ } from './dom';
 import {
@@ -79,7 +80,7 @@ export function setupModals() {
   setupModal('menu-commercial', 'commercial-overlay');
   setupModal('menu-disclaimer', 'disclaimer-overlay');
 
-  ['feedback-overlay', 'commercial-overlay', 'license-overlay', 'export-overlay', 'svg-export-overlay', 'modal-overlay'].forEach((id) => {
+  ['feedback-overlay', 'commercial-overlay', 'license-overlay', 'export-overlay', 'step-export-overlay', 'svg-export-overlay', 'modal-overlay'].forEach((id) => {
     const el = document.getElementById(id);
     el?.addEventListener('click', (e) => { if (e.target === el) (el as HTMLElement).style.display = 'none'; });
   });
@@ -1255,6 +1256,31 @@ export function setupExportOverlay() {
   });
 }
 
+// === STEP EXPORT OVERLAY (F15d) ===
+export function setupStepExportOverlay() {
+  const overlay = $('step-export-overlay');
+
+  document.getElementById('menu-export-step')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (overlay) (overlay as HTMLElement).style.display = 'flex';
+    fileMenuDropdown()?.classList.remove('show');
+  });
+
+  document.getElementById('btn-close-step-export')?.addEventListener('click', () => {
+    if (overlay) (overlay as HTMLElement).style.display = 'none';
+  });
+
+  overlay?.addEventListener('click', (e) => {
+    if (e.target === overlay) (overlay as HTMLElement).style.display = 'none';
+  });
+
+  document.getElementById('btn-do-step-export')?.addEventListener('click', () => {
+    const incSpacers = $inp('step-spacers')?.checked ?? true;
+    exportStep({ includeSpacers: incSpacers });
+    if (overlay) (overlay as HTMLElement).style.display = 'none';
+  });
+}
+
 // === SVG/PDF EXPORT OVERLAY (F15a+b+c) ===
 export function setupSvgExportOverlay() {
   const overlay = $('svg-export-overlay');
@@ -1845,4 +1871,121 @@ export function setupDiagnosticPanel() {
     panel.classList.toggle('collapsed');
     localStorage.setItem('bca:diag-collapsed', String(panel.classList.contains('collapsed')));
   });
+}
+
+/* ── F17 — Power Connector & Cable Guide ── */
+
+import {
+  recommendConnector, generateBmsWiring,
+  renderConnectorCard, renderBmsWiringInfo,
+  CONNECTOR_DB, type Application,
+} from './power-connector-engine';
+
+function updatePowerConnectorDisplay() {
+  const packS = parseInt($inp('s-count')?.value ?? '1') || 1;
+  const packP = parseInt($inp('p-count')?.value ?? '1') || 1;
+  const cellNom = parseFloat($inp('c-volts')?.value ?? '3.6');
+  const cellAh = parseFloat($inp('c-mah')?.value ?? '2500') / 1000;
+  const packIMax = parseFloat($inp('c-amp')?.value ?? '20') * packP;
+
+  // Get max current from simulation slider if available
+  const simSlider = $inp('sim-load-slider');
+  const simCurrent = simSlider ? parseFloat(simSlider.value) : 0;
+  const effectiveIMax = Math.max(packIMax, simCurrent);
+
+  // Cable length
+  const cableLength = parseFloat($inp('conn-cable-length')?.value ?? '30') || 30;
+
+  // Application
+  const appSelect = $sel('conn-application');
+  const application: Application = (appSelect?.value as Application) ?? 'general';
+
+  // Get selected BMS
+  const bmsSel = $sel('bms-selector');
+  let selectedBms: import('./bms-database').BmsEntry | null = null;
+  if (bmsSel && bmsSel.value !== 'none' && bmsSel.value !== 'auto') {
+    selectedBms = BMS_DB.find(b => b.name === bmsSel.value)
+      ?? getCustomBms().find(b => b.name === bmsSel.value)
+      ?? null;
+  } else if (bmsSel?.value === 'auto') {
+    const chemId = ($inp('chem-selector')?.value !== 'custom'
+      ? JSON.parse($inp('chem-selector')?.value ?? '{}')?.id
+      : null) ?? 'li-ion';
+    const packAh = cellAh * packP;
+    const recs = recommendBms(packS, chemId as BmsCellType, effectiveIMax, packAh);
+    if (recs.length > 0) selectedBms = recs[0].bms;
+  }
+
+  // Input summary
+  const summaryEl = $('conn-input-summary');
+  if (summaryEl) {
+    const packV = packS * cellNom;
+    const packAh = cellAh * packP;
+    summaryEl.innerHTML = `
+      <div class="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[0.62rem]">
+        <span class="text-slate-500">Pack Voltage</span>
+        <span class="font-mono font-semibold text-slate-700">${packV.toFixed(1)}V (${packS}S)</span>
+        <span class="text-slate-500">Pack Capacity</span>
+        <span class="font-mono font-semibold text-slate-700">${packAh.toFixed(1)}Ah</span>
+        <span class="text-slate-500">Max Current</span>
+        <span class="font-mono font-semibold text-slate-700">${effectiveIMax.toFixed(1)}A</span>
+        <span class="text-slate-500">BMS</span>
+        <span class="font-mono font-semibold text-slate-700">${selectedBms ? selectedBms.name : 'None'}</span>
+      </div>
+    `;
+  }
+
+  // Skip if no load configured
+  if (effectiveIMax <= 0) {
+    const cardEl = $('conn-connector-card');
+    const wiringEl = $('conn-bms-wiring');
+    if (cardEl) cardEl.innerHTML = '';
+    if (wiringEl) wiringEl.innerHTML = '';
+    return;
+  }
+
+  // Get connector recommendation
+  const rec = recommendConnector(
+    packS, packP, cellNom, cellAh, effectiveIMax,
+    selectedBms, cableLength, application,
+  );
+
+  // Render connector card
+  const cardEl = $('conn-connector-card');
+  if (cardEl) cardEl.innerHTML = renderConnectorCard(rec);
+
+  // Get BMS wiring data
+  const wiring = generateBmsWiring(packS, selectedBms, packP, cellAh, effectiveIMax);
+  const wiringEl = $('conn-bms-wiring');
+  if (wiringEl) wiringEl.innerHTML = renderBmsWiringInfo(wiring);
+}
+
+export function setupPowerConnectors() {
+  // Listen for simulation updates
+  window.addEventListener('bca:sim-update', () => updatePowerConnectorDisplay());
+
+  // Listen for cable length / application changes
+  const cableInput = $inp('conn-cable-length');
+  const appSelect = $sel('conn-application');
+
+  cableInput?.addEventListener('input', () => updatePowerConnectorDisplay());
+  appSelect?.addEventListener('change', () => updatePowerConnectorDisplay());
+
+  // Populate connector reference table
+  const tbody = $('conn-ref-table-body');
+  if (tbody) {
+    const rows = CONNECTOR_DB.map(c => `
+      <tr class="border-b border-slate-100">
+        <td class="py-0.5 px-1 text-slate-700 font-semibold">${c.name}</td>
+        <td class="py-0.5 px-1 text-right font-mono text-slate-600">${c.continuousA}A</td>
+        <td class="py-0.5 px-1 text-right font-mono text-slate-600">${c.burstA}A</td>
+        <td class="py-0.5 px-1 text-right font-mono text-slate-600">${c.contactResistance}</td>
+        <td class="py-0.5 px-1 text-right font-mono text-slate-600">${c.wireRange[1]}–${c.wireRange[0]}</td>
+      </tr>
+    `).join('');
+    tbody.innerHTML = rows;
+  }
+
+  // Initial render
+  updatePowerConnectorDisplay();
 }

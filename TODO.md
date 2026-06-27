@@ -1,6 +1,6 @@
 # BCA Tool — Roadmap de Features
 
-Roadmap de implementación organizado por prioridad. Refleja el estado actual del proyecto al 26-06-2026 y las 16 features solicitadas, mapeadas contra el código existente.
+Roadmap de implementación organizado por prioridad. Refleja el estado actual del proyecto al 26-06-2026 y las 17 features solicitadas, mapeadas contra el código existente.
 
 ## Estado actual del proyecto
 
@@ -181,10 +181,26 @@ Implementación existente relevante:
   - ✅ Polaridad (+/-) marcada con color (rojo +, negro -)
   - ✅ Cruz central para alineación en taller
 
-- [ ] **F16 — Monitor Diagnóstico Semafórico**
-  - Panel lateral derecho (nuevo componente `DiagnosticMonitor.astro`)
-  - Estado global: Verde / Amarillo / Rojo según peor métrica
-  - Métricas: Voltage Sag % vs LVC, Joule Heat % vs límite térmico, Ampacity % por segmento
+- [x] **F16 — Monitor Diagnóstico Semafórico** ✅
+  - ✅ Panel lateral derecho (`DiagnosticPanel.astro`)
+  - ✅ Estado global: Verde / Amarillo / Rojo según peor métrica
+  - ✅ Métricas: Voltage Sag % vs LVC, Joule Heat % vs límite térmico, Ampacity % por segmento
+  - ✅ `diagnostic.ts` — `computeDiagnostic()` + `renderDiagnosticGlobal()`
+  - ✅ Barra de progreso global con toggle colapsable
+
+- [x] **F17 — Power Connector & Cable Guide** ✅
+  - ✅ `power-connector-engine.ts` — DB de 17 conectores (XT30/60/90/90-S, EC5/8, AS150/200, PP15/30/45, SB50/120/175/350)
+  - ✅ Tabla AWG con ampacity 60°C/75°C (14 AWG → 4/0 AWG)
+  - ✅ Recomendación automática de conector por corriente, voltaje, aplicación
+  - ✅ Recomendación de calibre de cable con cálculo de voltage drop
+  - ✅ Sizing de fuse (ANL/MIDI/Class-T) con ratings estándar
+  - ✅ Anti-spark detection para packs > 36V
+  - ✅ Cables de balance BMS: 22/20/18 AWG según S count
+  - ✅ Conexiones BMS↔Series renderizadas en 3D (Three.js) con líneas color-coded
+  - ✅ Sección sidebar "Power Connectors" (sección 7)
+  - ✅ Dropdown de aplicación (E-bike, Powerwall, EV, Drone, General)
+  - ✅ Tabla de referencia de conectores (colapsable)
+  - ✅ Safety notes contextuales (anti-spark, margin, voltage drop, high voltage)
 
 ### 🟢 Baja prioridad
 
@@ -194,15 +210,14 @@ Implementación existente relevante:
   - ✅ Documentado: `updatePack()` como fuente geométrica única que alimenta Three.js (3D), SVG (2D) y STL (export)
   - ✅ Documentado en README.md: diagrama de flujo, tipos compartidos, decisiones de diseño
 
-- [ ] **F15d — Export .STEP**
-  - Investigar `three-step`, `occt-import-js`, o `STEP-NC` exporter
-  - Solo exportar espaciadores (celdas y busbars ya van en STL)
-  - Output: archivo `.step` listo para Fusion 360 / SolidWorks
-
-- [ ] **ARQUITECTURA — nanostores**
-  - Evaluar si necesitamos `nanostores` para compartir estado entre islas React
-  - Actualmente todo el estado vive en `packState` (singleton) en `pack-builder.ts`; no parece haber islas múltiples compitiendo
-  - Decisión: probablemente no necesario en este proyecto, pero documentar el patrón por si se agrega un panel React pesado
+- [x] **F15d — Export .STEP** ✅
+  - ✅ Generador STEP AP214 puro en TypeScript (sin dependencias WASM)
+  - ✅ `step-export.ts` — genera cajas (BoxGeometry) y cilindros (CylinderGeometry) como B-Rep solids
+  - ✅ Solo exporta espaciadores (celdas y busbars ya van en STL)
+  - ✅ Output: archivo `.step` listo para Fusion 360 / SolidWorks
+  - ✅ Modal `StepExportModal.astro` con checkbox de selección
+  - ✅ Menú "Export CAD (STEP)" en el header (☰ → 🔧 Export CAD)
+  - ✅ Lazy: no carga WASM hasta que el usuario exporta
 
 ---
 
@@ -211,9 +226,8 @@ Implementación existente relevante:
 | Feature | Paquete | Notas |
 |---|---|---|
 | F15b PDF | `jspdf` (+ opcional `svg2pdf.js`) | Vectorial si se usa `svg2pdf.js`, raster si se usa `addSvgAsImage` |
-| F15d STEP | `three-step` o `occt-import-js` | Investigar antes de elegir; `occt-import-js` es más maduro |
+| F15d STEP | (ninguna nueva) | Generador AP214 puro en TypeScript, sin WASM |
 | F13 BMS box | (ninguna nueva) | Usar `THREE.BoxGeometry` translúcido existente |
-| ARQUITECTURA | `nanostores` + `@nanostores/react` | Solo si F11/F16 introducen islas React |
 
 ## Orden de implementación sugerido
 
@@ -225,5 +239,6 @@ Implementación existente relevante:
 6. **F15a + F15b + F15c** (export 2D/PDF — output tangible para el taller) ✅ COMPLETADO
 7. **F8a/F8b** (tolerancias reales — son detalle fino de calidad)
 8. **F9 + F10c** (materiales y recomendaciones) ✅ F10c COMPLETADO, **F10d** pendiente
-9. **F13 + F16** (visualización de BMS y monitor diagnóstico)
-10. **F15d** (STEP — nice-to-have para integración CAD)
+9. **F13 + F16** (visualización de BMS y monitor diagnóstico) ✅ F13/F16 COMPLETADO
+10. **F15d** (STEP — nice-to-have para integración CAD) ✅ COMPLETADO
+11. **F17** (Power Connector & Cable Guide — recomendaciones de conectores y calibres) ✅ COMPLETADO

@@ -3,8 +3,8 @@ import {
   initDisclaimer, setupModals, setupFileMenu, setupReset,
   setupPresetEvents, setupCellDbSearch,
   setupMetallicSliders, attachAllInputs, setupSnapshots,
-  renderSnapList, setupExportOverlay, setupSvgExportOverlay, setupBomOverlay,
-  setupBmsBox, setupDiagnosticPanel,
+  renderSnapList, setupExportOverlay, setupStepExportOverlay, setupSvgExportOverlay, setupBomOverlay,
+  setupBmsBox, setupDiagnosticPanel, setupPowerConnectors,
   populatePresets, selectInitialPresets,
   importStateFromFile, updateDeleteButtons,
 } from './ui';
@@ -32,10 +32,12 @@ export function initApp() {
   setupElectricalEngine();
   setupSnapshots();
   setupExportOverlay();
+  setupStepExportOverlay();
   setupSvgExportOverlay();
   setupBomOverlay();
   setupBmsBox();
   setupDiagnosticPanel();
+  setupPowerConnectors();
   renderSnapList();
   updateDeleteButtons();
 

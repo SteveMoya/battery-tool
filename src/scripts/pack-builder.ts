@@ -50,6 +50,9 @@ let cellPositions2D: CellPosition2D[] = [];
 let busbarConnections2D: BusbarConnection2D[] = [];
 let packBounds2D = { minX: 0, maxX: 0, minZ: 0, maxZ: 0 };
 
+/* ─── F17 — Series positions for BMS wiring ─── */
+let seriesPositions: { x: number; y: number; z: number }[] = [];
+
 /* ─── F13 — Pack bounds for BMS interference detection ─── */
 let packBounds3D = { minX: 0, maxX: 0, minZ: 0, maxZ: 0, minY: 0, maxY: 0 };
 
@@ -99,6 +102,10 @@ export const packState = {
     depthWrite: false,
   }),
   bmsBoxHitEdgeMat: new THREE.LineBasicMaterial({ color: 0xdc2626, transparent: true, opacity: 0.7 }),
+  bmsWiresGroup: null as unknown as THREE.Group,
+  bmsWiresMat: new THREE.LineBasicMaterial({ color: 0x60a5fa, transparent: true, opacity: 0.8 }),
+  bmsWireNegMat: new THREE.LineBasicMaterial({ color: 0xef4444, transparent: true, opacity: 0.9 }),
+  bmsWirePosMat: new THREE.LineBasicMaterial({ color: 0x22c55e, transparent: true, opacity: 0.9 }),
 };
 
 export function getStats() { return currentStats; }
@@ -200,6 +207,9 @@ export function initThree(container: HTMLElement) {
   const bmsBoxGroup = new THREE.Group();
   scene.add(bmsBoxGroup);
 
+  const bmsWiresGroup = new THREE.Group();
+  scene.add(bmsWiresGroup);
+
   packState.scene = scene;
   packState.camera = camera;
   packState.renderer = renderer;
@@ -208,6 +218,7 @@ export function initThree(container: HTMLElement) {
   packState.packGroup = packGroup;
   packState.dimGroup = dimGroup;
   packState.bmsBoxGroup = bmsBoxGroup;
+  packState.bmsWiresGroup = bmsWiresGroup;
 
   window.addEventListener('resize', () => {
     camera.aspect = container.clientWidth / container.clientHeight;
@@ -605,6 +616,7 @@ export function updatePack() {
   let lastLayerEndCells: any[] = [];
   let prevLayerOutputIsTop = true;
   let instanceIdx = 0; let spacerIdx = 0;
+  seriesPositions = []; // Reset for F17 BMS wiring
 
   for (let ly = 0; ly < Layers; ly++) {
     const layerYBase = ly * (l + physLayerSpace + barleyThickness + visualLayerSpace);
@@ -681,6 +693,12 @@ export function updatePack() {
           cellW, cellD, isPrismatic,
         });
       }
+      // F17: Store series center position for BMS wiring
+      const colCells = layerColCenters[s];
+      let cx = 0, cy = 0, cz = 0;
+      for (const c of colCells) { cx += c.x; cy += c.y; cz += c.z; }
+      const n = colCells.length || 1;
+      seriesPositions.push({ x: cx / n, y: cy / n, z: cz / n });
     }
 
     if (showGeo) {
@@ -914,6 +932,9 @@ export function updatePack() {
   // F13 — Render BMS bounding box
   renderBmsBox(bW, physHeight, bD);
 
+  // F17 — Render BMS balance wire connections in 3D
+  renderBmsWires(bW, physHeight, bD, S_Total);
+
   needsOcclusionUpdate = true;
 }
 
@@ -1087,6 +1108,182 @@ function updateBmsBoxInterferenceUI(result: BmsBoxResult) {
 }
 
 export function getPackBounds3D() { return packBounds3D; }
+
+/* ─── F17 — BMS Balance Wire Rendering (3D) ─── */
+
+function renderBmsWires(packW: number, packH: number, packD: number, packS: number): void {
+  // Clean previous wires
+  while (packState.bmsWiresGroup.children.length > 0) {
+    const c: any = packState.bmsWiresGroup.children[0];
+    if (c.geometry) c.geometry.dispose();
+    if (c.material && c.material !== packState.bmsWiresMat
+      && c.material !== packState.bmsWireNegMat
+      && c.material !== packState.bmsWirePosMat) {
+      c.material.dispose();
+    }
+    packState.bmsWiresGroup.remove(c);
+  }
+
+  if (seriesPositions.length === 0) return;
+
+  // Check BMS visibility and dimensions
+  const bmsVisible = (inputs['bms-box-visible'] as HTMLInputElement | null)?.checked ?? false;
+  if (!bmsVisible) return;
+
+  const bmsDims = getSelectedBmsDimensions();
+  if (!bmsDims) return;
+
+  const bmsBox = lastBmsBoxResult;
+  // Skip if BMS box has no valid dimensions (all zeros = not rendered)
+  const hasValidBox =
+    bmsBox.boxWorldMin.x !== 0 || bmsBox.boxWorldMax.x !== 0 ||
+    bmsBox.boxWorldMin.y !== 0 || bmsBox.boxWorldMax.y !== 0;
+  if (!hasValidBox) return;
+
+  const bmsCX = (bmsBox.boxWorldMin.x + bmsBox.boxWorldMax.x) / 2;
+  const bmsCY = (bmsBox.boxWorldMin.y + bmsBox.boxWorldMax.y) / 2;
+  const bmsCZ = (bmsBox.boxWorldMin.z + bmsBox.boxWorldMax.z) / 2;
+
+  const face: BmsBoxFace = (inputs['bms-box-position'] as HTMLInputElement | null)?.value as BmsBoxFace || 'right';
+
+  const packTopY = packH;
+  const clearance = 3;
+  const routeY = packTopY + clearance;
+
+  // BMS box extents for spreading wire endpoints along the face
+  const bmsW = bmsBox.boxWorldMax.x - bmsBox.boxWorldMin.x;
+  const bmsD = bmsBox.boxWorldMax.z - bmsBox.boxWorldMin.z;
+
+  // Compute S+1 tap positions at busbar junctions between series groups.
+  // Index 0 = B− (pack left edge), index S = B+ (pack right edge),
+  // indices 1..S-1 = midpoints between adjacent series centers.
+  const tapPositions: { x: number; z: number }[] = [];
+  const S = seriesPositions.length;
+
+  // B−: pack left edge, Z from first series
+  tapPositions.push({ x: packBounds3D.minX, z: seriesPositions[0].z });
+
+  // Intermediate busbar junctions (S-1 points)
+  for (let i = 0; i < S - 1; i++) {
+    const midX = (seriesPositions[i].x + seriesPositions[i + 1].x) / 2;
+    const midZ = (seriesPositions[i].z + seriesPositions[i + 1].z) / 2;
+    tapPositions.push({ x: midX, z: midZ });
+  }
+
+  // B+: pack right edge, Z from last series
+  tapPositions.push({ x: packBounds3D.maxX, z: seriesPositions[S - 1].z });
+
+  for (let i = 0; i < tapPositions.length; i++) {
+    const tap = tapPositions[i];
+    const isNeg = i === 0;
+    const isPos = i === tapPositions.length - 1;
+
+    // Color: B− = red, B+ = green, intermediate = blue gradient
+    let color: number;
+    if (isNeg) color = 0xef4444;
+    else if (isPos) color = 0x22c55e;
+    else {
+      const t = tapPositions.length > 2 ? (i - 1) / (tapPositions.length - 2) : 0.5;
+      const r = 96;
+      const g = Math.round(165 + t * 40);
+      const b = Math.round(250 - t * 50);
+      color = (r << 16) | (g << 8) | b;
+    }
+
+    const mat = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.85 });
+
+    const tapX = tap.x;
+    const tapZ = tap.z;
+
+    // Spread wire endpoints along the BMS face (not all converge to center)
+    const spread = tapPositions.length > 1 ? (i / (tapPositions.length - 1) - 0.5) : 0;
+    let endX = bmsCX, endY = bmsCY, endZ = bmsCZ;
+
+    switch (face) {
+      case 'right':
+      case 'left':
+        endZ = bmsCZ + spread * bmsD * 0.8;
+        break;
+      case 'front':
+      case 'back':
+        endX = bmsCX + spread * bmsW * 0.8;
+        break;
+      case 'top':
+      case 'bottom':
+        endX = bmsCX + spread * bmsW * 0.5;
+        break;
+    }
+
+    // Route from pack top surface to BMS, adapting to face position
+    let points: THREE.Vector3[];
+
+    switch (face) {
+      case 'right':
+      case 'left':
+        // Tap → lift → route along X to BMS → spread along Z → drop to BMS
+        points = [
+          new THREE.Vector3(tapX, packTopY, tapZ),
+          new THREE.Vector3(tapX, routeY, tapZ),
+          new THREE.Vector3(bmsCX, routeY, tapZ),
+          new THREE.Vector3(endX, routeY, endZ),
+          new THREE.Vector3(endX, endY, endZ),
+        ];
+        break;
+      case 'front':
+      case 'back':
+        // Tap → lift → route along Z to BMS → spread along X → drop to BMS
+        points = [
+          new THREE.Vector3(tapX, packTopY, tapZ),
+          new THREE.Vector3(tapX, routeY, tapZ),
+          new THREE.Vector3(tapX, routeY, bmsCZ),
+          new THREE.Vector3(endX, routeY, endZ),
+          new THREE.Vector3(endX, endY, endZ),
+        ];
+        break;
+      case 'top':
+      case 'bottom':
+        // Tap → lift → route directly to BMS
+        points = [
+          new THREE.Vector3(tapX, packTopY, tapZ),
+          new THREE.Vector3(tapX, routeY, tapZ),
+          new THREE.Vector3(endX, routeY, endZ),
+          new THREE.Vector3(endX, endY, endZ),
+        ];
+        break;
+      default:
+        points = [
+          new THREE.Vector3(tapX, packTopY, tapZ),
+          new THREE.Vector3(tapX, routeY, tapZ),
+          new THREE.Vector3(bmsCX, routeY, tapZ),
+          new THREE.Vector3(endX, routeY, endZ),
+          new THREE.Vector3(endX, endY, endZ),
+        ];
+    }
+
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const line = new THREE.Line(geometry, mat);
+    packState.bmsWiresGroup.add(line);
+
+    // Small sphere at the tap point (on pack top surface)
+    const tapGeo = new THREE.SphereGeometry(1.2, 8, 8);
+    const tapMat = new THREE.MeshStandardMaterial({ color, roughness: 0.4 });
+    const tapSphere = new THREE.Mesh(tapGeo, tapMat);
+    tapSphere.position.set(tapX, packTopY, tapZ);
+    packState.bmsWiresGroup.add(tapSphere);
+
+    // Labels for B− and B+
+    if (isNeg) {
+      addLabel('B−', tapX, routeY + 5, tapZ, '#ef4444');
+    } else if (isPos) {
+      addLabel(`B+ (S${packS})`, tapX, routeY + 5, tapZ, '#22c55e');
+    }
+  }
+
+  // BMS label
+  if (seriesPositions.length > 0) {
+    addLabel('BMS', bmsCX, bmsCY + 5, bmsCZ, '#16a34a');
+  }
+}
 
 let lastBmsBoxResult: BmsBoxResult = {
   hasInterference: false,
