@@ -211,6 +211,10 @@ export function gatherPackData(): PackData | null {
   function readSafetyLevel(elId: string): string {
     const el = document.getElementById(elId);
     if (!el) return 'neutral';
+    const dataLevel = el.getAttribute('data-level');
+    if (dataLevel && ['green', 'yellow', 'red', 'neutral'].includes(dataLevel)) {
+      return dataLevel;
+    }
     const color = el.style.borderColor || el.style.color;
     if (color.includes('22c55e') || color.includes('34d399')) return 'green';
     if (color.includes('eab308') || color.includes('fbbf24')) return 'yellow';

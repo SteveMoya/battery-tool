@@ -181,7 +181,7 @@ export function renderStripThermalIndicator(r: StripThermalResult) {
     const heatStr = r.heatPerSeg >= 0.01 ? `${r.heatPerSeg.toFixed(2)}W` : `${(r.heatPerSeg * 1000).toFixed(1)}mW`;
     text = `OK — ${r.tStrip.toFixed(1)}°C (${heatStr})`;
   }
-  setSafetyEl('safety-strip-thermal', EMOJI[r.level], text, COLOR[r.level]);
+  setSafetyEl('safety-strip-thermal', EMOJI[r.level], text, COLOR[r.level], r.level);
 }
 
 /* ─────────────────────────────────────────────
@@ -260,7 +260,7 @@ const EMOJI: Record<SafetyLevel, string> = {
   neutral: '⚪',
 };
 
-function setSafetyEl(id: string, emoji: string, text: string, color: string) {
+function setSafetyEl(id: string, emoji: string, text: string, color: string, level?: string) {
   const el = document.getElementById(id);
   if (!el) return;
   const emojiSpan = el.querySelector('.safety-emoji');
@@ -269,6 +269,7 @@ function setSafetyEl(id: string, emoji: string, text: string, color: string) {
   if (textSpan) textSpan.textContent = text;
   (el as HTMLElement).style.color = color;
   (el as HTMLElement).style.borderColor = color;
+  if (level) el.dataset.level = level;
 }
 
 const COLOR: Record<SafetyLevel, string> = {
@@ -289,7 +290,7 @@ export function renderVoltageSagIndicator(r: VoltageSagResult) {
   } else {
     text = `OK — ${r.headroomPct.toFixed(1)}% above LVC`;
   }
-  setSafetyEl('safety-voltage-sag', EMOJI[r.level], text, COLOR[r.level]);
+  setSafetyEl('safety-voltage-sag', EMOJI[r.level], text, COLOR[r.level], r.level);
 
   const ttEl = document.getElementById('safety-time-to-cutoff');
   if (ttEl) ttEl.textContent = r.timeToCutoff;
@@ -304,7 +305,7 @@ export function renderAmpacityIndicator(r: AmpacityResult) {
   } else {
     text = `OK — ${r.currentPerSegment.toFixed(1)}A ≤ ${r.optimalA}A`;
   }
-  setSafetyEl('safety-ampacity', EMOJI[r.level], text, COLOR[r.level]);
+  setSafetyEl('safety-ampacity', EMOJI[r.level], text, COLOR[r.level], r.level);
 
   renderStripRecommendations(r);
 }
@@ -408,7 +409,7 @@ export function renderMicahTollIndicator(r: MicahTollResult) {
   } else {
     text = `OK — ${r.currentPerSegment.toFixed(1)}A ≤ ${r.safeA.toFixed(1)}A`;
   }
-  setSafetyEl('safety-micah', EMOJI[r.level], text, COLOR[r.level]);
+  setSafetyEl('safety-micah', EMOJI[r.level], text, COLOR[r.level], r.level);
 }
 
 /* ─────────────────────────────────────────────
@@ -443,5 +444,5 @@ export function renderPackingIndicator(r: PackingResult) {
   } else {
     text = `GOOD — ${(r.efficiency * 100).toFixed(0)}% of theoretical max (${(r.theoMax * 100).toFixed(1)}%)`;
   }
-  setSafetyEl('safety-packing', EMOJI[r.level], text, COLOR[r.level]);
+  setSafetyEl('safety-packing', EMOJI[r.level], text, COLOR[r.level], r.level);
 }
