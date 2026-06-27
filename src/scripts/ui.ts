@@ -15,7 +15,7 @@ import {
   rescaleLoadSlider, updateSimulation,
   getOpenCircuitVoltage, getLastAmps, getLastWatts, getSimMax,
 } from './simulation';
-import { BMS_DB, recommendBms, validateBms, type BmsEntry, type CellType as BmsCellType } from './bms-database';
+import { BMS_DB, recommendBms, validateBms, getAllBms, type BmsEntry, type CellType as BmsCellType } from './bms-database';
 import { getCustomBms, addCustomBms, updateCustomBms, removeCustomBms, duplicateCustomBms, exportCustomBms, importCustomBms } from './bms-database';
 
 export const snapshots: { id: number; inputs: Record<string, any>; data: any }[] = [];
@@ -1721,4 +1721,110 @@ function updateCustomBmsActions() {
   if (!actionsEl) return;
   const idx = getSelectedCustomBmsIdx();
   actionsEl.classList.toggle('hidden', idx === null);
+}
+
+// === F13: BMS Bounding Box ===
+export function setupBmsBox() {
+  const visibleCheck = $inp('bms-box-visible');
+  const dimsSection = $('bms-box-dims');
+  const posInput = $inp('bms-box-position');
+  const rotInput = $inp('bms-box-rotation');
+  const offsetInput = $inp('bms-box-offset');
+  const bmsSelector = $sel('bms-selector');
+
+  if (!posInput || !rotInput) return;
+
+  // Sync dimensions display from selected BMS
+  function syncBmsDimensions() {
+    const dimsText = $('bms-box-dims-text');
+    if (!dimsText) return;
+    const name = bmsSelector?.value;
+    if (!name || name === 'auto' || name === 'none' || name === 'custom-add') {
+      dimsText.textContent = 'Select a BMS in section 5';
+      dimsText.className = 'text-[0.72rem] font-mono font-semibold text-slate-400';
+      return;
+    }
+    const allBms = getAllBms();
+    const bms = allBms.find((b) => b.name === name);
+    if (!bms) {
+      dimsText.textContent = 'BMS not found';
+      return;
+    }
+    const rot = parseInt(rotInput?.value ?? '0') || 0;
+    const isRotated = rot % 2 !== 0;
+    const dw = isRotated ? bms.d : bms.w;
+    const dd = isRotated ? bms.w : bms.d;
+    dimsText.textContent = `${dw} × ${dd} × ${bms.h} mm`;
+    dimsText.className = 'text-[0.72rem] font-mono font-semibold text-slate-700';
+  }
+
+  // Toggle dims section visibility
+  function syncBmsBoxUI() {
+    const visible = visibleCheck?.checked ?? false;
+    dimsSection?.classList.toggle('hidden', !visible);
+    syncBmsDimensions();
+    debouncedUpdate();
+  }
+  syncBmsBoxUI();
+  visibleCheck?.addEventListener('change', syncBmsBoxUI);
+
+  // Re-sync when BMS selection changes
+  bmsSelector?.addEventListener('change', () => {
+    syncBmsDimensions();
+    if (visibleCheck?.checked) debouncedUpdate();
+  });
+
+  // Position buttons
+  const posButtons = ['top', 'bottom', 'left', 'right', 'front', 'back'] as const;
+  posButtons.forEach((face) => {
+    const btn = $(`bms-pos-${face}`);
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      posInput.value = face;
+      // Update active states
+      posButtons.forEach((f) => {
+        const b = $(`bms-pos-${f}`);
+        if (b) b.classList.toggle('active', f === face);
+      });
+      debouncedUpdate();
+    });
+  });
+  // Set initial active state
+  const initialFace = posInput.value || 'right';
+  posButtons.forEach((f) => {
+    const b = $(`bms-pos-${f}`);
+    if (b) b.classList.toggle('active', f === initialFace);
+  });
+
+  // Rotation buttons
+  const rotLeftBtn = $('bms-rot-left');
+  const rotRightBtn = $('bms-rot-right');
+
+  function updateRotActive() {
+    const rot = parseInt(rotInput?.value ?? '0') || 0;
+    const isRotated = rot % 2 !== 0;
+    rotLeftBtn?.classList.toggle('active', isRotated);
+    rotRightBtn?.classList.toggle('active', !isRotated);
+  }
+
+  rotLeftBtn?.addEventListener('click', () => {
+    const rot = parseInt(rotInput?.value ?? '0') || 0;
+    if (rotInput) rotInput.value = String((rot + 1) % 4);
+    syncBmsDimensions();
+    updateRotActive();
+    debouncedUpdate();
+  });
+
+  rotRightBtn?.addEventListener('click', () => {
+    const rot = parseInt(rotInput?.value ?? '0') || 0;
+    if (rotInput) rotInput.value = String((rot + 3) % 4);
+    syncBmsDimensions();
+    updateRotActive();
+    debouncedUpdate();
+  });
+
+  updateRotActive();
+
+  // Offset input
+  offsetInput?.addEventListener('input', () => debouncedUpdate());
 }

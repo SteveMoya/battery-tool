@@ -18,6 +18,8 @@ export const INPUT_IDS = [
   'bms-name-input', 'bms-protocol-input', 'bms-s-min', 'bms-s-max', 'bms-smart',
   'bms-max-a-input', 'bms-v-cutoff-charge', 'bms-v-cutoff-discharge',
   'bms-dim-w', 'bms-dim-d', 'bms-dim-h',
+  // F13: BMS Bounding Box
+  'bms-box-visible', 'bms-box-position', 'bms-box-rotation', 'bms-box-offset',
 ];
 
 export function $<T extends HTMLElement = HTMLElement>(id: string): T | null {

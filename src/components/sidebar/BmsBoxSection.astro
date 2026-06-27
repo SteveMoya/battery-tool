@@ -1,0 +1,86 @@
+---
+import HelpIcon from '../HelpIcon.astro';
+---
+
+<section class="group-box">
+  <div class="flex justify-between items-center mb-1.5">
+    <h2 class="section-title m-0">6. BMS Bounding Box</h2>
+    <HelpIcon tooltip="Visualize the selected BMS enclosure in 3D attached to the pack face" />
+  </div>
+
+  <div class="toggle-row mb-2">
+    <label for="bms-box-visible" class="cursor-pointer">Show BMS Box</label>
+    <input id="bms-box-visible" type="checkbox" />
+  </div>
+
+  <div id="bms-box-dims" class="hidden">
+    <!-- BMS Dimensions (read-only from selected BMS) -->
+    <div id="bms-box-info" class="bg-slate-50 border border-slate-200 rounded-md p-2 mb-2">
+      <div class="text-[0.65rem] font-bold text-slate-400 uppercase mb-1 tracking-wide">BMS Dimensions</div>
+      <div id="bms-box-dims-text" class="text-[0.72rem] font-mono font-semibold text-slate-700">Select a BMS in section 5</div>
+    </div>
+
+    <!-- Position: 6 faces -->
+    <div class="text-[0.65rem] font-bold text-slate-400 uppercase mb-1 tracking-wide">
+      Position
+      <HelpIcon position="right" width="180px" align="left">
+        <strong>BMS Position</strong><br />
+        Place the BMS box against one of the 6 faces of the battery pack.
+      </HelpIcon>
+    </div>
+    <div class="grid grid-cols-3 gap-1 mb-2">
+      <button id="bms-pos-top" type="button" class="bms-pos-btn px-2 py-1.5 rounded border border-slate-300 bg-white text-[0.65rem] font-semibold text-slate-600 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors">Top</button>
+      <button id="bms-pos-bottom" type="button" class="bms-pos-btn px-2 py-1.5 rounded border border-slate-300 bg-white text-[0.65rem] font-semibold text-slate-600 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors">Bottom</button>
+      <div></div>
+      <button id="bms-pos-left" type="button" class="bms-pos-btn px-2 py-1.5 rounded border border-slate-300 bg-white text-[0.65rem] font-semibold text-slate-600 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors">Left</button>
+      <button id="bms-pos-right" type="button" class="bms-pos-btn px-2 py-1.5 rounded border border-slate-300 bg-white text-[0.65rem] font-semibold text-slate-600 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors">Right</button>
+      <div></div>
+      <button id="bms-pos-front" type="button" class="bms-pos-btn px-2 py-1.5 rounded border border-slate-300 bg-white text-[0.65rem] font-semibold text-slate-600 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors">Front</button>
+      <button id="bms-pos-back" type="button" class="bms-pos-btn px-2 py-1.5 rounded border border-slate-300 bg-white text-[0.65rem] font-semibold text-slate-600 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors">Back</button>
+      <div></div>
+    </div>
+    <input id="bms-box-position" type="hidden" value="right" />
+
+    <!-- Rotation -->
+    <div class="text-[0.65rem] font-bold text-slate-400 uppercase mb-1 tracking-wide">
+      Rotation
+      <HelpIcon position="right" width="180px" align="left">
+        <strong>BMS Rotation</strong><br />
+        Rotate the BMS box 90° to swap its width and depth orientation on the pack face.
+      </HelpIcon>
+    </div>
+    <div class="grid grid-cols-2 gap-1 mb-2">
+      <button id="bms-rot-left" type="button" class="bms-rot-btn px-2 py-1.5 rounded border border-slate-300 bg-white text-[0.65rem] font-semibold text-slate-600 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors">⟲ Rotate Left</button>
+      <button id="bms-rot-right" type="button" class="bms-rot-btn px-2 py-1.5 rounded border border-slate-300 bg-white text-[0.65rem] font-semibold text-slate-600 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors">⟳ Rotate Right</button>
+    </div>
+    <input id="bms-box-rotation" type="hidden" value="0" />
+
+    <!-- Offset from pack edge -->
+    <div class="flex items-center justify-between mb-1">
+      <span class="text-[0.65rem] font-bold text-slate-400 uppercase tracking-wide">Gap from Pack Edge</span>
+      <HelpIcon position="left" width="200px" align="right">
+        <strong>Gap from Pack Edge</strong><br />
+        Distance (mm) between the pack face and the BMS box. Increase to add clearance for wires or connectors.
+      </HelpIcon>
+    </div>
+    <div class="flex flex-col mb-2">
+      <input id="bms-box-offset" type="number" value="5" min="0" step="1" class="control-input" />
+    </div>
+
+    <!-- Interference Status -->
+    <div id="bms-box-interference" class="hidden rounded-md p-2 mt-1 border">
+      <div class="flex items-center gap-1.5">
+        <span id="bms-box-interference-emoji" class="text-[0.85rem]">🟢</span>
+        <span id="bms-box-interference-text" class="text-[0.68rem] font-bold">No interference</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .bms-pos-btn.active, .bms-rot-btn.active {
+    background-color: rgb(59 130 246 / 0.1);
+    border-color: rgb(59 130 246);
+    color: rgb(37 99 235);
+  }
+</style>

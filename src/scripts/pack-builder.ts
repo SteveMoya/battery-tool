@@ -6,6 +6,7 @@ import { DEFAULT_SIZE_PRESETS, DEFAULT_CHEM_PRESETS } from './presets';
 import { inputs, $ } from './dom';
 import { getOpenCircuitVoltage, rescaleLoadSlider, updateSimulation, renderCurrentStats } from './simulation';
 import { checkPacking, renderPackingIndicator } from './safety-indicators';
+import { getAllBms } from './bms-database';
 
 let userSizePresets: any[] = JSON.parse(localStorage.getItem('batt_vis_presets_size_v40') || '[]');
 let userChemPresets: any[] = JSON.parse(localStorage.getItem('batt_vis_presets_chem_v40') || '[]');
@@ -49,6 +50,9 @@ let cellPositions2D: CellPosition2D[] = [];
 let busbarConnections2D: BusbarConnection2D[] = [];
 let packBounds2D = { minX: 0, maxX: 0, minZ: 0, maxZ: 0 };
 
+/* ─── F13 — Pack bounds for BMS interference detection ─── */
+let packBounds3D = { minX: 0, maxX: 0, minZ: 0, maxZ: 0, minY: 0, maxY: 0 };
+
 export function getCellPositions2D(): CellPosition2D[] { return cellPositions2D; }
 export function getBusbarConnections2D(): BusbarConnection2D[] { return busbarConnections2D; }
 export function getPackBounds2D() { return packBounds2D; }
@@ -75,7 +79,26 @@ export const packState = {
   capMat: new THREE.MeshStandardMaterial({ roughness: 0.4 }),
   busMat: new THREE.MeshStandardMaterial({ roughness: 0.4 }),
   spacerMat: new THREE.MeshStandardMaterial({ roughness: 0.8 }),
-  interConnMat: new THREE.MeshStandardMaterial({ roughness: 0.4 }),
+  interConnMat:   new THREE.MeshStandardMaterial({ roughness: 0.4 }),
+  bmsBoxGroup:    null as unknown as THREE.Group,
+  bmsBoxMat:      new THREE.MeshStandardMaterial({
+    color: 0x4a90d9,
+    transparent: true,
+    opacity: 0.3,
+    roughness: 0.5,
+    side: THREE.DoubleSide,
+    depthWrite: false,
+  }),
+  bmsBoxEdgeMat:  new THREE.LineBasicMaterial({ color: 0x2563eb, transparent: true, opacity: 0.6 }),
+  bmsBoxHitMat:   new THREE.MeshStandardMaterial({
+    color: 0xef4444,
+    transparent: true,
+    opacity: 0.35,
+    roughness: 0.5,
+    side: THREE.DoubleSide,
+    depthWrite: false,
+  }),
+  bmsBoxHitEdgeMat: new THREE.LineBasicMaterial({ color: 0xdc2626, transparent: true, opacity: 0.7 }),
 };
 
 export function getStats() { return currentStats; }
@@ -174,6 +197,8 @@ export function initThree(container: HTMLElement) {
   scene.add(packGroup);
   const dimGroup = new THREE.Group();
   scene.add(dimGroup);
+  const bmsBoxGroup = new THREE.Group();
+  scene.add(bmsBoxGroup);
 
   packState.scene = scene;
   packState.camera = camera;
@@ -182,6 +207,7 @@ export function initThree(container: HTMLElement) {
   packState.controls = controls;
   packState.packGroup = packGroup;
   packState.dimGroup = dimGroup;
+  packState.bmsBoxGroup = bmsBoxGroup;
 
   window.addEventListener('resize', () => {
     camera.aspect = container.clientWidth / container.clientHeight;
@@ -819,6 +845,12 @@ export function updatePack() {
   packState.packGroup.position.set(-cX, 0, -cZ);
   // F15a: Store pack bounds for SVG export
   packBounds2D = { minX, maxX, minZ, maxZ };
+  // F13: Store 3D pack bounds in world space (after centering at origin)
+  packBounds3D = {
+    minX: minX - cX, maxX: maxX - cX,
+    minZ: minZ - cZ, maxZ: maxZ - cZ,
+    minY: 0, maxY: physHeight,
+  };
   addDimensions(bW, renderHeight, bD, cX, cZ, physHeight);
 
   /* ─── F7 — Fill Ratio & Packing Heuristics ─── */
@@ -877,8 +909,188 @@ export function updatePack() {
   if (slider) slider.max = String(maxAmps * 1.5);
   rescaleLoadSlider();
   updateSimulation();
+
+  // F13 — Render BMS bounding box
+  renderBmsBox(bW, physHeight, bD);
+
   needsOcclusionUpdate = true;
 }
+
+/* ─── F13 — BMS Bounding Box Rendering & Interference Detection ─── */
+
+export type BmsBoxFace = 'top' | 'bottom' | 'left' | 'right' | 'front' | 'back';
+
+export interface BmsBoxResult {
+  hasInterference: boolean;
+  boxWorldMin: { x: number; y: number; z: number };
+  boxWorldMax: { x: number; y: number; z: number };
+}
+
+function getSelectedBmsDimensions(): { w: number; d: number; h: number } | null {
+  const sel = inputs['bms-selector'] as HTMLSelectElement | null;
+  if (!sel) return null;
+  const name = sel.value;
+  if (name === 'auto' || name === 'none' || name === 'custom-add') return null;
+  const allBms = getAllBms();
+  const bms = allBms.find((b) => b.name === name);
+  if (!bms) return null;
+  return { w: bms.w, d: bms.d, h: bms.h };
+}
+
+function renderBmsBox(packW: number, packH: number, packD: number): BmsBoxResult {
+  const result: BmsBoxResult = {
+    hasInterference: false,
+    boxWorldMin: { x: 0, y: 0, z: 0 },
+    boxWorldMax: { x: 0, y: 0, z: 0 },
+  };
+
+  // Clean previous BMS box
+  while (packState.bmsBoxGroup.children.length > 0) {
+    const c: any = packState.bmsBoxGroup.children[0];
+    if (c.geometry) c.geometry.dispose();
+    packState.bmsBoxGroup.remove(c);
+  }
+  packState.bmsBoxGroup.rotation.set(0, 0, 0);
+
+  const visible = (inputs['bms-box-visible'] as HTMLInputElement | null)?.checked ?? false;
+  if (!visible) {
+    updateBmsBoxInterferenceUI(result);
+    return result;
+  }
+
+  // Get BMS dimensions from the selected BMS in section 5
+  const bmsDims = getSelectedBmsDimensions();
+  if (!bmsDims) {
+    updateBmsBoxInterferenceUI(result);
+    return result;
+  }
+
+  const face: BmsBoxFace = (inputs['bms-box-position'] as HTMLInputElement | null)?.value as BmsBoxFace || 'right';
+  const rotation = parseInt(inputs['bms-box-rotation']?.value ?? '0') || 0;
+  const offset = parseFloat(inputs['bms-box-offset']?.value ?? '5') || 0;
+
+  // Effective dimensions after rotation (swaps w and d)
+  const isRotated = rotation % 2 !== 0;
+  const effW = isRotated ? bmsDims.d : bmsDims.w;
+  const effD = isRotated ? bmsDims.w : bmsDims.d;
+  const effH = bmsDims.h;
+
+  // Pack half-extents (world space, pack centered at origin)
+  const hx = packW / 2;
+  const hy = packH / 2;
+  const hz = packD / 2;
+
+  let boxCenterX = 0, boxCenterY = 0, boxCenterZ = 0;
+  let geoW = effW, geoH = effH, geoD = effD;
+
+  switch (face) {
+    case 'right': // +X face — base (effW×effD) faces cells, effH extends outward (+X)
+      boxCenterX = hx + offset + effH / 2;
+      boxCenterY = effD / 2;
+      boxCenterZ = 0;
+      geoW = effH; geoH = effD; geoD = effW;
+      break;
+    case 'left': // -X face — base (effW×effD) faces cells, effH extends outward (-X)
+      boxCenterX = -(hx + offset + effH / 2);
+      boxCenterY = effD / 2;
+      boxCenterZ = 0;
+      geoW = effH; geoH = effD; geoD = effW;
+      break;
+    case 'top': // +Y face — base (effW×effD) faces cells downward, effH extends upward
+      boxCenterX = 0;
+      boxCenterY = packH + offset + effH / 2;
+      boxCenterZ = 0;
+      break;
+    case 'bottom': // -Y face — base (effW×effD) faces cells upward, effH extends downward
+      boxCenterX = 0;
+      boxCenterY = -(offset + effH / 2);
+      boxCenterZ = 0;
+      break;
+    case 'front': // +Z face — base (effW×effD) faces cells, effH extends outward (+Z)
+      boxCenterX = 0;
+      boxCenterY = effD / 2;
+      boxCenterZ = hz + offset + effH / 2;
+      geoW = effW; geoH = effD; geoD = effH;
+      break;
+    case 'back': // -Z face — base (effW×effD) faces cells, effH extends outward (-Z)
+      boxCenterX = 0;
+      boxCenterY = effD / 2;
+      boxCenterZ = -(hz + offset + effH / 2);
+      geoW = effW; geoH = effD; geoD = effH;
+      break;
+  }
+
+  // Create translucent box — geo dimensions match the world-space orientation
+  const boxGeo = new THREE.BoxGeometry(geoW, geoH, geoD);
+  const boxMesh = new THREE.Mesh(boxGeo, packState.bmsBoxMat.clone());
+  boxMesh.position.set(boxCenterX, boxCenterY, boxCenterZ);
+  packState.bmsBoxGroup.add(boxMesh);
+
+  // Add wireframe edges
+  const edgesGeo = new THREE.EdgesGeometry(boxGeo);
+  const edgesLine = new THREE.LineSegments(edgesGeo, packState.bmsBoxEdgeMat.clone());
+  edgesLine.position.copy(boxMesh.position);
+  packState.bmsBoxGroup.add(edgesLine);
+
+  // Calculate world-space AABB of the BMS box (using geo dimensions which match world orientation)
+  const bMin = { x: boxCenterX - geoW / 2, y: boxCenterY - geoH / 2, z: boxCenterZ - geoD / 2 };
+  const bMax = { x: boxCenterX + geoW / 2, y: boxCenterY + geoH / 2, z: boxCenterZ + geoD / 2 };
+  result.boxWorldMin = bMin;
+  result.boxWorldMax = bMax;
+
+  // Interference detection: AABB overlap test
+  const pb = packBounds3D;
+  const intersects =
+    bMin.x < pb.maxX && bMax.x > pb.minX &&
+    bMin.y < pb.maxY && bMax.y > pb.minY &&
+    bMin.z < pb.maxZ && bMax.z > pb.minZ;
+
+  result.hasInterference = intersects;
+
+  if (intersects) {
+    boxMesh.material.dispose();
+    boxMesh.material = packState.bmsBoxHitMat.clone();
+    edgesLine.material.dispose();
+    edgesLine.material = packState.bmsBoxHitEdgeMat.clone();
+  }
+
+  updateBmsBoxInterferenceUI(result);
+  lastBmsBoxResult = result;
+  return result;
+}
+
+function updateBmsBoxInterferenceUI(result: BmsBoxResult) {
+  const el = $('bms-box-interference');
+  const emoji = $('bms-box-interference-emoji');
+  const text = $('bms-box-interference-text');
+
+  if (!el) return;
+
+  const visible = (inputs['bms-box-visible'] as HTMLInputElement | null)?.checked ?? false;
+  if (!visible) {
+    el.classList.add('hidden');
+    return;
+  }
+
+  el.classList.remove('hidden');
+
+  if (result.hasInterference) {
+    el.className = 'rounded-md p-2 mt-1 border bg-red-50 border-red-300 text-red-700';
+    if (emoji) emoji.textContent = '🔴';
+    if (text) text.textContent = 'Interference detected — BMS box overlaps pack';
+  } else {
+    el.className = 'rounded-md p-2 mt-1 border bg-green-50 border-green-300 text-green-700';
+    if (emoji) emoji.textContent = '🟢';
+    if (text) text.textContent = 'No interference';
+  }
+}
+
+export function getPackBounds3D() { return packBounds3D; }
+
+let lastBmsBoxResult: BmsBoxResult = {
+  hasInterference: false,
+  boxWorldMin: { x: 0, y: 0, z: 0 }, boxWorldMax: { x: 0, y: 0, z: 0 },
+};
 
 export function animate(_time: number) {
   requestAnimationFrame(animate);

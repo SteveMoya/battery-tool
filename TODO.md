@@ -168,12 +168,13 @@ Implementación existente relevante:
   - ✅ Menú "Bill of Materials" en el header (☰ → 📋 Bill of Materials)
   - ✅ `setupBomOverlay()` en `ui.ts` — wiring del modal, populate data, y download handlers
 
-- [ ] **F13 — Geometría BMS Bounding Box**
-  - Inputs `bms-w / bms-d / bms-h / bms-pos-x / bms-pos-y / bms-pos-z / bms-offset-x / bms-offset-y / bms-offset-z` (mm)
-  - Renderizar prisma translúcido en 3D junto al pack
-  - Posición relativa al pack (offset x,y,z)
-  - Detección de interferencia: si la caja intersecta con carcasa → marcar en rojo y sugerir offset (x,y,z)
-  - Dropdown de BMS comerciales (ANT, Daly, Xuanjing) con dimensiones pre-cargadas
+- [x] **F13 — Geometría BMS Bounding Box** ✅
+  - ✅ Inputs `bms-box-w / bms-box-d / bms-box-h / bms-box-pos-x / bms-box-pos-y / bms-box-pos-z / bms-box-offset-x / bms-box-offset-y / bms-box-offset-z` (mm)
+  - ✅ Renderizar prisma translúcido en 3D junto al pack (THREE.BoxGeometry + EdgesGeometry)
+  - ✅ Posición relativa al pack (offset x,y,z) con default: lado +X del pack
+  - ✅ Detección de interferencia AABB: si la caja intersecta con el pack → marcar en rojo y sugerir offset
+  - ✅ Dropdown de BMS comerciales (Daly, JK, ANT, Xuanjing, Generic) con dimensiones pre-cargadas de BMS_DB
+  - ✅ Botón "Apply Suggestion" para aplicar offset sugerido automáticamente
 
 - [x] **F15c — Spot Welding Template** ✅
   - ✅ Sobre la proyección SVG: marcas circulares (Ø3mm) en cada punto de soldadura previsto

@@ -4,6 +4,7 @@ import {
   setupPresetEvents, setupCellDbSearch,
   setupMetallicSliders, attachAllInputs, setupSnapshots,
   renderSnapList, setupExportOverlay, setupSvgExportOverlay, setupBomOverlay,
+  setupBmsBox,
   populatePresets, selectInitialPresets,
   importStateFromFile, updateDeleteButtons,
 } from './ui';
@@ -33,6 +34,7 @@ export function initApp() {
   setupExportOverlay();
   setupSvgExportOverlay();
   setupBomOverlay();
+  setupBmsBox();
   renderSnapList();
   updateDeleteButtons();
 
