@@ -1,6 +1,7 @@
 import { CELL_DB, type Cell } from './cell-database';
 import { DEFAULT_SIZE_PRESETS, DEFAULT_CHEM_PRESETS, type SizePreset, type ChemPreset } from './presets';
 import { exportSTL } from './stl-export';
+import { exportSvg, exportPdf, type PaperSize, type PaperOrientation } from './svg-export';
 import { INPUT_IDS, $ } from './dom';
 import {
   packState,
@@ -49,7 +50,7 @@ export function setupModals() {
   setupModal('menu-commercial', 'commercial-overlay');
   setupModal('menu-disclaimer', 'disclaimer-overlay');
 
-  ['feedback-overlay', 'commercial-overlay', 'license-overlay', 'export-overlay', 'modal-overlay'].forEach((id) => {
+  ['feedback-overlay', 'commercial-overlay', 'license-overlay', 'export-overlay', 'svg-export-overlay', 'modal-overlay'].forEach((id) => {
     const el = document.getElementById(id);
     el?.addEventListener('click', (e) => { if (e.target === el) (el as HTMLElement).style.display = 'none'; });
   });
@@ -1145,6 +1146,65 @@ export function setupExportOverlay() {
     const incBus = $inp('ex-bus')?.checked ?? false;
     exportSTL(packState.packGroup, incCells, incSpacers, incBus);
     const overlay = $('export-overlay'); if (overlay) (overlay as HTMLElement).style.display = 'none';
+  });
+}
+
+// === SVG/PDF EXPORT OVERLAY (F15a+b+c) ===
+export function setupSvgExportOverlay() {
+  const overlay = $('svg-export-overlay');
+  const pdfOpts = $('svg-pdf-options');
+
+  // Menu trigger
+  document.getElementById('menu-export-svg')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (overlay) (overlay as HTMLElement).style.display = 'flex';
+    fileMenuDropdown()?.classList.remove('show');
+  });
+
+  // Close
+  document.getElementById('btn-close-svg-export')?.addEventListener('click', () => {
+    if (overlay) (overlay as HTMLElement).style.display = 'none';
+  });
+  document.getElementById('btn-cancel-svg-export')?.addEventListener('click', () => {
+    if (overlay) (overlay as HTMLElement).style.display = 'none';
+  });
+  overlay?.addEventListener('click', (e) => { if (e.target === overlay) (overlay as HTMLElement).style.display = 'none'; });
+
+  // Format toggle: show/hide PDF options
+  document.querySelectorAll<HTMLInputElement>('input[name="svg-format"]').forEach((radio) => {
+    radio.addEventListener('change', () => {
+      if (pdfOpts) {
+        (pdfOpts as HTMLElement).style.display = radio.value === 'pdf' ? 'block' : 'none';
+      }
+      // Update button text
+      const btn = $btn('btn-do-svg-export');
+      if (btn) btn.textContent = radio.value === 'pdf' ? 'Download PDF' : 'Download SVG';
+    });
+  });
+
+  // Download button
+  document.getElementById('btn-do-svg-export')?.addEventListener('click', () => {
+    const format = document.querySelector<HTMLInputElement>('input[name="svg-format"]:checked')?.value ?? 'svg';
+
+    const opts = {
+      showCells: $inp('svg-cells')?.checked ?? true,
+      showBusbars: $inp('svg-busbars')?.checked ?? true,
+      showArrows: $inp('svg-arrows')?.checked ?? true,
+      showWelds: $inp('svg-welds')?.checked ?? false,
+      showPolarity: $inp('svg-polarity')?.checked ?? true,
+      showDimensions: $inp('svg-dims')?.checked ?? true,
+      showGrid: $inp('svg-grid')?.checked ?? false,
+    };
+
+    if (format === 'pdf') {
+      const paperSize = (document.querySelector<HTMLInputElement>('input[name="svg-paper"]:checked')?.value ?? 'a4') as PaperSize;
+      const orientation = (document.querySelector<HTMLInputElement>('input[name="svg-orient"]:checked')?.value ?? 'portrait') as PaperOrientation;
+      exportPdf({ ...opts, paperSize, orientation });
+    } else {
+      exportSvg();
+    }
+
+    if (overlay) (overlay as HTMLElement).style.display = 'none';
   });
 }
 

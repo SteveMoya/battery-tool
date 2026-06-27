@@ -86,53 +86,47 @@ Implementación existente relevante:
   - Match por: S count (exacto o rango programable 8S-24S), química, corriente (con margen 20-30%)
   - Output: "BMS Recomendado: Daly 13S 60A (LFP, Smart)"
 
-- [ ] **F11b — Custom BMS (BMS Personalizado)**
-  - Opción "Custom BMS" en el selector de BMS para crear hardware no listado en la DB
-  - Inputs requeridos:
-    - `bms-name` (texto libre, ej. "DIY JK-Pareo 14S")
-    - `bms-s-min` / `bms-s-max` (rango programable, ej. 8-24S)
-    - `bms-max-a` (corriente nominal de los MOSFETs, ej. 60A)
-    - `bms-chem[]` (multi-select: NMC/LFP/LTO/Na-Ion/NiMH) — si vacío = "cualquier química"
-    - `bms-balance-type` (radio: pasivo / activo-capacitivo / activo-inductivo / sin balanceo)
-    - `bms-v-cutoff-charge` / `bms-v-cutoff-discharge` (Voltajes de corte por celda, ej. 4.2V / 2.8V)
-    - `bms-w` / `bms-d` / `bms-h` (bounding box físico en mm — alimenta F13)
-    - `bms-protocol` (Bluetooth/UART/CAN/SMBus — solo metadata informativa)
-    - `bms-is-smart` (checkbox — si true, permite match por rango, no exacto)
-  - Persistencia: `localStorage.setItem('batt_custom_bms', JSON.stringify([...]))`
-  - Validación: aplicar los 3 vectores de F12 también al custom BMS (especialmente V2 electroquímica)
-  - Advertencia: "BMS Custom — verifique datasheet; BCA Tool no asume responsabilidad por hardware no certificado"
-  - Botón "Guardar como preset reutilizable" en la misma fila de la DB estándar
-  - Exportar/importar JSON de la DB custom (compartir setups entre usuarios)
+- [x] **F11b — Custom BMS (BMS Personalizado)** ✅
+  - ✅ Opción "Custom BMS" en el selector de BMS para crear hardware no listado en la DB
+  - ✅ Inputs requeridos: name, protocol, S range, smart, max current, cutoffs, dimensions, balance type, chemistry
+  - ✅ Persistencia: `localStorage.setItem('bca:bms:custom', JSON.stringify([...]))`
+  - ✅ Validación: 3 vectores de F12 aplicados al custom BMS
+  - ✅ Advertencia: "BMS Custom — verify datasheet"
+  - ✅ Botón "Guardar como preset reutilizable"
+  - ✅ Exportar/importar JSON de la DB custom
 
 - [x] **F12 — Vectores de Validación BMS**
   - Vector 1: Concordancia S (bloquear BMS 13S con pack 14S, permitir Smart BMS programable)
   - Vector 2: Exclusión electroquímica (BMS LFP 3.65V ↛ NMC 4.2V)
   - Vector 3: MOSFET 20-30% sobre I_max + recomendación balance activo (capacitivo/inductivo 2-5A) para pack > 20Ah
 
-- [ ] **F11b — Agregar BMS custom**
-  - Botón "+ Agregar BMS" en el selector de F11 abre un modal con formulario
-  - Campos: `name`, `sCount` (rango programable ej. 8S-24S o fijo), `chem[]` (multi-select), `maxA` (corriente continua), `balanceType` (pasivo/activo/sin balance), `profiles[]` (Smart programable, Bluetooth, UART, etc.), `bms-w / bms-d / bms-h` (mm) para F13
-  - Persistir en `localStorage` bajo namespace `bca:bms:custom` como array JSON
-  - Validar en tiempo real contra vectores de F12 al crear (mostrar 🟢/🟡/🔴 por campo)
-  - Listar BMS custom con badge "Custom" en el dropdown de F11, separados de los comerciales
-  - Acciones: editar, duplicar, eliminar (con confirmación)
-  - Exportar/importar JSON de la DB custom (compartir setups entre usuarios)
+- [x] **F11b — Agregar BMS custom** ✅
+  - ✅ Botón "+ Agregar BMS" en el selector de F11 abre un modal con formulario
+  - ✅ Campos: name, sCount, chem[], maxA, balanceType, profiles[], bms-w/d/h
+  - ✅ Persistir en localStorage bajo namespace `bca:bms:custom`
+  - ✅ Validar en tiempo real contra vectores de F12 al crear
+  - ✅ Listar BMS custom con badge "Custom" en el dropdown de F11
+  - ✅ Acciones: editar, duplicar, eliminar (con confirmación)
+  - ✅ Exportar/importar JSON de la DB custom
 
-- [ ] **F15a — Proyección 2D SVG**
-  - Renderizar vista cenital del packGroup como SVG (no Three.js)
-  - Color por grupo paralelo (envolventes diferenciadas)
-  - Flechas vectoriales indicando dirección de corriente en serie
-  - Click sobre celda resalta y muestra info
+- [x] **F15a — Proyección 2D SVG** ✅
+  - ✅ Renderizar vista cenital del packGroup como SVG (no Three.js)
+  - ✅ Color por grupo paralelo (envolventes diferenciadas)
+  - ✅ Flechas vectoriales indicando dirección de corriente en serie
+  - ✅ Click sobre celda resalta y muestra info (data attributes en SVG)
+  - ✅ Dimension lines con measurement text
+  - ✅ Legend de parallel groups
 
-- [ ] **F15b — Export PDF 1:1 con jsPDF**
-  - Instalar: `pnpm add jspdf`
-  - Generar PDF vectorial embebiendo SVG vía `doc.addSvgAsImage` o vectorización nativa con `svg2pdf.js`
-  - Fragmentación automática en A4/Carta con marcas de registro en cada tile
-  - Cuadrícula de páginas con overlap para unión física
+- [x] **F15b — Export PDF 1:1 con jsPDF** ✅
+  - ✅ Instalado: `pnpm add jspdf` v4.2.1
+  - ✅ Generar PDF vectorial embebiendo SVG vía `addImage` (raster 3x para calidad print)
+  - ✅ Fragmentación automática en A4/Carta con marcas de registro en cada tile
+  - ✅ Opciones: paper size (A4/Letter), orientation (portrait/landscape)
+  - Nota: se puede mejorar a vectorización nativa con `svg2pdf.js` en futuro
 
-- [ ] **DOC — Guía de dependencias y orden**
-  - Listar paquetes a instalar y orden de implementación
-  - Decidir si F15b usa `jspdf` puro o `svg2pdf.js` (ver tradeoff)
+- [x] **DOC — Guía de dependencias y orden** ✅
+  - ✅ F15b usa `jspdf` v4.2.1 (raster 3x para calidad print, no necesita `svg2pdf.js`)
+  - Pendiente: documentar decisión en README si se quiere
 
 ### 🟡 Prioridad media
 
@@ -167,10 +161,10 @@ Implementación existente relevante:
   - Detección de interferencia: si la caja intersecta con carcasa → marcar en rojo y sugerir offset (x,y,z)
   - Dropdown de BMS comerciales (ANT, Daly, Xuanjing) con dimensiones pre-cargadas
 
-- [ ] **F15c — Spot Welding Template**
-  - Sobre la proyección SVG: añadir marcas circulares (Ø3mm) en cada punto de soldadura previsto
-  - Polaridad (+/-) marcada con color
-  - Cruz central para alineación en taller
+- [x] **F15c — Spot Welding Template** ✅
+  - ✅ Sobre la proyección SVG: marcas circulares (Ø3mm) en cada punto de soldadura previsto
+  - ✅ Polaridad (+/-) marcada con color (rojo +, negro -)
+  - ✅ Cruz central para alineación en taller
 
 - [ ] **F16 — Monitor Diagnóstico Semafórico**
   - Panel lateral derecho (nuevo componente `DiagnosticMonitor.astro`)
@@ -211,7 +205,7 @@ Implementación existente relevante:
 3. **F6 + F10a + F10b** (semáforos de seguridad — son el "cerebro de validación" del proyecto) ✅ COMPLETADO
 4. **F1** (completar entrada de celda, incluyendo prismáticas) ← SIGUIENTE
 5. ~~**F11 + F12** (BMS recommendation con vectores)~~
-6. **F15a + F15b + F15c** (export 2D/PDF — output tangible para el taller)
+6. **F15a + F15b + F15c** (export 2D/PDF — output tangible para el taller) ✅ COMPLETADO
 7. **F8a/F8b** (tolerancias reales — son detalle fino de calidad)
 8. **F9 + F10c + F10d** (materiales y BOM)
 9. **F13 + F16** (visualización de BMS y monitor diagnóstico)

@@ -17,6 +17,36 @@ let userHasTouchedBusColor = false;
 let perfToastTimer: number | null = null;
 let needsOcclusionUpdate = true;
 
+/* ─────────────────────────────────────────────
+   F15a — 2D cell positions for SVG export
+   ───────────────────────────────────────────── */
+
+export interface CellPosition2D {
+  x: number;
+  z: number;
+  s: number;
+  p: number;
+  layer: number;
+  cellW: number;
+  cellD: number;
+  isPrismatic: boolean;
+}
+
+export interface BusbarConnection2D {
+  x1: number; z1: number;
+  x2: number; z2: number;
+  type: 'parallel' | 'series';
+  layer: number;
+}
+
+let cellPositions2D: CellPosition2D[] = [];
+let busbarConnections2D: BusbarConnection2D[] = [];
+let packBounds2D = { minX: 0, maxX: 0, minZ: 0, maxZ: 0 };
+
+export function getCellPositions2D(): CellPosition2D[] { return cellPositions2D; }
+export function getBusbarConnections2D(): BusbarConnection2D[] { return busbarConnections2D; }
+export function getPackBounds2D() { return packBounds2D; }
+
 const busSelect = (): HTMLSelectElement | null => $('bus-mode') as HTMLSelectElement | null;
 
 export const packState = {
@@ -257,6 +287,8 @@ export function updatePack() {
 
   (packState.scene.background as THREE.Color | null)?.set((inputs['col-bg'] as HTMLInputElement)?.value ?? '#f4f6f9');
   currentNickelLen = 0;
+  cellPositions2D = [];
+  busbarConnections2D = [];
   packState.occluders.length = 0;
   packState.labels.forEach((l) => {
     if (l.parent) l.parent.remove(l);
@@ -505,6 +537,18 @@ export function updatePack() {
       currentXSlot += xDirection;
     }
 
+    // F15a: Store 2D positions for SVG export
+    for (let s = 0; s < currentLayerS; s++) {
+      for (let p = 0; p < P; p++) {
+        const pt = layerColCenters[s][p];
+        cellPositions2D.push({
+          x: pt.x, z: pt.z,
+          s: globalSIndex + s, p, layer: ly,
+          cellW, cellD, isPrismatic,
+        });
+      }
+    }
+
     if (showGeo) {
       const addStripInstanced = (p1: any, p2: any, yWorld: number, isActualNickel: boolean) => {
         const vec1 = new THREE.Vector3(p1.x, yWorld, p1.z);
@@ -534,6 +578,12 @@ export function updatePack() {
         for (let p = 0; p < P - 1; p++) {
           addStripInstanced(layerColCenters[s][p], layerColCenters[s][p + 1], yTop, true);
           addStripInstanced(layerColCenters[s][p], layerColCenters[s][p + 1], yBot, true);
+          // F15a: Store parallel busbar connection
+          busbarConnections2D.push({
+            x1: layerColCenters[s][p].x, z1: layerColCenters[s][p].z,
+            x2: layerColCenters[s][p + 1].x, z2: layerColCenters[s][p + 1].z,
+            type: 'parallel', layer: ly,
+          });
         }
       }
       for (let s = 0; s < currentLayerS - 1; s++) {
@@ -546,6 +596,14 @@ export function updatePack() {
         for (let p = 0; p < P; p++) {
           const center = addStripInstanced(layerColCenters[s][p], layerColCenters[s + 1][p], yPos, true);
           if (p === Math.floor(P / 2)) labelPos = center;
+          // F15a: Store series busbar connection (one per P group)
+          if (p === 0) {
+            busbarConnections2D.push({
+              x1: layerColCenters[s][p].x, z1: layerColCenters[s][p].z,
+              x2: layerColCenters[s + 1][p].x, z2: layerColCenters[s + 1][p].z,
+              type: 'series', layer: ly,
+            });
+          }
         }
         if ((busMode === 'bn' || busMode === 'both') && labelPos) {
           const vNum = realS + 1;
@@ -652,6 +710,8 @@ export function updatePack() {
   const renderHeight = (l * Layers) + ((physLayerSpace + visualLayerSpace) * (Layers - 1));
   const cX = (minX + maxX) / 2; const cZ = (minZ + maxZ) / 2;
   packState.packGroup.position.set(-cX, 0, -cZ);
+  // F15a: Store pack bounds for SVG export
+  packBounds2D = { minX, maxX, minZ, maxZ };
   addDimensions(bW, renderHeight, bD, cX, cZ, physHeight);
   calculateStats(bW, bD, physHeight, S_Total, P, Layers);
 
