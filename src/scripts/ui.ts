@@ -33,6 +33,35 @@ const $sel = (id: string): HTMLSelectElement | null => document.getElementById(i
 const $inp = (id: string): HTMLInputElement | null => document.getElementById(id) as HTMLInputElement | null;
 const $btn = (id: string): HTMLButtonElement | null => document.getElementById(id) as HTMLButtonElement | null;
 
+// Strip input validation: width ≤ cell contact, thickness ≥ 0.05mm
+function getMaxStripWidth(): number {
+  const cellType = ($inp('cell-type') as HTMLInputElement | null)?.value ?? 'cylindrical';
+  if (cellType === 'prismatic') {
+    return parseFloat($inp('c-prism-w')?.value ?? '148');
+  }
+  // Cylindrical: positive terminal is ~40% of diameter.
+  // Max strip = 50% of diameter to avoid bridging to negative casing.
+  const d = parseFloat($inp('c-diam')?.value ?? '18');
+  return Math.round(d * 0.5 * 10) / 10;
+}
+
+export function clampStripInputs() {
+  const stripW = $inp('sim-strip-w');
+  const stripT = $inp('sim-strip-t');
+  if (stripW) {
+    const maxW = getMaxStripWidth();
+    let val = parseFloat(stripW.value);
+    if (!isNaN(val)) {
+      if (val > maxW) { stripW.value = String(maxW); }
+      if (val < 1) { stripW.value = '1'; }
+    }
+  }
+  if (stripT) {
+    let val = parseFloat(stripT.value);
+    if (!isNaN(val) && val < 0.05) { stripT.value = '0.05'; }
+  }
+}
+
 // === MODALES ===
 export function setupModals() {
   const setupModal = (triggerId: string, overlayId: string) => {
@@ -735,6 +764,7 @@ export function applyCellData(data: Cell) {
     if (fallback) chemSel.value = JSON.stringify(fallback.data);
   }
   chemSel.dispatchEvent(new Event('change'));
+  clampStripInputs();
   updatePack();
   checkPitchTolerance();
 }
@@ -892,6 +922,7 @@ export function attachAllInputs() {
     const val = (t as any).dataset.val as string;
     if (inputCellType) inputCellType.value = val;
     syncCellTypeUI();
+    clampStripInputs();
     updatePack();
   });
 
@@ -901,6 +932,16 @@ export function attachAllInputs() {
     checkPitchTolerance();
     updatePack();
   });
+
+  // Strip input validation: width ≤ cell contact, thickness ≥ 0.05mm
+  $inp('sim-strip-w')?.addEventListener('input', clampStripInputs);
+  $inp('sim-strip-t')?.addEventListener('input', clampStripInputs);
+  $inp('sim-strip-w')?.addEventListener('change', clampStripInputs);
+  $inp('sim-strip-t')?.addEventListener('change', clampStripInputs);
+
+  // Re-clamp when cell type or diameter changes (new max may apply)
+  $inp('c-diam')?.addEventListener('input', clampStripInputs);
+  $inp('c-prism-w')?.addEventListener('input', clampStripInputs);
 
   ['sim-soc', 'sys-cutoff'].forEach((id) => {
     const el = $(id); el?.addEventListener('input', () => updateSimulation());

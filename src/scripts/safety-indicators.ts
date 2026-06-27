@@ -263,6 +263,98 @@ export function renderAmpacityIndicator(r: AmpacityResult) {
     text = `OK — ${r.currentPerSegment.toFixed(1)}A ≤ ${r.optimalA}A`;
   }
   setSafetyEl('safety-ampacity', EMOJI[r.level], text, COLOR[r.level]);
+
+  renderStripRecommendations(r);
+}
+
+/* ─────────────────────────────────────────────
+   F10c — Automatic Strip Recommendations
+   Triggered when ampacity is yellow/red.
+   Suggests upgrade options from AMPACITY_TABLE.
+   ───────────────────────────────────────────── */
+
+export interface StripRecommendation {
+  label: string;
+  detail: string;
+  t: number;
+  w: number;
+  layers: number;
+}
+
+export function getStripRecommendations(
+  currentPerSeg: number,
+  currentT: number,
+  currentW: number,
+): StripRecommendation[] {
+  if (currentPerSeg <= 0) return [];
+
+  const recs: StripRecommendation[] = [];
+  const currentArea = currentT * currentW;
+
+  // Suggestion 1: best single-layer upgrade (smallest area that handles the current)
+  const singleCandidates = AMPACITY_TABLE
+    .filter(e => e.maxA >= currentPerSeg && (e.t * e.w) > currentArea)
+    .sort((a, b) => (a.t * a.w) - (b.t * b.w));
+
+  if (singleCandidates.length > 0) {
+    const best = singleCandidates[0];
+    recs.push({
+      label: `Upgrade to ${best.t}×${best.w}mm`,
+      detail: `${best.maxA}A max (single layer)`,
+      t: best.t,
+      w: best.w,
+      layers: 1,
+    });
+  }
+
+  // Suggestion 2: double-layer option using existing or thinner strip
+  const doubleCandidates = AMPACITY_TABLE
+    .filter(e => (e.maxA * 2) >= currentPerSeg && (e.t * e.w * 2) < currentArea * 1.5)
+    .sort((a, b) => (a.t * a.w) - (b.t * b.w));
+
+  if (doubleCandidates.length > 0) {
+    const best = doubleCandidates[0];
+    recs.push({
+      label: `Double layer: 2× ${best.t}×${best.w}mm`,
+      detail: `${(best.maxA * 2).toFixed(0)}A combined`,
+      t: best.t,
+      w: best.w,
+      layers: 2,
+    });
+  }
+
+  return recs;
+}
+
+function renderStripRecommendations(r: AmpacityResult) {
+  const container = document.getElementById('safety-ampacity-recs');
+  if (!container) return;
+
+  if (r.level === 'green' || r.level === 'neutral') {
+    container.innerHTML = '';
+    container.style.display = 'none';
+    return;
+  }
+
+  const tStrip = parseFloat(inputs['sim-strip-t']?.value ?? '0.15');
+  const wStrip = parseFloat(inputs['sim-strip-w']?.value ?? '7');
+  const recs = getStripRecommendations(r.currentPerSegment, tStrip, wStrip);
+
+  if (recs.length === 0) {
+    container.innerHTML = '';
+    container.style.display = 'none';
+    return;
+  }
+
+  const items = recs.map(rec =>
+    `<div class="flex items-start gap-1 text-[0.6rem] leading-tight mt-0.5">
+      <span class="text-amber-500 font-bold shrink-0">→</span>
+      <span><span class="font-semibold text-slate-700">${rec.label}</span> <span class="text-slate-500">${rec.detail}</span></span>
+    </div>`
+  ).join('');
+
+  container.innerHTML = items;
+  container.style.display = 'block';
 }
 
 export function renderMicahTollIndicator(r: MicahTollResult) {

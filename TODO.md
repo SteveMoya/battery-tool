@@ -153,10 +153,12 @@ Implementación existente relevante:
   - ✅ Alerta visual si Steel + corriente > 30A → "Riesgo térmico elevado" (safety-indicators.ts)
   - ✅ Color automático del busbar por material (pack-builder.ts:480-488)
 
-- [ ] **F10c — Recomendaciones automáticas de tira**
-  - Trigger cuando ampacity excedida
-  - Sugerencia 1: "Subir a 0.30mm × 7mm (15A continuos)"
-  - Sugerencia 2: "Aplicar laminación doble: 2× 0.15mm × 8mm (10A compartidos)"
+- [x] **F10c — Recomendaciones automáticas de tira** ✅
+  - ✅ `getStripRecommendations()` en `safety-indicators.ts` — filtra AMPACITY_TABLE por `maxA ≥ currentPerSeg`
+  - ✅ Sugerencia 1: upgrade single-layer (menor área que soporte la corriente)
+  - ✅ Sugerencia 2: doble capa (2× strip más delgado, combinado ≥ corriente)
+  - ✅ `renderStripRecommendations()` — renderiza en `#safety-ampacity-recs` debajo del indicador
+  - ✅ Se oculta automáticamente cuando ampacity es verde/neutro
 
 - [ ] **F10d — BOM metraje lineal**
   - Calcular `nickelMetersTotal = nickelInPack + ladderOverhead + wasteFactor (15%)`
@@ -215,6 +217,6 @@ Implementación existente relevante:
 5. ~~**F11 + F12** (BMS recommendation con vectores)~~
 6. **F15a + F15b + F15c** (export 2D/PDF — output tangible para el taller) ✅ COMPLETADO
 7. **F8a/F8b** (tolerancias reales — son detalle fino de calidad)
-8. **F9 + F10c + F10d** (materiales y BOM)
+8. **F9 + F10c** (materiales y recomendaciones) ✅ F10c COMPLETADO, **F10d** pendiente
 9. **F13 + F16** (visualización de BMS y monitor diagnóstico)
 10. **F15d** (STEP — nice-to-have para integración CAD)
