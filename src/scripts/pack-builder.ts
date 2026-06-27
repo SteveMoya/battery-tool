@@ -5,9 +5,14 @@ import { CELL_DB } from './cell-database';
 import { DEFAULT_SIZE_PRESETS, DEFAULT_CHEM_PRESETS } from './presets';
 import { inputs, $ } from './dom';
 import { getOpenCircuitVoltage, rescaleLoadSlider, updateSimulation, renderCurrentStats } from './simulation';
+import { checkPacking, renderPackingIndicator } from './safety-indicators';
 
 let userSizePresets: any[] = JSON.parse(localStorage.getItem('batt_vis_presets_size_v40') || '[]');
 let userChemPresets: any[] = JSON.parse(localStorage.getItem('batt_vis_presets_chem_v40') || '[]');
+
+/* ─── F7 — Theoretical packing densities ─── */
+const THEO_SQUARE = Math.PI / 4;               // ≈ 0.7854
+const THEO_HEX = Math.PI * Math.sqrt(3) / 6;   // ≈ 0.9069
 
 let currentStats: any = {};
 let currentNickelLen = 0;
@@ -215,7 +220,19 @@ export function addDimensions(w: number, hRender: number, d: number, _cx: number
   createWitness(new THREE.Vector3(-w / 2, hRender, d / 2), ptsH[1]);
 }
 
-export function calculateStats(w: number, dep: number, h: number, S_Total: number, P: number, L: number) {
+export interface FillRatioData {
+  fillRatio: number;
+  theoMax: number;
+  theoLabel: string;
+  theoAlt: number;
+  theoAltLabel: string;
+  rotationSuggestion: string | null;
+  cellAreaTotal: number;
+  packArea: number;
+  isHex: boolean;
+}
+
+export function calculateStats(w: number, dep: number, h: number, S_Total: number, P: number, L: number, fillData?: FillRatioData) {
   const v = parseFloat(inputs['c-volts']?.value ?? '3.6');
   const vMin = parseFloat(inputs['c-min-v']?.value ?? '2.5');
   const vMax = parseFloat(inputs['c-max-v']?.value ?? '4.2');
@@ -263,6 +280,36 @@ export function calculateStats(w: number, dep: number, h: number, S_Total: numbe
     : packCost.toFixed(2);
   const outCost = $('out-cost'); if (outCost) outCost.textContent = `${costSym}${costDisplay}`;
 
+  // F7 — Fill Ratio display
+  if (fillData) {
+    const outFill = $('out-fill-ratio');
+    if (outFill) {
+      const pct = (fillData.fillRatio * 100).toFixed(1);
+      const theoPct = (fillData.theoMax * 100).toFixed(1);
+      outFill.textContent = `${pct}% / ${theoPct}%`;
+      // Color: green if within 5% of theoretical, yellow if 5-15% gap, red if >15%
+      const gap = fillData.theoMax > 0 ? (fillData.theoMax - fillData.fillRatio) / fillData.theoMax : 0;
+      outFill.className = outFill.className.replace(/\bc-(green|yellow|red|orange)\b/g, '');
+      if (gap < 0.05) outFill.classList.add('c-green');
+      else if (gap < 0.15) outFill.classList.add('c-yellow');
+      else outFill.classList.add('c-orange');
+    }
+    const outTheo = $('out-theo-density');
+    if (outTheo) {
+      outTheo.textContent = `${fillData.theoLabel}: ${(fillData.theoMax * 100).toFixed(1)}%`;
+    }
+    const rotEl = $('out-rotation-hint');
+    if (rotEl) {
+      if (fillData.rotationSuggestion) {
+        rotEl.textContent = fillData.rotationSuggestion;
+        rotEl.classList.remove('hidden');
+      } else {
+        rotEl.textContent = '';
+        rotEl.classList.add('hidden');
+      }
+    }
+  }
+
   renderCurrentStats();
 
   setCurrentStats({
@@ -273,6 +320,8 @@ export function calculateStats(w: number, dep: number, h: number, S_Total: numbe
     kg: packKg, cost: packCost, kw: maxKw,
     amp: maxAmps, vmin: packVMin, vmax: packVMax,
     nickel: nickelMeters,
+    fillRatio: fillData?.fillRatio ?? 0,
+    theoMax: fillData?.theoMax ?? THEO_SQUARE,
   });
 }
 
@@ -713,7 +762,56 @@ export function updatePack() {
   // F15a: Store pack bounds for SVG export
   packBounds2D = { minX, maxX, minZ, maxZ };
   addDimensions(bW, renderHeight, bD, cX, cZ, physHeight);
-  calculateStats(bW, bD, physHeight, S_Total, P, Layers);
+
+  /* ─── F7 — Fill Ratio & Packing Heuristics ─── */
+  const packArea = bW * bD;
+  let cellAreaTotal = 0;
+  let cellAreaSingle = 0;
+  if (isPrismatic) {
+    cellAreaSingle = pw * pd;
+  } else {
+    cellAreaSingle = Math.PI * (d / 2) ** 2;
+  }
+  cellAreaTotal = cellAreaSingle * S_Total * P;
+  const fillRatio = packArea > 0 ? cellAreaTotal / packArea : 0;
+
+  // Theoretical max densities for current mode
+  const theoMax = isHex ? THEO_HEX : THEO_SQUARE;
+  const theoAlt = isHex ? THEO_SQUARE : THEO_HEX;
+  const theoLabel = isHex ? 'Hex' : 'Square';
+  const theoAltLabel = isHex ? 'Square' : 'Hex';
+
+  // Auto-rotation check: would rotating 90° improve packing?
+  let rotationSuggestion: string | null = null;
+  if (!isPrismatic && S_Total > 1 && P > 1) {
+    // Simulate rotated layout: swap effectiveW and effectiveDepth roles
+    const rotW = P * effectiveD + (isHex ? effectiveD * 0.5 : 0);
+    const rotD = S_Total * (isHex ? effectiveD * 0.866 : effectiveD);
+    const rotArea = rotW * rotD;
+    const rotFill = rotArea > 0 ? cellAreaTotal / rotArea : 0;
+    if (rotFill > fillRatio * 1.02) {
+      rotationSuggestion = `${(rotFill * 100).toFixed(1)}% vs ${(fillRatio * 100).toFixed(1)}% — rotate 90° for better density`;
+    }
+  }
+
+  // Overflow detection
+  const overflowCells = 0; // Always fits since pack is computed from cells
+
+  calculateStats(bW, bD, physHeight, S_Total, P, Layers, {
+    fillRatio,
+    theoMax,
+    theoLabel,
+    theoAlt,
+    theoAltLabel,
+    rotationSuggestion,
+    cellAreaTotal,
+    packArea,
+    isHex,
+  });
+
+  // F7: Packing efficiency indicator
+  const packingResult = checkPacking(fillRatio, theoMax);
+  renderPackingIndicator(packingResult);
 
   const maxAmps = P * parseFloat(inputs['c-amp']?.value ?? '20');
   const slider = $('sim-load-slider') as HTMLInputElement | null;

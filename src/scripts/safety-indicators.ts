@@ -232,3 +232,38 @@ export function renderMicahTollIndicator(r: MicahTollResult) {
   }
   setSafetyEl('safety-micah', EMOJI[r.level], text, COLOR[r.level]);
 }
+
+/* ─────────────────────────────────────────────
+   F7 — Packing Efficiency Indicator
+   Compare actual fill ratio vs theoretical max
+   🟢 ≥85% of theoretical / 🟡 70-85% / 🔴 <70%
+   ───────────────────────────────────────────── */
+
+export interface PackingResult {
+  level: SafetyLevel;
+  fillRatio: number;
+  theoMax: number;
+  efficiency: number; // fillRatio / theoMax (0..1)
+}
+
+export function checkPacking(fillRatio: number, theoMax: number): PackingResult {
+  const efficiency = theoMax > 0 ? fillRatio / theoMax : 0;
+
+  let level: SafetyLevel = 'green';
+  if (efficiency < 0.70) level = 'red';
+  else if (efficiency < 0.85) level = 'yellow';
+
+  return { level, fillRatio, theoMax, efficiency };
+}
+
+export function renderPackingIndicator(r: PackingResult) {
+  let text: string;
+  if (r.level === 'red') {
+    text = `LOW — ${(r.efficiency * 100).toFixed(0)}% of theoretical max (${(r.theoMax * 100).toFixed(1)}%)`;
+  } else if (r.level === 'yellow') {
+    text = `FAIR — ${(r.efficiency * 100).toFixed(0)}% of theoretical max`;
+  } else {
+    text = `GOOD — ${(r.efficiency * 100).toFixed(0)}% of theoretical max (${(r.theoMax * 100).toFixed(1)}%)`;
+  }
+  setSafetyEl('safety-packing', EMOJI[r.level], text, COLOR[r.level]);
+}

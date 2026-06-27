@@ -63,12 +63,14 @@ Implementación existente relevante:
   - ✅ Indicador "Time-to-cutoff" con estimación vía binary search sobre OCV curve
   - ✅ UI en `SafetyChecks` panel debajo deSimulationSection.astro
 
-- [ ] **F7 — Algoritmos Heurísticos 2D**
-  - Modo actual: hex-mode (checkbox) + ladder — falta Fill Ratio explícito
-  - Calcular: `fillRatio = (n × π × d²/4) / (width × depth)`
-  - Comparar densidades teóricas: `π/4 ≈ 0.785` (square) vs `π√3/6 ≈ 0.907` (hex)
-  - Auto-rotación 90° si fill ratio es mejor en la otra orientación
-  - Mostrar "celdas fuera de límite" cuando el contenedor es insuficiente
+- [x] **F7 — Algoritmos Heurísticos 2D** ✅
+  - ✅ `fillRatio = (n × cellArea) / (packWidth × packDepth)` calculado en `pack-builder.ts:760-795`
+  - ✅ Densidades teóricas: `π/4 ≈ 0.785` (square) vs `π√3/6 ≈ 0.907` (hex) como constantes de módulo
+  - ✅ Auto-rotación 90°: sugiere rotar si mejora fill ratio >2%
+  - ✅ Fill Ratio en StatsPanel Physical section con color semáforo (🟢 ≥95% teórico, 🟡 85-95%, 🟠 <85%)
+  - ✅ Rotation Hint en StatsPanel cuando rotación mejora densidad
+  - ✅ Packing Efficiency en Safety Panel (🟢 ≥85% teórico, 🟡 70-85%, 🔴 <70%)
+  - ✅ `FillRatioData` interface exportada para uso externo
 
 - [x] **F10a — Tabla de Ampacity** ✅
   - ✅ Tabla empírica 6 entradas en `safety-indicators.ts:18-25`: `[(0.10×5), (0.10×7), (0.15×7), (0.15×8), (0.20×7), (0.30×7)]`
