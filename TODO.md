@@ -140,9 +140,13 @@ Implementación existente relevante:
   - ✅ Banner `#pitch-tolerance-warning` con auto-dismiss (8s)
   - ✅ Check se ejecuta en debouncedUpdate, change de origin, y applyCellData
 
-- [ ] **F8b — Barley Paper**
-  - Checkbox "Incluir papel de cebada" + input `barley-thickness` (default 0.2mm)
-  - Sumar al `h` (altura física) y notificar que reduce holgura axial
+- [x] **F8b — Barley Paper** ✅
+  - ✅ Checkbox "Barley Paper" + input `barley-thickness` (default 0.2mm) en PackConfigSection.astro
+  - ✅ Toggle-row con HelpIcon explicando que reduce holgura axial
+  - ✅ Thickeness input se muestra/oculta según checkbox, se deshabilita si Layers < 2
+  - ✅ Suma al `physHeight` y `renderHeight` en pack-builder.ts (barleyThickness × (Layers - 1))
+  - ✅ Layer Y-position incluye barley paper en el pitch por capa
+  - ✅ Registrado en `INPUT_IDS` para auto-wiring de eventos
 
 - [ ] **F9 — Materiales Interconector UI**
   - Ya existe `sim-strip-mat`; falta:

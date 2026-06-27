@@ -381,6 +381,8 @@ export function updatePack() {
   const showGeo = busMode !== 'none';
   const physLayerSpace = parseFloat(inputs['layer-spacing']?.value ?? '0') || 0;
   const visualLayerSpace = (inputs['exploded-view'] as HTMLInputElement | null)?.checked ? 40 : 0;
+  const barleyPaper = (inputs['barley-paper'] as HTMLInputElement | null)?.checked ?? false;
+  const barleyThickness = barleyPaper ? (parseFloat(inputs['barley-thickness']?.value ?? '0.2') || 0) : 0;
   if (Layers < 1) Layers = 1;
   if (Layers > S_Total) Layers = S_Total;
   const totalInstances = S_Total * P;
@@ -444,6 +446,25 @@ export function updatePack() {
     rowInter?.classList.add('disabled');
     if (inpInterCol) inpInterCol.disabled = true;
     if (inpInterMet) inpInterMet.disabled = true;
+  }
+
+  /* F8b: Barley paper — show/hide thickness input based on layers */
+  const barleyCheck = $('barley-paper') as HTMLInputElement | null;
+  const barleyRow = $('barley-thickness-row');
+  const barleyInp = $('barley-thickness') as HTMLInputElement | null;
+  if (Layers > 1) {
+    if (barleyCheck) barleyCheck.disabled = false;
+  } else {
+    if (barleyCheck) { barleyCheck.checked = false; barleyCheck.disabled = true; }
+    if (barleyRow) barleyRow.classList.add('hidden');
+    if (barleyInp) barleyInp.disabled = true;
+  }
+  if (barleyCheck?.checked) {
+    if (barleyRow) barleyRow.classList.remove('hidden');
+    if (barleyInp) barleyInp.disabled = false;
+  } else {
+    if (barleyRow) barleyRow.classList.add('hidden');
+    if (barleyInp) barleyInp.disabled = true;
   }
 
   packState.interConnMat.color.set(inpInterCol?.value ?? '#b87333');
@@ -522,7 +543,7 @@ export function updatePack() {
   let instanceIdx = 0; let spacerIdx = 0;
 
   for (let ly = 0; ly < Layers; ly++) {
-    const layerYBase = ly * (l + physLayerSpace + visualLayerSpace);
+    const layerYBase = ly * (l + physLayerSpace + barleyThickness + visualLayerSpace);
     const currentLayerS = (ly < remainder) ? (baseS + 1) : baseS;
     if (ly > 0) { currentXSlot -= xDirection; xDirection *= -1; }
     const layerColCenters: any[][] = [];
@@ -755,8 +776,8 @@ export function updatePack() {
 
   minX -= spacing / 2; maxX += spacing / 2; minZ -= spacing / 2; maxZ += spacing / 2;
   const bW = (maxX - minX); const bD = (maxZ - minZ);
-  const physHeight = (l * Layers) + (physLayerSpace * (Layers - 1));
-  const renderHeight = (l * Layers) + ((physLayerSpace + visualLayerSpace) * (Layers - 1));
+  const physHeight = (l * Layers) + ((physLayerSpace + barleyThickness) * (Layers - 1));
+  const renderHeight = (l * Layers) + ((physLayerSpace + barleyThickness + visualLayerSpace) * (Layers - 1));
   const cX = (minX + maxX) / 2; const cZ = (minZ + maxZ) / 2;
   packState.packGroup.position.set(-cX, 0, -cZ);
   // F15a: Store pack bounds for SVG export

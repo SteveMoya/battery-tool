@@ -59,6 +59,23 @@ import HelpIcon from '../HelpIcon.astro';
     </div>
   </div>
 
+  <div class="toggle-row">
+    <label for="barley-paper" class="cursor-pointer">
+      Barley Paper
+      <HelpIcon position="right" width="180px" align="left">
+        <strong>Barley Paper Interlayer</strong><br />
+        Adds insulating paper between layers. Increases total pack height by the paper thickness per layer boundary.<br /><br />
+        <span class="text-yellow-300">⚠ Reduces axial clearance.</span>
+      </HelpIcon>
+    </label>
+    <input id="barley-paper" type="checkbox" />
+  </div>
+
+  <div id="barley-thickness-row" class="flex flex-col mb-2 hidden">
+    <label class="control-label" for="barley-thickness">Barley Paper Thickness (mm)</label>
+    <input id="barley-thickness" type="number" value="0.2" step="0.05" min="0" class="control-input" />
+  </div>
+
   <div class="control-item full-width mb-2">
     <label class="control-label">Busbar Visualization</label>
     <select id="bus-mode" class="control-input">

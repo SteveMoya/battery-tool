@@ -9,6 +9,7 @@ export const INPUT_IDS = [
   'cell-origin',
   's-count','p-count','target-v','target-ah','c-spacing','hex-mode','pack-layers','layer-spacing',
   'exploded-view','pack-name','calc-ladder',
+  'barley-paper','barley-thickness',
   'gen-target-v','gen-target-ah',
   'sim-cell-ir','sim-strip-mat','sim-strip-w','sim-strip-t','sim-load-slider',
   'col-cell','col-bg','met-cell','col-cap','col-spacer','col-bus','col-inter','met-inter','met-cap','met-bus','met-spacer',
