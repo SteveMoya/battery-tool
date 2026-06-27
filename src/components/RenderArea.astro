@@ -11,6 +11,17 @@
     <span>🖱️ Right: Pan</span>
     <span>🖱️ Scroll: Zoom</span>
   </div>
+  <!-- F18: Camera presets toolbar -->
+  <div id="camera-toolbar" class="absolute top-2 left-2 flex gap-1 z-40 max-md:hidden">
+    <button id="cam-front" class="bg-white/90 border border-slate-300 text-slate-600 text-[0.6rem] font-semibold px-2 py-1 rounded cursor-pointer hover:bg-slate-100 hover:border-slate-400 transition-colors shadow-sm" title="Front View">Front</button>
+    <button id="cam-side" class="bg-white/90 border border-slate-300 text-slate-600 text-[0.6rem] font-semibold px-2 py-1 rounded cursor-pointer hover:bg-slate-100 hover:border-slate-400 transition-colors shadow-sm" title="Side View">Side</button>
+    <button id="cam-top" class="bg-white/90 border border-slate-300 text-slate-600 text-[0.6rem] font-semibold px-2 py-1 rounded cursor-pointer hover:bg-slate-100 hover:border-slate-400 transition-colors shadow-sm" title="Top View">Top</button>
+    <button id="cam-iso" class="bg-white/90 border border-slate-300 text-slate-600 text-[0.6rem] font-semibold px-2 py-1 rounded cursor-pointer hover:bg-slate-100 hover:border-slate-400 transition-colors shadow-sm" title="Isometric View">Iso</button>
+    <button id="cam-free" class="bg-white/90 border border-slate-300 text-slate-600 text-[0.6rem] font-semibold px-2 py-1 rounded cursor-pointer hover:bg-slate-100 hover:border-slate-400 transition-colors shadow-sm" title="Free Orbit">Free</button>
+    <button id="cam-fit" class="bg-white/90 border border-slate-300 text-slate-600 text-[0.6rem] font-semibold px-2 py-1 rounded cursor-pointer hover:bg-slate-100 hover:border-slate-400 transition-colors shadow-sm" title="Zoom to Fit">Fit</button>
+  </div>
+  <!-- F18: Hover tooltip -->
+  <div id="f18-tooltip" class="absolute hidden bg-black/80 text-white text-[0.65rem] px-2 py-1.5 rounded pointer-events-none z-50 max-w-[220px] leading-tight shadow-lg"></div>
   <div
     id="perf-toast"
     class="absolute top-[60px] left-1/2 -translate-x-1/2 bg-white/95 border border-app-yellow border-l-4 border-l-app-yellow py-2 px-4 rounded shadow-lg text-[0.75rem] text-app-amber-dark font-semibold hidden items-center gap-2 z-50 pointer-events-none"

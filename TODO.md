@@ -202,15 +202,14 @@ Implementación existente relevante:
   - ✅ Tabla de referencia de conectores (colapsable)
   - ✅ Safety notes contextuales (anti-spark, margin, voltage drop, high voltage)
 
-- [ ] **F18 — Visualización 3D del Paquete Ensamblado**
-  - Vista 3D completa del pack ya empaquetado: celdas + spacers + busbars + BMS + conectores + cables
-  - Renderizado realista con materiales (metal para busbars, plástico para spacers, shrink wrap translúcido)
-  - Modo "Exploded View" toggle para ver componentes internos separados
-  - Modo "Wireframe" para inspeccionar estructura interna
-  - Cámaras predefinidas: Front, Side, Top, Isometric, Free orbit
-  - Zoom-to-fit con bounding box del pack completo
-  - Highlights al hover sobre componentes con tooltip de info (material, dimensiones, posición)
-  - Screenshot rápido del viewport 3D (PNG con fondo transparente)
+- [x] **F18 — Visualización 3D del Paquete Ensamblado** ✅
+  - ✅ Materiales PBR mejorados: busbars metálicos (metalness 0.85), spacers plásticos (roughness 0.85), shrink wrap translúcido
+  - ✅ Cámaras predefinidas: Front, Side, Top, Isometric, Free orbit — toolbar en viewport
+  - ✅ Zoom-to-fit con bounding box del pack completo
+  - ✅ Wireframe toggle para inspección interna (todos los meshes)
+  - ✅ Hover highlights con raycasting — componente resaltado en azul + tooltip con info (tipo, dimensiones, voltaje, configuración)
+  - ✅ Screenshot PNG del viewport 3D con fondo transparente
+  - ✅ UI: camera toolbar en RenderArea, wireframe toggle + screenshot button en VisualSettingsSection
 
 - [ ] **F19 — Fix Export SVG/PDF + Ficha Técnica de Batería**
   - **Fix SVG**: Corregir exportación SVG de la proyección 2D del pack (F15a) — verificar que todos los elementos se renderizan correctamente (celdas, busbars, dimensiones, leyendas)

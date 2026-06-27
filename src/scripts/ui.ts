@@ -11,6 +11,7 @@ import {
   setUserTouchedBusMode, setLastUserBusMode,
   setUserTouchedBusColor,
   updatePack, getStats, getBomData,
+  setCameraPreset, zoomToFit, toggleWireframe, setupHoverDetection, takeScreenshot,
 } from './pack-builder';
 import {
   rescaleLoadSlider, updateSimulation,
@@ -1958,6 +1959,29 @@ function updatePowerConnectorDisplay() {
   const wiring = generateBmsWiring(packS, selectedBms, packP, cellAh, effectiveIMax);
   const wiringEl = $('conn-bms-wiring');
   if (wiringEl) wiringEl.innerHTML = renderBmsWiringInfo(wiring);
+}
+
+/* ─── F18 — 3D View Controls ─── */
+export function setupF18Controls() {
+  // Camera presets
+  $btn('cam-front')?.addEventListener('click', () => setCameraPreset('front'));
+  $btn('cam-side')?.addEventListener('click', () => setCameraPreset('side'));
+  $btn('cam-top')?.addEventListener('click', () => setCameraPreset('top'));
+  $btn('cam-iso')?.addEventListener('click', () => setCameraPreset('iso'));
+  $btn('cam-free')?.addEventListener('click', () => setCameraPreset('free'));
+  $btn('cam-fit')?.addEventListener('click', () => zoomToFit());
+
+  // Wireframe toggle
+  $inp('f18-wireframe')?.addEventListener('change', (e) => {
+    toggleWireframe((e.target as HTMLInputElement).checked);
+  });
+
+  // Screenshot
+  $btn('f18-screenshot')?.addEventListener('click', () => takeScreenshot());
+
+  // Hover detection
+  const container = document.getElementById('render-area');
+  if (container) setupHoverDetection(container);
 }
 
 export function setupPowerConnectors() {

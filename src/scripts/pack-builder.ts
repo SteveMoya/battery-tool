@@ -24,6 +24,12 @@ let userHasTouchedBusColor = false;
 let perfToastTimer: number | null = null;
 let needsOcclusionUpdate = true;
 
+/* ─── F18 — 3D Visualization state ─── */
+let isWireframe = false;
+let hoveredMesh: THREE.Mesh | null = null;
+let highlightedOriginalColor: THREE.Color | null = null;
+const HIGHLIGHT_COLOR = new THREE.Color(0x60a5fa);
+
 /* ─────────────────────────────────────────────
    F15a — 2D cell positions for SVG export
    ───────────────────────────────────────────── */
@@ -78,11 +84,11 @@ export const packState = {
   wireRedMat: new THREE.MeshStandardMaterial({ color: 0xd32f2f, roughness: 0.5 }),
   wireBlackMat: new THREE.MeshStandardMaterial({ color: 0x212121, roughness: 0.5 }),
   lineMat: new THREE.LineBasicMaterial({ color: 0x333333 }),
-  cellMat: new THREE.MeshStandardMaterial({ roughness: 0.4 }),
-  capMat: new THREE.MeshStandardMaterial({ roughness: 0.4 }),
-  busMat: new THREE.MeshStandardMaterial({ roughness: 0.4 }),
-  spacerMat: new THREE.MeshStandardMaterial({ roughness: 0.8 }),
-  interConnMat:   new THREE.MeshStandardMaterial({ roughness: 0.4 }),
+  cellMat: new THREE.MeshStandardMaterial({ roughness: 0.35, metalness: 0.15 }),
+  capMat: new THREE.MeshStandardMaterial({ roughness: 0.25, metalness: 0.6 }),
+  busMat: new THREE.MeshStandardMaterial({ roughness: 0.2, metalness: 0.85 }),
+  spacerMat: new THREE.MeshStandardMaterial({ roughness: 0.85, metalness: 0.0 }),
+  interConnMat:   new THREE.MeshStandardMaterial({ roughness: 0.3, metalness: 0.8 }),
   bmsBoxGroup:    null as unknown as THREE.Group,
   bmsBoxMat:      new THREE.MeshStandardMaterial({
     color: 0x4a90d9,
@@ -106,6 +112,15 @@ export const packState = {
   bmsWiresMat: new THREE.LineBasicMaterial({ color: 0x60a5fa, transparent: true, opacity: 0.8 }),
   bmsWireNegMat: new THREE.LineBasicMaterial({ color: 0xef4444, transparent: true, opacity: 0.9 }),
   bmsWirePosMat: new THREE.LineBasicMaterial({ color: 0x22c55e, transparent: true, opacity: 0.9 }),
+  shrinkWrapMat: new THREE.MeshStandardMaterial({
+    color: 0xdddddd,
+    transparent: true,
+    opacity: 0.15,
+    roughness: 0.6,
+    metalness: 0.0,
+    side: THREE.DoubleSide,
+    depthWrite: false,
+  }),
 };
 
 export function getStats() { return currentStats; }
@@ -1289,6 +1304,180 @@ let lastBmsBoxResult: BmsBoxResult = {
   hasInterference: false,
   boxWorldMin: { x: 0, y: 0, z: 0 }, boxWorldMax: { x: 0, y: 0, z: 0 },
 };
+
+/* ─── F18 — Camera Presets ─── */
+
+export type CameraPreset = 'front' | 'side' | 'top' | 'iso' | 'free';
+
+export function setCameraPreset(preset: CameraPreset) {
+  const cam = packState.camera;
+  const ctrl = packState.controls;
+  const pb = packBounds3D;
+  const cx = (pb.minX + pb.maxX) / 2;
+  const cy = (pb.minY + pb.maxY) / 2;
+  const cz = (pb.minZ + pb.maxZ) / 2;
+  const center = new THREE.Vector3(cx, cy, cz);
+  const maxDim = Math.max(pb.maxX - pb.minX, pb.maxY - pb.minY, pb.maxZ - pb.minZ);
+  const dist = maxDim * 1.8;
+
+  let target = new THREE.Vector3();
+  switch (preset) {
+    case 'front': target.set(cx, cy, cz + dist); break;
+    case 'side':  target.set(cx + dist, cy, cz); break;
+    case 'top':   target.set(cx, cy + dist, cz + 0.01); break;
+    case 'iso':   target.set(cx + dist * 0.577, cy + dist * 0.577, cz + dist * 0.577); break;
+    case 'free':  target.set(200, 200, 250); break;
+  }
+  cam.position.copy(target);
+  ctrl.target.copy(center);
+  ctrl.update();
+  needsOcclusionUpdate = true;
+}
+
+export function zoomToFit() {
+  const cam = packState.camera;
+  const ctrl = packState.controls;
+  const pb = packBounds3D;
+  const cx = (pb.minX + pb.maxX) / 2;
+  const cy = (pb.minY + pb.maxY) / 2;
+  const cz = (pb.minZ + pb.maxZ) / 2;
+  const center = new THREE.Vector3(cx, cy, cz);
+  const maxDim = Math.max(pb.maxX - pb.minX, pb.maxY - pb.minY, pb.maxZ - pb.minZ);
+  const fov = cam.fov * (Math.PI / 180);
+  const dist = (maxDim / 2) / Math.tan(fov / 2) * 1.5;
+  const dir = cam.position.clone().sub(ctrl.target).normalize();
+  cam.position.copy(center).addScaledVector(dir, dist);
+  ctrl.target.copy(center);
+  ctrl.update();
+  needsOcclusionUpdate = true;
+}
+
+/* ─── F18 — Wireframe Toggle ─── */
+
+export function toggleWireframe(on: boolean) {
+  isWireframe = on;
+  packState.packGroup.traverse((child) => {
+    if ((child as THREE.Mesh).isMesh) {
+      const mesh = child as THREE.Mesh;
+      if (Array.isArray(mesh.material)) {
+        mesh.material.forEach((m) => { (m as THREE.MeshStandardMaterial).wireframe = on; });
+      } else if (mesh.material) {
+        (mesh.material as THREE.MeshStandardMaterial).wireframe = on;
+      }
+    }
+  });
+}
+
+/* ─── F18 — Hover Highlights ─── */
+
+export function setupHoverDetection(container: HTMLElement) {
+  const tooltip = document.getElementById('f18-tooltip');
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+
+  container.addEventListener('mousemove', (e) => {
+    const rect = container.getBoundingClientRect();
+    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, packState.camera);
+    const meshes: THREE.Mesh[] = [];
+    packState.packGroup.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh && (child as THREE.InstancedMesh).isInstancedMesh) {
+        meshes.push(child as THREE.Mesh);
+      }
+    });
+    const intersects = raycaster.intersectObjects(meshes, false);
+
+    // Restore previously hovered
+    if (hoveredMesh && highlightedOriginalColor) {
+      if (Array.isArray(hoveredMesh.material)) {
+        (hoveredMesh.material[0] as THREE.MeshStandardMaterial).emissive.setHex(0x000000);
+      } else {
+        (hoveredMesh.material as THREE.MeshStandardMaterial).emissive.setHex(0x000000);
+      }
+      hoveredMesh = null;
+      highlightedOriginalColor = null;
+    }
+
+    if (intersects.length > 0) {
+      const hit = intersects[0];
+      const mesh = hit.object as THREE.Mesh;
+      hoveredMesh = mesh;
+      highlightedOriginalColor = new THREE.Color();
+
+      if (Array.isArray(mesh.material)) {
+        highlightedOriginalColor.copy((mesh.material[0] as THREE.MeshStandardMaterial).emissive);
+        (mesh.material[0] as THREE.MeshStandardMaterial).emissive.set(HIGHLIGHT_COLOR);
+      } else {
+        highlightedOriginalColor.copy((mesh.material as THREE.MeshStandardMaterial).emissive);
+        (mesh.material as THREE.MeshStandardMaterial).emissive.set(HIGHLIGHT_COLOR);
+      }
+
+      if (tooltip) {
+        const name = (mesh as any).name || 'Unknown';
+        let info = '';
+        const s = currentStats;
+        if (name === 'cells' || name === 'caps') {
+          const cellType = (inputs['cell-type'] as HTMLInputElement | null)?.value ?? 'cylindrical';
+          const d = parseFloat(inputs['c-diam']?.value ?? '18');
+          const l = parseFloat(inputs['c-len']?.value ?? '65');
+          const v = parseFloat(inputs['c-volts']?.value ?? '3.6');
+          info = `<b>${name === 'cells' ? 'Cell Body' : 'Cell Cap'}</b><br>` +
+            `Type: ${cellType}<br>Dimensions: ${d.toFixed(1)} × ${l.toFixed(1)} mm<br>` +
+            `Voltage: ${v.toFixed(2)}V<br>Cells: ${s.cells ?? 0}`;
+        } else if (name === 'busbars') {
+          const mat = (inputs['sim-strip-mat'] as HTMLSelectElement | null)?.value ?? '7';
+          const matName = parseFloat(mat) <= 1.8 ? 'Copper' : parseFloat(mat) <= 2.5 ? 'Nickel-Plated' : parseFloat(mat) >= 13 ? 'Steel' : 'Nickel';
+          info = `<b>Busbars</b><br>Material: ${matName}<br>Config: ${s.s ?? 0}S × ${s.p ?? 1}P`;
+        } else if (name === 'spacers') {
+          info = `<b>Spacers</b><br>Insulating垫片<br>Pack: ${s.s ?? 0}S × ${s.p ?? 1}P`;
+        } else {
+          info = `<b>${name}</b>`;
+        }
+        tooltip.innerHTML = info;
+        tooltip.style.display = 'block';
+        tooltip.style.left = `${e.clientX - rect.left + 12}px`;
+        tooltip.style.top = `${e.clientY - rect.top - 10}px`;
+      }
+    } else {
+      if (tooltip) tooltip.style.display = 'none';
+    }
+  });
+
+  container.addEventListener('mouseleave', () => {
+    if (hoveredMesh && highlightedOriginalColor) {
+      if (Array.isArray(hoveredMesh.material)) {
+        (hoveredMesh.material[0] as THREE.MeshStandardMaterial).emissive.copy(highlightedOriginalColor);
+      } else {
+        (hoveredMesh.material as THREE.MeshStandardMaterial).emissive.copy(highlightedOriginalColor);
+      }
+      hoveredMesh = null;
+      highlightedOriginalColor = null;
+    }
+    if (tooltip) tooltip.style.display = 'none';
+  });
+}
+
+/* ─── F18 — Screenshot ─── */
+
+export function takeScreenshot() {
+  const renderer = packState.renderer;
+  const scene = packState.scene;
+  const camera = packState.camera;
+
+  const prevBg = scene.background;
+  scene.background = null;
+  renderer.render(scene, camera);
+
+  const link = document.createElement('a');
+  link.download = `bca-pack-${Date.now()}.png`;
+  link.href = renderer.domElement.toDataURL('image/png');
+  link.click();
+
+  scene.background = prevBg;
+  needsOcclusionUpdate = true;
+}
 
 export function animate(_time: number) {
   requestAnimationFrame(animate);
