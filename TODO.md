@@ -132,10 +132,13 @@ Implementación existente relevante:
 
 ### 🟡 Prioridad media
 
-- [ ] **F8a — Tolerancia de Pitch 21.2 vs 21.7mm**
-  - Dropdown "Origen de celda" (Tier 1 / Genérica China)
-  - Si 21700 + origen China → `c-spacing` mínimo = 0.5mm; Tier 1 → 0.2mm
-  - Alerta: "0.5mm × 200 celdas = 100mm desviación acumulada" si spacing es subdimensionado
+- [x] **F8a — Tolerancia de Pitch 21.2 vs 21.7mm** ✅
+  - ✅ Dropdown "Origen de celda" (Tier 1 / Genérica China) en CellSpecsSection.astro
+  - ✅ Field `origin` en interfaces `Cell` y `SizePreset`
+  - ✅ Validación: 21700 + China → spacing mínimo 0.5mm; Tier 1 → 0.2mm
+  - ✅ Alerta amber con desviación acumulada calculada: "N cells × X mm = Y mm deviation risk"
+  - ✅ Banner `#pitch-tolerance-warning` con auto-dismiss (8s)
+  - ✅ Check se ejecuta en debouncedUpdate, change de origin, y applyCellData
 
 - [ ] **F8b — Barley Paper**
   - Checkbox "Incluir papel de cebada" + input `barley-thickness` (default 0.2mm)

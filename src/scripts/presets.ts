@@ -1,4 +1,4 @@
-import type { Cell, CellFormFactor } from './cell-database';
+import type { Cell, CellFormFactor, CellOrigin } from './cell-database';
 
 export type CellType = Cell['type'];
 
@@ -19,6 +19,7 @@ export interface SizePreset {
     type: CellType;
     ir: number;
     formFactor?: CellFormFactor;
+    origin?: CellOrigin;
   };
 }
 

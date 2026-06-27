@@ -26,7 +26,7 @@ const debounce = (fn: (...a: any[]) => void, delay: number) => {
   let t: number | null = null;
   return (...args: any[]) => { if (t) clearTimeout(t); t = window.setTimeout(() => fn(...args), delay); };
 };
-const debouncedUpdate = debounce(() => updatePack(), 50);
+const debouncedUpdate = debounce(() => { updatePack(); checkPitchTolerance(); }, 50);
 
 // Typed shortcuts (cleaner casts than `as unknown as ...` everywhere)
 const $sel = (id: string): HTMLSelectElement | null => document.getElementById(id) as HTMLSelectElement | null;
@@ -536,6 +536,59 @@ export function clearChemWarning() {
   if (chemWarnTimer) { window.clearTimeout(chemWarnTimer); chemWarnTimer = null; }
 }
 
+// === F8a: PITCH TOLERANCE ===
+let pitchWarnTimer: number | null = null;
+
+export function showPitchWarning(msg: string) {
+  const el = $('pitch-tolerance-warning');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  if (pitchWarnTimer) window.clearTimeout(pitchWarnTimer);
+  pitchWarnTimer = window.setTimeout(() => el.classList.add('hidden'), 8000);
+}
+
+export function clearPitchWarning() {
+  const el = $('pitch-tolerance-warning');
+  if (el) el.classList.add('hidden');
+  if (pitchWarnTimer) { window.clearTimeout(pitchWarnTimer); pitchWarnTimer = null; }
+}
+
+export function checkPitchTolerance() {
+  const origin = (document.getElementById('cell-origin') as HTMLSelectElement | null)?.value ?? 'tier1';
+  const diam = parseFloat($inp('c-diam')?.value ?? '0');
+  const spacing = parseFloat($inp('c-spacing')?.value ?? '1');
+  const sCount = parseInt($inp('s-count')?.value ?? '10');
+  const pCount = parseInt($inp('p-count')?.value ?? '1');
+  const totalCells = sCount * pCount;
+
+  if (diam < 20 || origin === 'tier1') {
+    if (origin === 'tier1' && diam >= 20 && spacing < 0.2) {
+      const devPerCell = 0.2 - spacing;
+      const totalDev = devPerCell * totalCells;
+      showPitchWarning(
+        `⚠️ Tier 1 21700 min spacing is 0.2mm. Current: ${spacing.toFixed(1)}mm. ` +
+        `${totalCells} cells × ${devPerCell.toFixed(1)}mm = ${totalDev.toFixed(0)}mm cumulative deviation risk.`
+      );
+    } else {
+      clearPitchWarning();
+    }
+    return;
+  }
+
+  const minSpacingChina = 0.5;
+  if (spacing < minSpacingChina) {
+    const devPerCell = minSpacingChina - spacing;
+    const totalDev = devPerCell * totalCells;
+    showPitchWarning(
+      `⚠️ Generic China 21700 requires ≥${minSpacingChina}mm spacing. Current: ${spacing.toFixed(1)}mm. ` +
+      `${totalCells} cells × ${devPerCell.toFixed(1)}mm = ${totalDev.toFixed(0)}mm cumulative deviation risk.`
+    );
+  } else {
+    clearPitchWarning();
+  }
+}
+
 // === F5: GENERATIVE MODE ===
 export function generatePack() {
   const targetV = parseFloat($inp('gen-target-v')?.value ?? '');
@@ -629,6 +682,10 @@ export function applyCellData(data: Cell) {
   if (cylDims) cylDims.classList.toggle('hidden', isPrism);
   if (prismDims) prismDims.classList.toggle('hidden', !isPrism);
 
+  // F8a: Set cell origin if provided
+  const originSel = $sel('cell-origin');
+  if (originSel && data.origin) originSel.value = data.origin;
+
   if (isPrism) {
     const cPrismW = $inp('c-prism-w'); if (cPrismW && data.pw) cPrismW.value = String(data.pw);
     const cPrismD = $inp('c-prism-d'); if (cPrismD && data.pd) cPrismD.value = String(data.pd);
@@ -679,6 +736,7 @@ export function applyCellData(data: Cell) {
   }
   chemSel.dispatchEvent(new Event('change'));
   updatePack();
+  checkPitchTolerance();
 }
 
 // === REVERSE LOOKUP (Poka-yoke) ===
@@ -834,6 +892,13 @@ export function attachAllInputs() {
     const val = (t as any).dataset.val as string;
     if (inputCellType) inputCellType.value = val;
     syncCellTypeUI();
+    updatePack();
+  });
+
+  // F8a: Cell Origin dropdown → pitch tolerance check
+  const cellOrigin = $sel('cell-origin');
+  cellOrigin?.addEventListener('change', () => {
+    checkPitchTolerance();
     updatePack();
   });
 

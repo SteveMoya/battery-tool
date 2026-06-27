@@ -43,6 +43,24 @@ import HelpIcon from '../HelpIcon.astro';
     </div>
   </div>
 
+  <div class="control-item full-width mb-2">
+    <label class="control-label">
+      Cell Origin
+      <HelpIcon position="right" width="220px" align="left">
+        <strong>Pitch Tolerance</strong><br />
+        Chinese generic 21700 cells can vary ±0.5mm from nominal diameter.<br /><br />
+        <strong>Tier 1</strong>: Samsung, LG, Panasonic, Sony — ±0.2mm tolerance.<br />
+        <strong>Generic China</strong>: Wider tolerance — requires larger spacing.
+      </HelpIcon>
+    </label>
+    <select id="cell-origin" class="control-input">
+      <option value="tier1">Tier 1 (Samsung, LG, Panasonic...)</option>
+      <option value="generic-china">Generic China (±0.5mm tolerance)</option>
+    </select>
+  </div>
+
+  <div id="pitch-tolerance-warning" class="hidden bg-amber-900/40 border border-amber-500/50 rounded px-2 py-1.5 mb-2 text-[0.65rem] text-amber-300 leading-snug"></div>
+
   <!-- Cylindrical dimensions (default) -->
   <div id="cell-dims-cylindrical" class="grid grid-cols-2 gap-2 mb-2 items-end">
     <div class="flex flex-col">

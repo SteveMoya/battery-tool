@@ -1,4 +1,5 @@
 export type CellFormFactor = 'cylindrical' | 'prismatic';
+export type CellOrigin = 'tier1' | 'generic-china';
 
 export interface Cell {
   name: string;
@@ -16,6 +17,7 @@ export interface Cell {
   ir: number;        // internal resistance mΩ
   cost?: string;
   formFactor?: CellFormFactor; // defaults to 'cylindrical'
+  origin?: CellOrigin;        // F8a: tier1 = manufacturer spec, generic-china = generic
 }
 
 export const CELL_DB: Cell[] = [
