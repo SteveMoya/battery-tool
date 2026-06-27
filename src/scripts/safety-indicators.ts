@@ -99,6 +99,50 @@ export function checkMicahToll(packCurrentA: number, P: number): MicahTollResult
 }
 
 /* ─────────────────────────────────────────────
+   F9 — Steel Thermal Risk Check
+   Steel (ρ=14×10⁻⁸ Ωm) has high resistivity.
+   If pack current per segment > 30A → thermal risk.
+   ───────────────────────────────────────────── */
+
+const STEEL_THERMAL_THRESHOLD_A = 30;
+
+export interface SteelThermalResult {
+  level: SafetyLevel;
+  currentPerSegment: number;
+  threshold: number;
+  isSteel: boolean;
+}
+
+export function checkSteelThermal(packCurrentA: number, P: number): SteelThermalResult {
+  const rho = parseFloat(inputs['sim-strip-mat']?.value ?? '7');
+  const isSteel = rho >= 13.0;
+  const perSeg = P > 0 ? packCurrentA / P : packCurrentA;
+
+  let level: SafetyLevel = 'neutral';
+  if (isSteel) {
+    if (perSeg > STEEL_THERMAL_THRESHOLD_A) level = 'red';
+    else if (perSeg > STEEL_THERMAL_THRESHOLD_A * 0.8) level = 'yellow';
+    else level = 'green';
+  }
+
+  return { level, currentPerSegment: perSeg, threshold: STEEL_THERMAL_THRESHOLD_A, isSteel };
+}
+
+export function renderSteelThermalIndicator(r: SteelThermalResult) {
+  let text: string;
+  if (!r.isSteel) {
+    text = 'N/A (not steel)';
+  } else if (r.level === 'red') {
+    text = `THERMAL RISK — ${r.currentPerSegment.toFixed(1)}A > ${r.threshold}A limit`;
+  } else if (r.level === 'yellow') {
+    text = `APPROACHING — ${r.currentPerSegment.toFixed(1)}A near ${r.threshold}A limit`;
+  } else {
+    text = `OK — ${r.currentPerSegment.toFixed(1)}A ≤ ${r.threshold}A`;
+  }
+  setSafetyEl('safety-steel-thermal', EMOJI[r.level], text, COLOR[r.level]);
+}
+
+/* ─────────────────────────────────────────────
    F6 — Voltage Sag Semaphore
    Compare vNet vs cutoffPack = cutoff × S
    🟢 OK / 🟡 LVC Cercano (within 10%) / 🔴 HIT LVC

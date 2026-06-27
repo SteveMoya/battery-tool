@@ -148,11 +148,10 @@ Implementación existente relevante:
   - ✅ Layer Y-position incluye barley paper en el pitch por capa
   - ✅ Registrado en `INPUT_IDS` para auto-wiring de eventos
 
-- [ ] **F9 — Materiales Interconector UI**
-  - Ya existe `sim-strip-mat`; falta:
-    - Tooltip con resistividad (Ni 7.0, Cu 1.7, Steel 14.0 ×10⁻⁸ Ωm)
-    - Alerta visual si Steel + corriente > 30A → "Riesgo térmico elevado"
-    - Color automático del busbar por material (ya implementado parcialmente en `pack-builder.ts:368-373`)
+- [x] **F9 — Materiales Interconector UI** ✅
+  - ✅ Tooltip con resistividad (Ni 7.0, Cu 1.7, Steel 14.0 ×10⁻⁸ Ωm) via HelpIcon
+  - ✅ Alerta visual si Steel + corriente > 30A → "Riesgo térmico elevado" (safety-indicators.ts)
+  - ✅ Color automático del busbar por material (pack-builder.ts:480-488)
 
 - [ ] **F10c — Recomendaciones automáticas de tira**
   - Trigger cuando ampacity excedida

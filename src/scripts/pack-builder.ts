@@ -793,7 +793,8 @@ export function updatePack() {
   } else {
     cellAreaSingle = Math.PI * (d / 2) ** 2;
   }
-  cellAreaTotal = cellAreaSingle * S_Total * P;
+  // 2D fill ratio: only count cells in ONE layer (layers stack vertically, same footprint)
+  cellAreaTotal = cellAreaSingle * (S_Total / Layers) * P;
   const fillRatio = packArea > 0 ? cellAreaTotal / packArea : 0;
 
   // Theoretical max densities for current mode

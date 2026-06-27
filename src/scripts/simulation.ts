@@ -1,7 +1,7 @@
 import { inputs, $ } from './dom';
 import {
-  checkVoltageSag, checkAmpacity, checkMicahToll,
-  renderVoltageSagIndicator, renderAmpacityIndicator, renderMicahTollIndicator,
+  checkVoltageSag, checkAmpacity, checkMicahToll, checkSteelThermal,
+  renderVoltageSagIndicator, renderAmpacityIndicator, renderMicahTollIndicator, renderSteelThermalIndicator,
 } from './safety-indicators';
 
 let simMaxVal = 100;
@@ -293,6 +293,9 @@ export function updateSimulation(e?: Event) {
 
   const micahResult = checkMicahToll(I, P);
   renderMicahTollIndicator(micahResult);
+
+  const steelResult = checkSteelThermal(I, P);
+  renderSteelThermalIndicator(steelResult);
 
   renderCurrentStats();
 
