@@ -16,6 +16,7 @@ const THEO_HEX = Math.PI * Math.sqrt(3) / 6;   // ≈ 0.9069
 
 let currentStats: any = {};
 let currentNickelLen = 0;
+let currentIsLadder = false;
 let userHasTouchedBusMode = false;
 let lastUserBusMode = 'both';
 let userHasTouchedBusColor = false;
@@ -100,6 +101,41 @@ export function getCurrentNickelLen() { return currentNickelLen; }
 export function getPerfToastTimer() { return perfToastTimer; }
 export function setPerfToastTimer(t: number | null) { perfToastTimer = t; }
 export function setCurrentStats(s: any) { currentStats = s; }
+
+/* ─── F10d — BOM Linear Footage ─── */
+export interface BomData {
+  nickelInPack: number;
+  ladderOverhead: number;
+  wasteFactorPct: number;
+  wasteFactor: number;
+  nickelMetersTotal: number;
+  cellCount: number;
+  configLabel: string;
+  packName: string;
+}
+
+const WASTE_FACTOR_PCT = 0.15;
+const LADDER_OVERHEAD_PER_P = 0.05;
+
+export function getBomData(): BomData {
+  const s = currentStats;
+  const nickelInPack = s.nickel ?? 0;
+  const isLadder = currentIsLadder;
+  const P = s.p ?? 1;
+  const ladderOverhead = isLadder && P > 1 ? nickelInPack * LADDER_OVERHEAD_PER_P * (P - 1) : 0;
+  const wasteFactor = (nickelInPack + ladderOverhead) * WASTE_FACTOR_PCT;
+  const nickelMetersTotal = nickelInPack + ladderOverhead + wasteFactor;
+  return {
+    nickelInPack,
+    ladderOverhead,
+    wasteFactorPct: WASTE_FACTOR_PCT,
+    wasteFactor,
+    nickelMetersTotal,
+    cellCount: s.cells ?? 0,
+    configLabel: `${s.s ?? 0}S ${s.p ?? 1}P${s.l > 1 ? ` ${s.l}L` : ''}`,
+    packName: s.name ?? 'Pack',
+  };
+}
 
 export function initThree(container: HTMLElement) {
   const scene = new THREE.Scene();
@@ -376,6 +412,7 @@ export function updatePack() {
   const effectiveDepth = cellD + spacing;
   const isHex = (inputs['hex-mode'] as HTMLInputElement | null)?.checked ?? false;
   const isLadder = (inputs['calc-ladder'] as HTMLInputElement | null)?.checked ?? false;
+  currentIsLadder = isLadder;
   const nomV = parseFloat(inputs['c-volts']?.value ?? '3.6');
   const busMode = (inputs['bus-mode'] as unknown as HTMLSelectElement | null)?.value ?? 'both';
   const showGeo = busMode !== 'none';

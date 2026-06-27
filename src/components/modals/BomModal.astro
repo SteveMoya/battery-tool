@@ -1,0 +1,73 @@
+---
+---
+
+<div id="bom-overlay" class="modal-base-overlay">
+  <div
+    id="bom-box"
+    class="bg-white w-[90%] max-w-[420px] max-h-[90vh] rounded-lg shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col"
+  >
+    <!-- Header -->
+    <div class="px-5 py-3 border-b border-slate-200 flex justify-between items-center flex-shrink-0">
+      <h3 class="m-0 text-slate-800 text-[0.95rem]">Bill of Materials — Linear Footage</h3>
+      <button id="btn-close-bom" class="border-none bg-none text-[1.5rem] cursor-pointer leading-none text-slate-400 hover:text-slate-600">×</button>
+    </div>
+
+    <!-- Body -->
+    <div class="px-5 py-4 overflow-y-auto flex-1">
+      <!-- Summary table -->
+      <div class="border border-slate-200 rounded-md p-3 mb-4">
+        <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-2">Nickel Strip Summary</div>
+        <table class="w-full text-[0.78rem] border-collapse">
+          <tbody>
+            <tr class="border-b border-slate-100">
+              <td class="py-1.5 text-slate-500 font-semibold">In-pack length</td>
+              <td id="bom-nickel-in-pack" class="py-1.5 text-right font-mono font-bold text-slate-800">--</td>
+            </tr>
+            <tr id="bom-ladder-row" class="border-b border-slate-100 hidden">
+              <td class="py-1.5 text-slate-500 font-semibold">Ladder overhead</td>
+              <td id="bom-ladder-overhead" class="py-1.5 text-right font-mono font-bold text-slate-800">--</td>
+            </tr>
+            <tr class="border-b border-slate-100">
+              <td class="py-1.5 text-slate-500 font-semibold">Waste factor (15%)</td>
+              <td id="bom-waste" class="py-1.5 text-right font-mono font-bold text-slate-800">--</td>
+            </tr>
+            <tr>
+              <td class="py-2 text-slate-700 font-extrabold">Total to purchase</td>
+              <td id="bom-total" class="py-2 text-right font-mono font-extrabold text-app-blue text-[0.9rem]">--</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Config info -->
+      <div class="border border-slate-200 rounded-md p-3 mb-4">
+        <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-2">Pack Info</div>
+        <div class="flex justify-between text-[0.75rem] mb-1">
+          <span class="text-slate-500 font-semibold">Name</span>
+          <span id="bom-name" class="font-bold text-slate-800">--</span>
+        </div>
+        <div class="flex justify-between text-[0.75rem] mb-1">
+          <span class="text-slate-500 font-semibold">Configuration</span>
+          <span id="bom-config" class="font-bold text-slate-800">--</span>
+        </div>
+        <div class="flex justify-between text-[0.75rem]">
+          <span class="text-slate-500 font-semibold">Total cells</span>
+          <span id="bom-cells" class="font-bold text-slate-800">--</span>
+        </div>
+      </div>
+
+      <!-- Export buttons -->
+      <div class="flex gap-2">
+        <button id="btn-bom-csv" class="flex-1 bg-emerald-600 text-white border-none py-2.5 rounded-md font-bold text-[0.8rem] cursor-pointer hover:bg-emerald-700 transition-colors">
+          Export CSV
+        </button>
+        <button id="btn-bom-json" class="flex-1 bg-app-blue text-white border-none py-2.5 rounded-md font-bold text-[0.8rem] cursor-pointer hover:bg-app-blue-dark transition-colors">
+          Export JSON
+        </button>
+      </div>
+      <button id="btn-cancel-bom" class="w-full mt-2 bg-slate-100 text-slate-600 border border-slate-300 py-2 rounded-md font-bold text-[0.8rem] cursor-pointer hover:bg-slate-200 transition-colors">
+        Close
+      </button>
+    </div>
+  </div>
+</div>

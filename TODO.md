@@ -160,9 +160,13 @@ Implementación existente relevante:
   - ✅ `renderStripRecommendations()` — renderiza en `#safety-ampacity-recs` debajo del indicador
   - ✅ Se oculta automáticamente cuando ampacity es verde/neutro
 
-- [ ] **F10d — BOM metraje lineal**
-  - Calcular `nickelMetersTotal = nickelInPack + ladderOverhead + wasteFactor (15%)`
-  - Exportar a CSV/JSON en BOM modal
+- [x] **F10d — BOM metraje lineal** ✅
+  - ✅ `getBomData()` en `pack-builder.ts` — calcula `nickelMetersTotal = nickelInPack + ladderOverhead + wasteFactor (15%)`
+  - ✅ Interface `BomData` exportada con todos los campos del BOM
+  - ✅ Modal `BomModal.astro` — tabla resumen con desglose de metraje + info del pack
+  - ✅ Export CSV y JSON desde el modal
+  - ✅ Menú "Bill of Materials" en el header (☰ → 📋 Bill of Materials)
+  - ✅ `setupBomOverlay()` en `ui.ts` — wiring del modal, populate data, y download handlers
 
 - [ ] **F13 — Geometría BMS Bounding Box**
   - Inputs `bms-w / bms-d / bms-h / bms-pos-x / bms-pos-y / bms-pos-z / bms-offset-x / bms-offset-y / bms-offset-z` (mm)

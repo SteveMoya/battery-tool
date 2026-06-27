@@ -9,7 +9,7 @@ import {
   setUserSizePresets, setUserChemPresets,
   setUserTouchedBusMode, setLastUserBusMode,
   setUserTouchedBusColor,
-  updatePack, getStats,
+  updatePack, getStats, getBomData,
 } from './pack-builder';
 import {
   rescaleLoadSlider, updateSimulation,
@@ -1312,6 +1312,98 @@ export function setupSvgExportOverlay() {
 
     if (overlay) (overlay as HTMLElement).style.display = 'none';
   });
+}
+
+// === F10d — BOM OVERLAY ===
+export function setupBomOverlay() {
+  const overlay = $('bom-overlay');
+
+  document.getElementById('menu-export-bom')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    openBomModal();
+    fileMenuDropdown()?.classList.remove('show');
+  });
+
+  document.getElementById('btn-close-bom')?.addEventListener('click', closeBomModal);
+  document.getElementById('btn-cancel-bom')?.addEventListener('click', closeBomModal);
+  overlay?.addEventListener('click', (e) => { if (e.target === overlay) closeBomModal(); });
+
+  document.getElementById('btn-bom-csv')?.addEventListener('click', () => {
+    const bom = getBomData();
+    downloadFile(buildCsv(bom), `bca_bom_${safeFileName(bom.packName)}.csv`, 'text/csv');
+    closeBomModal();
+  });
+
+  document.getElementById('btn-bom-json')?.addEventListener('click', () => {
+    const bom = getBomData();
+    downloadFile(JSON.stringify(bom, null, 2), `bca_bom_${safeFileName(bom.packName)}.json`, 'application/json');
+    closeBomModal();
+  });
+}
+
+function openBomModal() {
+  const bom = getBomData();
+  const el = $('bom-overlay');
+  if (!el) return;
+
+  const fmt = (n: number) => n.toFixed(2);
+  setText('bom-nickel-in-pack', `${fmt(bom.nickelInPack)} m`);
+  setText('bom-waste', `+ ${fmt(bom.wasteFactor)} m`);
+  setText('bom-total', `${fmt(bom.nickelMetersTotal)} m`);
+  setText('bom-name', bom.packName || 'Untitled');
+  setText('bom-config', bom.configLabel);
+  setText('bom-cells', String(bom.cellCount));
+
+  const ladderRow = $('bom-ladder-row');
+  if (ladderRow) {
+    if (bom.ladderOverhead > 0) {
+      ladderRow.classList.remove('hidden');
+      setText('bom-ladder-overhead', `+ ${fmt(bom.ladderOverhead)} m`);
+    } else {
+      ladderRow.classList.add('hidden');
+    }
+  }
+
+  (el as HTMLElement).style.display = 'flex';
+}
+
+function closeBomModal() {
+  const el = $('bom-overlay');
+  if (el) (el as HTMLElement).style.display = 'none';
+}
+
+function setText(id: string, val: string) {
+  const el = $(id);
+  if (el) el.textContent = val;
+}
+
+function buildCsv(bom: ReturnType<typeof getBomData>): string {
+  return [
+    'Item,Value,Unit',
+    `Pack Name,"${bom.packName}",`,
+    `Configuration,"${bom.configLabel}",`,
+    `Cell Count,${bom.cellCount},`,
+    `Nickel In-Pack Length,${bom.nickelInPack.toFixed(2)},m`,
+    `Ladder Overhead,${bom.ladderOverhead.toFixed(2)},m`,
+    `Waste Factor (${bom.wasteFactorPct * 100}%),${bom.wasteFactor.toFixed(2)},m`,
+    `Total Nickel to Purchase,${bom.nickelMetersTotal.toFixed(2)},m`,
+  ].join('\n');
+}
+
+function safeFileName(s: string): string {
+  return (s || 'pack').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+}
+
+function downloadFile(content: string, filename: string, mime: string) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 }
 
 // === INITIAL PRESET SELECTION ===

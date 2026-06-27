@@ -3,7 +3,8 @@ import {
   initDisclaimer, setupModals, setupFileMenu, setupReset,
   setupPresetEvents, setupCellDbSearch,
   setupMetallicSliders, attachAllInputs, setupSnapshots,
-  renderSnapList, setupExportOverlay, setupSvgExportOverlay, populatePresets, selectInitialPresets,
+  renderSnapList, setupExportOverlay, setupSvgExportOverlay, setupBomOverlay,
+  populatePresets, selectInitialPresets,
   importStateFromFile, updateDeleteButtons,
 } from './ui';
 import { setupElectricalEngine } from './electrical-engine';
@@ -31,6 +32,7 @@ export function initApp() {
   setupSnapshots();
   setupExportOverlay();
   setupSvgExportOverlay();
+  setupBomOverlay();
   renderSnapList();
   updateDeleteButtons();
 
