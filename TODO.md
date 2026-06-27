@@ -202,6 +202,34 @@ Implementación existente relevante:
   - ✅ Tabla de referencia de conectores (colapsable)
   - ✅ Safety notes contextuales (anti-spark, margin, voltage drop, high voltage)
 
+- [ ] **F18 — Visualización 3D del Paquete Ensamblado**
+  - Vista 3D completa del pack ya empaquetado: celdas + spacers + busbars + BMS + conectores + cables
+  - Renderizado realista con materiales (metal para busbars, plástico para spacers, shrink wrap translúcido)
+  - Modo "Exploded View" toggle para ver componentes internos separados
+  - Modo "Wireframe" para inspeccionar estructura interna
+  - Cámaras predefinidas: Front, Side, Top, Isometric, Free orbit
+  - Zoom-to-fit con bounding box del pack completo
+  - Highlights al hover sobre componentes con tooltip de info (material, dimensiones, posición)
+  - Screenshot rápido del viewport 3D (PNG con fondo transparente)
+
+- [ ] **F19 — Fix Export SVG/PDF + Ficha Técnica de Batería**
+  - **Fix SVG**: Corregir exportación SVG de la proyección 2D del pack (F15a) — verificar que todos los elementos se renderizan correctamente (celdas, busbars, dimensiones, leyendas)
+  - **Fix PDF**: Corregir exportación PDF (F15b) — asegurar que el contenido SVG se embebe correctamente sin cortes ni elementos faltantes
+  - **Ficha Técnica (Datasheet)**: Generar PDF con ficha técnica completa del paquete usando estándares de la industria:
+    - **Header**: Logo empresa, modelo, fecha, número de serie
+    - **Especificaciones eléctricas**: Voltage nominal, capacidad (Ah), energía (Wh), corriente max descarga, corriente max carga, C-rate por celda
+    - **Especificaciones físicas**: Dimensiones (L×W×H), peso estimado, tipo de celda, química
+    - **Configuración**: Series (S) × Paralelo (P), total celdas, distribución por capa
+    - **BMS**: Modelo seleccionado, tipo balance, rango S, corriente max, features
+    - **Conectores**: Conector principal推荐, calibre de cable, fusible, anti-spark
+    - **Seguridad**: Voltage sag %, joule heat %, ampacity por segmento, packing efficiency
+    - **Simulación**: Runtime estimado, curva de descarga, LVC cutoff, temperature range
+    - **BOM Resumen**: Materiales principales con cantidades y metraje
+    - **Normativas**: Referencias a IEC 62619, UN 38.3, UL 2580 (si aplicable)
+  - Formato: A4 landscape con grid layout, logos, tablas con bordes
+  - Export desde menú header: "📄 Technical Datasheet (PDF)"
+  - Datos capturados desde el estado actual del pack (sin re-cálculos)
+
 ### 🟢 Baja prioridad
 
 - [x] **F14 — Documentar arquitectura gráfica** ✅
