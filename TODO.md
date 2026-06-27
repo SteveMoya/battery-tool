@@ -188,9 +188,11 @@ Implementación existente relevante:
 
 ### 🟢 Baja prioridad
 
-- [ ] **F14 — Documentar arquitectura gráfica**
-  - Confirmar que `Three.js` cubre el 3D y que `SVG` nativo cubrirá el 2D (no necesitamos segunda librería 3D)
-  - Documentar decisión: `Three.js` para render interactivo + `SVG` inline para proyección 2D → una sola fuente geométrica
+- [x] **F14 — Documentar arquitectura gráfica** ✅
+  - ✅ Confirmado: Three.js cubre el 3D (InstancedMesh, PerspectiveCamera, WebGLRenderer)
+  - ✅ Confirmado: SVG nativo por string concatenation cubre el 2D (no se necesita segunda librería 3D)
+  - ✅ Documentado: `updatePack()` como fuente geométrica única que alimenta Three.js (3D), SVG (2D) y STL (export)
+  - ✅ Documentado en README.md: diagrama de flujo, tipos compartidos, decisiones de diseño
 
 - [ ] **F15d — Export .STEP**
   - Investigar `three-step`, `occt-import-js`, o `STEP-NC` exporter
