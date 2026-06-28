@@ -106,7 +106,7 @@ Cada paso es atómico, independiente, y puede delegarse a un sub-agente.
 
 ## Fase 3 — Rendimiento
 
-### FIX-10: Memory leak — undisposed geometries in updatePack cleanup
+### ✅ FIX-10: Memory leak — undisposed geometries in updatePack cleanup
 - **File**: `src/scripts/pack-builder.ts`
 - **Lines**: 436-449
 - **Bug**: Cleanup loop doesn't dispose all geometry types (TubeGeometry, inline BufferGeometry)
@@ -124,14 +124,14 @@ Cada paso es atómico, independiente, y puede delegarse a un sub-agente.
   Then clear children.
 - **Verify**: Open dev tools memory tab → no growing detached meshes after 20 updatePack() calls
 
-### FIX-11: Double simulation update on some inputs
+### ✅ FIX-11: Double simulation update on some inputs
 - **File**: `src/scripts/ui.ts`
 - **Lines**: 889-898
 - **Bug**: Some inputs trigger both `debouncedUpdate()` (→ updatePack → updateSimulation) AND direct `updateSimulation()`
 - **Fix**: In the `input` event handler, remove the direct `updateSimulation(e)` call for `sim-load-slider` and `sim-cell-ir` — let `updatePack()` handle it. OR: skip `updatePack()` for simulation-only inputs.
 - **Verify**: Move simulation slider → only one recalculation per frame
 
-### FIX-12: Raycast occlusion runs every frame for all labels
+### ✅ FIX-12: Raycast occlusion runs every frame for all labels
 - **File**: `src/scripts/pack-builder.ts`
 - **Lines**: 1487-1508
 - **Bug**: `animate()` runs raycasting for every label on every frame when `needsOcclusionUpdate` is true
