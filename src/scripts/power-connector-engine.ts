@@ -323,6 +323,7 @@ export function generateBmsWiring(
   packP: number,
   cellAh: number,
   iMax: number,
+  cellNom: number,
 ): BmsWiringData {
   // Balance wire gauge based on series count
   let balAwg = 22;
@@ -339,7 +340,7 @@ export function generateBmsWiring(
 
   // Main B- wire gauge (BMS handles this current)
   const mainCurrent = iMax;
-  const mainCable = recommendCableGauge(mainCurrent, 30, packS * 3.6, 3);
+  const mainCable = recommendCableGauge(mainCurrent, 30, packS * cellNom, 3);
 
   // Generate diagram nodes (vertical layout)
   const diagram: BmsDiagramNode[] = [];

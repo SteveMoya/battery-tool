@@ -1981,7 +1981,7 @@ function updatePowerConnectorDisplay() {
   if (cardEl) cardEl.innerHTML = renderConnectorCard(rec);
 
   // Get BMS wiring data
-  const wiring = generateBmsWiring(packS, selectedBms, packP, cellAh, effectiveIMax);
+  const wiring = generateBmsWiring(packS, selectedBms, packP, cellAh, effectiveIMax, cellNom);
   const wiringEl = $('conn-bms-wiring');
   if (wiringEl) wiringEl.innerHTML = renderBmsWiringInfo(wiring);
 }
