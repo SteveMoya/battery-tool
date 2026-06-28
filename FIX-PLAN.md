@@ -71,7 +71,7 @@ Cada paso es atómico, independiente, y puede delegarse a un sub-agente.
 
 ## Fase 2 — Bugs Menores
 
-### FIX-06: LVC Pack sync doesn't trigger updatePack
+### ✅ FIX-06: LVC Pack sync doesn't trigger updatePack
 - **File**: `src/scripts/ui.ts`
 - **Lines**: 1019-1028
 - **Bug**: LVC Pack input handler calls `updateSimulation()` but not `updatePack()`

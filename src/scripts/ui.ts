@@ -1019,11 +1019,13 @@ export function attachAllInputs() {
   lvcCell?.addEventListener('input', () => {
     const S = parseInt($inp('s-count')?.value ?? '1') || 1;
     if (lvcPack) lvcPack.value = (parseFloat(lvcCell.value) * S).toFixed(1);
+    updatePack();
     updateSimulation();
   });
   lvcPack?.addEventListener('input', () => {
     const S = parseInt($inp('s-count')?.value ?? '1') || 1;
     if (lvcCell) lvcCell.value = (parseFloat(lvcPack.value) / S).toFixed(2);
+    updatePack();
     updateSimulation();
   });
 
