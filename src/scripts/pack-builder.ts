@@ -938,7 +938,7 @@ export function updatePack() {
   const packingResult = checkPacking(fillRatio, theoMax);
   renderPackingIndicator(packingResult);
 
-  const maxAmps = P * parseFloat(inputs['c-amp']?.value ?? '20' || '20');
+  const maxAmps = P * (parseFloat(inputs['c-amp']?.value ?? '20') || 20);
   const slider = $('sim-load-slider') as HTMLInputElement | null;
   if (slider) slider.max = String(maxAmps * 1.5);
   rescaleLoadSlider();

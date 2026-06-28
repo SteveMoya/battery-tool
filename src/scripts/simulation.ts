@@ -120,7 +120,7 @@ export function updateSimulation(e?: Event) {
 
   const mode = ($('sim-mode-val') as HTMLInputElement | null)?.value ?? 'discharge';
   const type = ($('sim-load-type') as HTMLInputElement | null)?.value ?? 'cc';
-  const soc = parseFloat(($('sim-soc') as HTMLInputElement | null)?.value ?? '100' || '100') / 100;
+  const soc = parseFloat(($('sim-soc') as HTMLInputElement | null)?.value ?? '100') / 100 || 1;
 
   const S = parseInt(inputs['s-count']?.value ?? '1') || 1;
   const P = parseInt(inputs['p-count']?.value ?? '1') || 1;
@@ -128,7 +128,7 @@ export function updateSimulation(e?: Event) {
   const cellMin = parseFloat(inputs['c-min-v']?.value ?? '2.5') || 2.5;
   const cellMax = parseFloat(inputs['c-max-v']?.value ?? '4.2') || 4.2;
   const cellNom = parseFloat(inputs['c-volts']?.value ?? '3.6') || 3.6;
-  const cellAh = parseFloat(inputs['c-mah']?.value ?? '2500' || '2500') / 1000;
+  const cellAh = parseFloat(inputs['c-mah']?.value ?? '2500') / 1000 || 2.5;
   const cellAmp = parseFloat(inputs['c-amp']?.value ?? '20') || 20;
 
   const cutoffEl = $('sys-cutoff') as HTMLInputElement | null;
@@ -148,15 +148,15 @@ export function updateSimulation(e?: Event) {
     const lblRuntime = $('lbl-runtime'); if (lblRuntime) lblRuntime.textContent = 'Runtime';
   }
 
-  const irCell = parseFloat(inputs['sim-cell-ir']?.value ?? '25' || '25') / 1000;
-  const rho = parseFloat(inputs['sim-strip-mat']?.value ?? '7' || '7') * 1e-8;
-  const wStrip = parseFloat(inputs['sim-strip-w']?.value ?? '7' || '7') / 1000;
-  const tStrip = parseFloat(inputs['sim-strip-t']?.value ?? '0.15' || '0.15') / 1000;
-  const dRaw = parseFloat(inputs['c-diam']?.value ?? '18' || '18') / 1000;
-  const pwRaw = parseFloat(inputs['c-prism-w']?.value ?? '0' || '0') / 1000;
+  const irCell = parseFloat(inputs['sim-cell-ir']?.value ?? '25') / 1000 || 0.025;
+  const rho = parseFloat(inputs['sim-strip-mat']?.value ?? '7') * 1e-8 || 7e-8;
+  const wStrip = parseFloat(inputs['sim-strip-w']?.value ?? '7') / 1000 || 0.007;
+  const tStrip = parseFloat(inputs['sim-strip-t']?.value ?? '0.15') / 1000 || 0.00015;
+  const dRaw = parseFloat(inputs['c-diam']?.value ?? '18') / 1000 || 0.018;
+  const pwRaw = parseFloat(inputs['c-prism-w']?.value ?? '0') / 1000 || 0;
   const isPrismatic = inputs['cell-type']?.value === 'prismatic';
   const d = isPrismatic && pwRaw > 0 ? pwRaw : dRaw;
-  const sp = parseFloat(inputs['c-spacing']?.value ?? '1' || '1') / 1000;
+  const sp = parseFloat(inputs['c-spacing']?.value ?? '1') / 1000 || 0.001;
 
   const rCellsTotal = (S * irCell) / P;
   const rStripsTotal = ((S * ((rho * (d + sp)) / (wStrip * tStrip))) / P) * 1.2;
