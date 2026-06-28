@@ -165,7 +165,7 @@ Cada paso es atómico, independiente, y puede delegarse a un sub-agente.
   3. Default to 25 if not set
 - **Verify**: Change ambient temp → thermal indicators update
 
-### FIX-15: BOM waste factor configurable
+### ✅ FIX-15: BOM waste factor configurable
 - **File**: `src/scripts/pack-builder.ts`
 - **Lines**: 162-163
 - **Current**: `WASTE_FACTOR_PCT = 0.15` hardcoded

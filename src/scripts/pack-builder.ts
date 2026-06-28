@@ -169,12 +169,14 @@ export function getBomData(): BomData {
   const isLadder = currentIsLadder;
   const P = s.p ?? 1;
   const ladderOverhead = isLadder && P > 1 ? nickelInPack * LADDER_OVERHEAD_PER_P * (P - 1) : 0;
-  const wasteFactor = (nickelInPack + ladderOverhead) * WASTE_FACTOR_PCT;
+  const wastePctInput = parseFloat((document.getElementById('bom-waste-pct') as HTMLInputElement)?.value);
+  const wastePct = isNaN(wastePctInput) ? WASTE_FACTOR_PCT : wastePctInput / 100;
+  const wasteFactor = (nickelInPack + ladderOverhead) * wastePct;
   const nickelMetersTotal = nickelInPack + ladderOverhead + wasteFactor;
   return {
     nickelInPack,
     ladderOverhead,
-    wasteFactorPct: WASTE_FACTOR_PCT,
+    wasteFactorPct: wastePct,
     wasteFactor,
     nickelMetersTotal,
     cellCount: s.cells ?? 0,

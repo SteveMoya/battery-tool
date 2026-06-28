@@ -1379,6 +1379,7 @@ function openBomModal() {
   const fmt = (n: number) => n.toFixed(2);
   setText('bom-nickel-in-pack', `${fmt(bom.nickelInPack)} m`);
   setText('bom-waste', `+ ${fmt(bom.wasteFactor)} m`);
+  setText('bom-waste-label', `Waste factor (${Math.round(bom.wasteFactorPct * 100)}%)`);
   setText('bom-total', `${fmt(bom.nickelMetersTotal)} m`);
   setText('bom-name', bom.packName || 'Untitled');
   setText('bom-config', bom.configLabel);
