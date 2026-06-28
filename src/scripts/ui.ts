@@ -3,6 +3,7 @@ import { DEFAULT_SIZE_PRESETS, DEFAULT_CHEM_PRESETS, type SizePreset, type ChemP
 import { exportSTL } from './stl-export';
 import { exportStep } from './step-export';
 import { exportSvg, exportPdf, type PaperSize, type PaperOrientation } from './svg-export';
+import { exportDatasheet } from './datasheet';
 import { INPUT_IDS, $ } from './dom';
 import {
   packState,
@@ -81,7 +82,7 @@ export function setupModals() {
   setupModal('menu-commercial', 'commercial-overlay');
   setupModal('menu-disclaimer', 'disclaimer-overlay');
 
-  ['feedback-overlay', 'commercial-overlay', 'license-overlay', 'export-overlay', 'step-export-overlay', 'svg-export-overlay', 'modal-overlay'].forEach((id) => {
+  ['feedback-overlay', 'commercial-overlay', 'license-overlay', 'export-overlay', 'step-export-overlay', 'svg-export-overlay', 'bom-overlay', 'datasheet-overlay', 'modal-overlay'].forEach((id) => {
     const el = document.getElementById(id);
     el?.addEventListener('click', (e) => { if (e.target === el) (el as HTMLElement).style.display = 'none'; });
   });
@@ -1334,7 +1335,7 @@ export function setupSvgExportOverlay() {
       const orientation = (document.querySelector<HTMLInputElement>('input[name="svg-orient"]:checked')?.value ?? 'portrait') as PaperOrientation;
       exportPdf({ ...opts, paperSize, orientation });
     } else {
-      exportSvg();
+      exportSvg(opts);
     }
 
     if (overlay) (overlay as HTMLElement).style.display = 'none';
@@ -1431,6 +1432,30 @@ function downloadFile(content: string, filename: string, mime: string) {
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+}
+
+// === F19 — TECHNICAL DATASHEET OVERLAY ===
+export function setupDatasheetOverlay() {
+  const overlay = $('datasheet-overlay');
+
+  document.getElementById('menu-datasheet')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (overlay) (overlay as HTMLElement).style.display = 'flex';
+    fileMenuDropdown()?.classList.remove('show');
+  });
+
+  document.getElementById('btn-close-datasheet')?.addEventListener('click', () => {
+    if (overlay) (overlay as HTMLElement).style.display = 'none';
+  });
+  document.getElementById('btn-cancel-datasheet')?.addEventListener('click', () => {
+    if (overlay) (overlay as HTMLElement).style.display = 'none';
+  });
+  overlay?.addEventListener('click', (e) => { if (e.target === overlay) (overlay as HTMLElement).style.display = 'none'; });
+
+  document.getElementById('btn-gen-datasheet')?.addEventListener('click', () => {
+    exportDatasheet();
+    if (overlay) (overlay as HTMLElement).style.display = 'none';
+  });
 }
 
 // === INITIAL PRESET SELECTION ===

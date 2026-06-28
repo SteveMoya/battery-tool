@@ -1,0 +1,46 @@
+---
+---
+
+<div id="datasheet-overlay" class="modal-base-overlay">
+  <div
+    id="datasheet-box"
+    class="bg-white w-[90%] max-w-[380px] max-h-[90vh] rounded-lg shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col"
+  >
+    <!-- Header -->
+    <div class="px-5 py-3 border-b border-slate-200 flex justify-between items-center flex-shrink-0">
+      <h3 class="m-0 text-slate-800 text-[0.95rem]">Technical Datasheet</h3>
+      <button id="btn-close-datasheet" class="border-none bg-none text-[1.5rem] cursor-pointer leading-none text-slate-400 hover:text-slate-600">×</button>
+    </div>
+
+    <!-- Body -->
+    <div class="px-5 py-4 overflow-y-auto flex-1">
+      <p class="text-[0.78rem] text-slate-600 mb-4 leading-relaxed">
+        Generate a professional A4 landscape PDF with all pack specifications, BMS selection, connector recommendations, safety status, simulation results, and BOM summary.
+      </p>
+
+      <!-- Info card -->
+      <div class="border border-slate-200 rounded-md p-3 mb-4 bg-slate-50">
+        <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-2">Contents</div>
+        <ul class="text-[0.72rem] text-slate-600 list-none p-0 m-0 space-y-1">
+          <li>• Electrical & Physical Specifications</li>
+          <li>• Configuration (S×P, layers, grid)</li>
+          <li>• BMS Recommendation</li>
+          <li>• Power Connectors & Wiring</li>
+          <li>• Safety Status (semaphore indicators)</li>
+          <li>• Simulation Results & Runtime</li>
+          <li>• BOM Summary (nickel strip, cells)</li>
+        </ul>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex gap-2">
+        <button id="btn-gen-datasheet" class="flex-1 bg-app-blue text-white border-none py-2.5 rounded-md font-bold text-[0.8rem] cursor-pointer hover:bg-app-blue-dark transition-colors">
+          Generate PDF
+        </button>
+        <button id="btn-cancel-datasheet" class="flex-1 bg-slate-100 text-slate-600 border border-slate-300 py-2.5 rounded-md font-bold text-[0.8rem] cursor-pointer hover:bg-slate-200 transition-colors">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

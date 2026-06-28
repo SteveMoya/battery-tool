@@ -23,11 +23,12 @@ import StepExportModal from '../components/modals/StepExportModal.astro';
 import SvgExportModal from '../components/modals/SvgExportModal.astro';
 import CompareModal from '../components/modals/CompareModal.astro';
 import CustomBmsModal from '../components/modals/CustomBmsModal.astro';
-import BomModal from '../components/modals/BomModal.astro';
+  import BomModal from '../components/modals/BomModal.astro';
+  import DatasheetModal from '../components/modals/DatasheetModal.astro';
 ---
 
 <Layout
-  title="Battery Pack Architect | 3D Design & Calculation Tool"
+  title="Battery Tool | 3D Design & Calculation Tool"
   description="Free 3D Battery Pack Simulator and Designer. Calculate voltage sag, heat, and efficiency for 18650/21700 packs. Export to STL for 3D printing."
 >
   <aside
@@ -77,6 +78,7 @@ import BomModal from '../components/modals/BomModal.astro';
   <SvgExportModal />
   <CustomBmsModal />
   <BomModal />
+  <DatasheetModal />
 
   <script>
     import { initApp } from '../scripts/app';

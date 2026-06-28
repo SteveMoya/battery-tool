@@ -3,7 +3,7 @@ import {
   initDisclaimer, setupModals, setupFileMenu, setupReset,
   setupPresetEvents, setupCellDbSearch,
   setupMetallicSliders, attachAllInputs, setupSnapshots,
-  renderSnapList, setupExportOverlay, setupStepExportOverlay, setupSvgExportOverlay, setupBomOverlay,
+  renderSnapList,   setupExportOverlay, setupStepExportOverlay, setupSvgExportOverlay, setupBomOverlay, setupDatasheetOverlay,
   setupBmsBox, setupDiagnosticPanel, setupPowerConnectors, setupF18Controls,
   populatePresets, selectInitialPresets,
   importStateFromFile, updateDeleteButtons,
@@ -13,7 +13,7 @@ import { setupElectricalEngine } from './electrical-engine';
 export function initApp() {
   const container = document.getElementById('render-area') as HTMLElement | null;
   if (!container) {
-    console.warn('Battery Pack Architect: render-area no encontrado, abortando init.');
+    console.warn('Battery Tool: render-area no encontrado, abortando init.');
     return;
   }
 
@@ -35,6 +35,7 @@ export function initApp() {
   setupStepExportOverlay();
   setupSvgExportOverlay();
   setupBomOverlay();
+  setupDatasheetOverlay();
   setupBmsBox();
   setupDiagnosticPanel();
   setupPowerConnectors();
