@@ -321,12 +321,12 @@ export interface FillRatioData {
 }
 
 export function calculateStats(w: number, dep: number, h: number, S_Total: number, P: number, L: number, fillData?: FillRatioData) {
-  const v = parseFloat(inputs['c-volts']?.value ?? '3.6');
-  const vMin = parseFloat(inputs['c-min-v']?.value ?? '2.5');
-  const vMax = parseFloat(inputs['c-max-v']?.value ?? '4.2');
-  const ah = parseFloat(inputs['c-mah']?.value ?? '2500');
-  const amp = parseFloat(inputs['c-amp']?.value ?? '20');
-  const weight = parseFloat(inputs['c-weight']?.value ?? '45');
+  const v = parseFloat(inputs['c-volts']?.value ?? '3.6') || 3.6;
+  const vMin = parseFloat(inputs['c-min-v']?.value ?? '2.5') || 2.5;
+  const vMax = parseFloat(inputs['c-max-v']?.value ?? '4.2') || 4.2;
+  const ah = parseFloat(inputs['c-mah']?.value ?? '2500') || 2500;
+  const amp = parseFloat(inputs['c-amp']?.value ?? '20') || 20;
+  const weight = parseFloat(inputs['c-weight']?.value ?? '45') || 45;
   const costStr = inputs['c-cost']?.value ?? '€0';
   const costVal = parseFloat(costStr.replace(/[^0-9.]/g, '')) || 0;
   let costSym = costStr.replace(/[0-9.]/g, '').trim(); if (!costSym) costSym = '€';
@@ -414,11 +414,11 @@ export function calculateStats(w: number, dep: number, h: number, S_Total: numbe
 }
 
 export function updatePack() {
-  const d = parseFloat(inputs['c-diam']?.value ?? '18');
+  const d = parseFloat(inputs['c-diam']?.value ?? '18') || 18;
   const cellType = (inputs['cell-type'] as HTMLInputElement | null)?.value ?? 'cylindrical';
   const isPrismatic = cellType === 'prismatic';
-  const pw = parseFloat(inputs['c-prism-w']?.value ?? '148');  // prismatic width (mm)
-  const pd = parseFloat(inputs['c-prism-d']?.value ?? '27');   // prismatic depth (mm)
+  const pw = parseFloat(inputs['c-prism-w']?.value ?? '148') || 148;  // prismatic width (mm)
+  const pd = parseFloat(inputs['c-prism-d']?.value ?? '27') || 27;   // prismatic depth (mm)
   const stripWidth = parseFloat(inputs['sim-strip-w']?.value ?? '') || (d * 0.4);
   const stripThick = parseFloat(inputs['sim-strip-t']?.value ?? '') || 0.3;
 
@@ -451,12 +451,12 @@ export function updatePack() {
   document.querySelectorAll('.label-tag, .dim-tag').forEach((el) => el.remove());
 
   const l = isPrismatic
-    ? parseFloat(inputs['c-len-p']?.value ?? '91')
-    : parseFloat(inputs['c-len']?.value ?? '65');
-  const S_Total = parseInt(inputs['s-count']?.value ?? '10');
-  const P = parseInt(inputs['p-count']?.value ?? '1');
+    ? parseFloat(inputs['c-len-p']?.value ?? '91') || 91
+    : parseFloat(inputs['c-len']?.value ?? '65') || 65;
+  const S_Total = parseInt(inputs['s-count']?.value ?? '10') || 10;
+  const P = parseInt(inputs['p-count']?.value ?? '1') || 1;
   let Layers = parseInt(inputs['pack-layers']?.value ?? '1') || 1;
-  const spacing = parseFloat(inputs['c-spacing']?.value ?? '1');
+  const spacing = parseFloat(inputs['c-spacing']?.value ?? '1') || 1;
   const effectiveD = d + spacing;
   const cellW = isPrismatic ? pw : d;
   const cellD = isPrismatic ? pd : d;
@@ -465,7 +465,7 @@ export function updatePack() {
   const isHex = (inputs['hex-mode'] as HTMLInputElement | null)?.checked ?? false;
   const isLadder = (inputs['calc-ladder'] as HTMLInputElement | null)?.checked ?? false;
   currentIsLadder = isLadder;
-  const nomV = parseFloat(inputs['c-volts']?.value ?? '3.6');
+  const nomV = parseFloat(inputs['c-volts']?.value ?? '3.6') || 3.6;
   const busMode = (inputs['bus-mode'] as unknown as HTMLSelectElement | null)?.value ?? 'both';
   const showGeo = busMode !== 'none';
   const physLayerSpace = parseFloat(inputs['layer-spacing']?.value ?? '0') || 0;
@@ -938,7 +938,7 @@ export function updatePack() {
   const packingResult = checkPacking(fillRatio, theoMax);
   renderPackingIndicator(packingResult);
 
-  const maxAmps = P * parseFloat(inputs['c-amp']?.value ?? '20');
+  const maxAmps = P * parseFloat(inputs['c-amp']?.value ?? '20' || '20');
   const slider = $('sim-load-slider') as HTMLInputElement | null;
   if (slider) slider.max = String(maxAmps * 1.5);
   rescaleLoadSlider();
