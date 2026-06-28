@@ -105,7 +105,6 @@ export function checkMicahToll(packCurrentA: number, P: number): MicahTollResult
    temperature rise via natural convection (h ≈ 25 W/m²·K).
    ───────────────────────────────────────────── */
 
-const T_AMB = 25;
 const H_CONVECTION = 25;
 
 const MATERIAL_T_MAX: Record<number, number> = {

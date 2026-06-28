@@ -152,11 +152,11 @@ Cada paso es atómico, independiente, y puede delegarse a un sub-agente.
 
 ## Fase 4 — Valores Hardcoded → Dinámicos
 
-### FIX-13: Charge rate per chemistry (related to FIX-05)
+### ✅ FIX-13: Charge rate per chemistry (related to FIX-05)
 - **File**: `src/scripts/simulation.ts`
 - **Already covered in FIX-05**
 
-### FIX-14: Ambient temperature as input
+### ✅ FIX-14: Ambient temperature as input
 - **Files**: `src/scripts/diagnostic.ts`, `src/scripts/safety-indicators.ts`
 - **Current**: `T_AMB = 25` hardcoded in both files
 - **Fix**:
