@@ -120,11 +120,7 @@ export function computeDiagnostic(joule: JouleHeatResult): DiagnosticReport {
 
   function readLevel(el: HTMLElement | null): SafetyLevel {
     if (!el) return 'neutral';
-    const color = el.style.borderColor || el.style.color;
-    if (color.includes('22c55e') || color.includes('34d399')) return 'green';
-    if (color.includes('eab308') || color.includes('fbbf24')) return 'yellow';
-    if (color.includes('ef4444') || color.includes('f87171')) return 'red';
-    return 'neutral';
+    return (el.dataset.level as SafetyLevel) || 'neutral';
   }
 
   function readPct(el: HTMLElement | null): number {
