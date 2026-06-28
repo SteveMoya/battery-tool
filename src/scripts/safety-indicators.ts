@@ -46,8 +46,8 @@ function findClosestAmpacity(tMm: number, wMm: number): AmpacityEntry {
 }
 
 export function checkAmpacity(packCurrentA: number, P: number): AmpacityResult {
-  const tStrip = parseFloat(inputs['sim-strip-t']?.value ?? '0.15');
-  const wStrip = parseFloat(inputs['sim-strip-w']?.value ?? '7');
+  const tStrip = parseFloat(inputs['sim-strip-t']?.value ?? '0.15') || 0.15;
+  const wStrip = parseFloat(inputs['sim-strip-w']?.value ?? '7') || 7;
   const entry = findClosestAmpacity(tStrip, wStrip);
   const perSeg = P > 0 ? packCurrentA / P : packCurrentA;
 
@@ -83,8 +83,8 @@ export interface MicahTollResult {
 }
 
 export function checkMicahToll(packCurrentA: number, P: number): MicahTollResult {
-  const tStrip = parseFloat(inputs['sim-strip-t']?.value ?? '0.15');
-  const wStrip = parseFloat(inputs['sim-strip-w']?.value ?? '7');
+  const tStrip = parseFloat(inputs['sim-strip-t']?.value ?? '0.15') || 0.15;
+  const wStrip = parseFloat(inputs['sim-strip-w']?.value ?? '7') || 7;
 
   const areaRatio = (tStrip * wStrip) / (MICAH_TOLL_T * MICAH_TOLL_W);
   const safeA = MICAH_TOLL_BASELINE_A * areaRatio;
@@ -132,17 +132,17 @@ function getMaterialLabel(rhoRaw: number): string {
 }
 
 export function checkStripThermal(packCurrentA: number, P: number): StripThermalResult {
-  const rhoRaw = parseFloat(inputs['sim-strip-mat']?.value ?? '7');
+  const rhoRaw = parseFloat(inputs['sim-strip-mat']?.value ?? '7') || 7;
   const rho = rhoRaw * 1e-8;
   const perSeg = P > 0 ? packCurrentA / P : packCurrentA;
 
-  const dRaw = parseFloat(inputs['c-diam']?.value ?? '18') / 1000;
-  const pwRaw = parseFloat(inputs['c-prism-w']?.value ?? '0') / 1000;
+  const dRaw = (parseFloat(inputs['c-diam']?.value ?? '18') || 18) / 1000;
+  const pwRaw = (parseFloat(inputs['c-prism-w']?.value ?? '0') || 0) / 1000;
   const isPrismatic = inputs['cell-type']?.value === 'prismatic';
   const d = isPrismatic && pwRaw > 0 ? pwRaw : dRaw;
-  const sp = parseFloat(inputs['c-spacing']?.value ?? '1') / 1000;
-  const wStrip = parseFloat(inputs['sim-strip-w']?.value ?? '7') / 1000;
-  const tStrip = parseFloat(inputs['sim-strip-t']?.value ?? '0.15') / 1000;
+  const sp = (parseFloat(inputs['c-spacing']?.value ?? '1') || 1) / 1000;
+  const wStrip = (parseFloat(inputs['sim-strip-w']?.value ?? '7') || 7) / 1000;
+  const tStrip = (parseFloat(inputs['sim-strip-t']?.value ?? '0.15') || 0.15) / 1000;
   const tAmb = parseFloat(inputs['sim-tamb']?.value ?? '25') || 25;
 
   const L_seg = d + sp;
@@ -216,7 +216,7 @@ export function checkVoltageSag(
   const cutoffPack = cutoff * S;
 
   if (mode !== 'discharge' || I < 0.01) {
-    return { level: 'neutral', vNet, cutoffPack, headroomPct: 100, timeToCutoff: '--' };
+    return { level: 'green', vNet, cutoffPack, headroomPct: 100, timeToCutoff: '--' };
   }
 
   const headroomPct = cutoffPack > 0 ? ((vNet - cutoffPack) / cutoffPack) * 100 : 100;
@@ -280,18 +280,49 @@ const COLOR: Record<SafetyLevel, string> = {
 };
 
 export function renderVoltageSagIndicator(r: VoltageSagResult) {
+  const el = document.getElementById('safety-voltage-sag');
+  if (!el) return;
+
+  const emojiSpan = el.querySelector('.safety-emoji');
+  const textSpan = el.querySelector('.safety-text');
+  if (emojiSpan) emojiSpan.textContent = EMOJI[r.level];
+
+  // Determine bar percentage: 0% = no sag risk, 100% = at/below LVC
+  let barPct: number;
   let text: string;
-  if (r.level === 'neutral') {
-    text = 'N/A (charge/idle)';
+
+  if (r.level === 'green' && r.timeToCutoff === '--') {
+    // Idle / charging — no load, no sag
+    text = `0% — No load`;
+    barPct = 0;
   } else if (r.level === 'red') {
     text = `HIT LVC — ${r.vNet.toFixed(1)}V < ${r.cutoffPack.toFixed(1)}V`;
+    barPct = 100;
   } else if (r.level === 'yellow') {
     text = `LVC Cercano — ${r.headroomPct.toFixed(1)}% headroom`;
+    barPct = Math.max(0, Math.min(100, 100 - r.headroomPct));
   } else {
     text = `OK — ${r.headroomPct.toFixed(1)}% above LVC`;
+    barPct = Math.max(0, Math.min(100, 100 - r.headroomPct));
   }
-  setSafetyEl('safety-voltage-sag', EMOJI[r.level], text, COLOR[r.level], r.level);
 
+  if (textSpan) textSpan.textContent = text;
+  (el as HTMLElement).style.color = COLOR[r.level];
+  (el as HTMLElement).style.borderColor = COLOR[r.level];
+  el.dataset.level = r.level;
+
+  // Update bar
+  const bar = el.querySelector('.diag-bar-fill') as HTMLElement | null;
+  if (bar) {
+    bar.style.width = `${barPct}%`;
+    bar.style.background = COLOR[r.level];
+  }
+
+  // Update percentage label
+  const pctLabel = el.querySelector('.diag-pct') as HTMLElement | null;
+  if (pctLabel) pctLabel.textContent = `${Math.round(barPct)}%`;
+
+  // Update TTC
   const ttEl = document.getElementById('safety-time-to-cutoff');
   if (ttEl) ttEl.textContent = r.timeToCutoff;
 }
@@ -379,8 +410,8 @@ function renderStripRecommendations(r: AmpacityResult) {
     return;
   }
 
-  const tStrip = parseFloat(inputs['sim-strip-t']?.value ?? '0.15');
-  const wStrip = parseFloat(inputs['sim-strip-w']?.value ?? '7');
+  const tStrip = parseFloat(inputs['sim-strip-t']?.value ?? '0.15') || 0.15;
+  const wStrip = parseFloat(inputs['sim-strip-w']?.value ?? '7') || 7;
   const recs = getStripRecommendations(r.currentPerSegment, tStrip, wStrip);
 
   if (recs.length === 0) {

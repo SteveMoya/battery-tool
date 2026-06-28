@@ -15,7 +15,14 @@ let userChemPresets: ChemPreset[] = JSON.parse(localStorage.getItem('batt_vis_pr
 const THEO_SQUARE = Math.PI / 4;               // ≈ 0.7854
 const THEO_HEX = Math.PI * Math.sqrt(3) / 6;   // ≈ 0.9069
 
-let currentStats: any = {};
+export interface PackStats {
+  name: string; s: number; p: number; l: number; cells: number;
+  v: number; ah: number; wh: number; w: number; d: number; h: number;
+  vol: number; kg: number; cost: number; kw: number; amp: number;
+  vmin: number; vmax: number; nickel: number;
+  fillRatio: number; theoMax: number;
+}
+let currentStats: Partial<PackStats> = {};
 let currentNickelLen = 0;
 let currentIsLadder = false;
 let userHasTouchedBusMode = false;
@@ -146,7 +153,7 @@ export function setNeedsOcclusionUpdate(v: boolean) { needsOcclusionUpdate = v; 
 export function getCurrentNickelLen() { return currentNickelLen; }
 export function getPerfToastTimer() { return perfToastTimer; }
 export function setPerfToastTimer(t: number | null) { perfToastTimer = t; }
-export function setCurrentStats(s: any) { currentStats = s; }
+export function setCurrentStats(s: Partial<PackStats>) { currentStats = s; }
 
 /* ─── F10d — BOM Linear Footage ─── */
 export interface BomData {
@@ -180,7 +187,7 @@ export function getBomData(): BomData {
     wasteFactor,
     nickelMetersTotal,
     cellCount: s.cells ?? 0,
-    configLabel: `${s.s ?? 0}S ${s.p ?? 1}P${s.l > 1 ? ` ${s.l}L` : ''}`,
+    configLabel: `${s.s ?? 0}S ${s.p ?? 1}P${(s.l ?? 0) > 1 ? ` ${s.l}L` : ''}`,
     packName: s.name ?? 'Pack',
   };
 }
@@ -564,16 +571,16 @@ export function updatePack() {
   }
 
   packState.interConnMat.color.set(inpInterCol?.value ?? '#b87333');
-  packState.interConnMat.metalness = parseFloat(inpInterMet?.value ?? '0.8');
+  packState.interConnMat.metalness = parseFloat(inpInterMet?.value ?? '0.8') || 0.8;
 
   packState.cellMat.color.set((inputs['col-cell'] as HTMLInputElement)?.value ?? '#f0a3ff');
-  packState.cellMat.metalness = parseFloat((inputs['met-cell'] as HTMLInputElement)?.value ?? '0.15');
+  packState.cellMat.metalness = parseFloat((inputs['met-cell'] as HTMLInputElement)?.value ?? '0.15') || 0.15;
   packState.capMat.color.set((inputs['col-cap'] as HTMLInputElement)?.value ?? '#ffffff');
-  packState.capMat.metalness = parseFloat((inputs['met-cap'] as HTMLInputElement)?.value ?? '0.2');
+  packState.capMat.metalness = parseFloat((inputs['met-cap'] as HTMLInputElement)?.value ?? '0.2') || 0.2;
   packState.spacerMat.color.set((inputs['col-spacer'] as HTMLInputElement)?.value ?? '#111111');
-  packState.spacerMat.metalness = parseFloat((inputs['met-spacer'] as HTMLInputElement)?.value ?? '0');
+  packState.spacerMat.metalness = parseFloat((inputs['met-spacer'] as HTMLInputElement)?.value ?? '0') || 0;
 
-  const matRho = parseFloat((inputs['sim-strip-mat'] as unknown as HTMLSelectElement)?.value ?? '7');
+  const matRho = parseFloat((inputs['sim-strip-mat'] as unknown as HTMLSelectElement)?.value ?? '7') || 7;
   let busColor = (inputs['col-bus'] as HTMLInputElement)?.value ?? '#ff8f00';
   if (!userHasTouchedBusColor) {
     if (matRho <= 1.8) busColor = '#b87333';
@@ -583,7 +590,7 @@ export function updatePack() {
     if (inputs['col-bus']) (inputs['col-bus'] as HTMLInputElement).value = busColor;
   }
   packState.busMat.color.set(busColor);
-  packState.busMat.metalness = parseFloat((inputs['met-bus'] as HTMLInputElement)?.value ?? '0.3');
+  packState.busMat.metalness = parseFloat((inputs['met-bus'] as HTMLInputElement)?.value ?? '0.3') || 0.3;
 
   const cellGeo = isPrismatic
     ? new THREE.BoxGeometry(cellW, l, cellD)
@@ -597,20 +604,20 @@ export function updatePack() {
     : new THREE.CylinderGeometry(effectiveD / 2, effectiveD / 2, 2.0, segs);
 
   const meshCells = new THREE.InstancedMesh(cellGeo, packState.cellMat, totalInstances);
-  (meshCells as any).name = 'cells';
+  meshCells.name = 'cells';
   const meshCaps = new THREE.InstancedMesh(capGeo, packState.capMat, totalInstances);
-  (meshCaps as any).name = 'caps';
+  meshCaps.name = 'caps';
   const hasSpacers = spacing > 0.05;
   const meshSpacers = new THREE.InstancedMesh(spacerGeo, packState.spacerMat, hasSpacers ? totalInstances * 2 : 0);
-  (meshSpacers as any).name = 'spacers';
+  meshSpacers.name = 'spacers';
   const applyShadows = (mesh: THREE.Mesh) => { mesh.castShadow = !highPerf; mesh.receiveShadow = !highPerf; };
   applyShadows(meshCells); applyShadows(meshCaps); applyShadows(meshSpacers);
 
   const maxConns = totalInstances * 4;
   const meshStrips = new THREE.InstancedMesh(boxGeo, packState.busMat, maxConns);
-  (meshStrips as any).name = 'busbars';
+  meshStrips.name = 'busbars';
   const meshBusCaps = new THREE.InstancedMesh(cylGeo, packState.busMat, maxConns * 2);
-  (meshBusCaps as any).name = 'busbars';
+  meshBusCaps.name = 'busbars';
   applyShadows(meshStrips); applyShadows(meshBusCaps);
 
   let stripIdx = 0;
@@ -1421,9 +1428,9 @@ export function setupHoverDetection(container: HTMLElement) {
         const s = currentStats;
         if (name === 'cells' || name === 'caps') {
           const cellType = (inputs['cell-type'] as HTMLInputElement | null)?.value ?? 'cylindrical';
-          const d = parseFloat(inputs['c-diam']?.value ?? '18');
-          const l = parseFloat(inputs['c-len']?.value ?? '65');
-          const v = parseFloat(inputs['c-volts']?.value ?? '3.6');
+          const d = parseFloat(inputs['c-diam']?.value ?? '18') || 18;
+          const l = parseFloat(inputs['c-len']?.value ?? '65') || 65;
+          const v = parseFloat(inputs['c-volts']?.value ?? '3.6') || 3.6;
           info = `<b>${name === 'cells' ? 'Cell Body' : 'Cell Cap'}</b><br>` +
             `Type: ${cellType}<br>Dimensions: ${d.toFixed(1)} × ${l.toFixed(1)} mm<br>` +
             `Voltage: ${v.toFixed(2)}V<br>Cells: ${s.cells ?? 0}`;
@@ -1486,7 +1493,7 @@ export function animate(_time: number) {
   packState.renderer.render(packState.scene, packState.camera);
 
   const now = performance.now();
-  if (needsOcclusionUpdate && currentStats.cells <= 500 && now - lastOcclusionTime > 100) {
+  if (needsOcclusionUpdate && (currentStats.cells ?? 0) <= 500 && now - lastOcclusionTime > 100) {
     lastOcclusionTime = now;
     needsOcclusionUpdate = false;
     for (const label of packState.labels) {
@@ -1504,7 +1511,7 @@ export function animate(_time: number) {
         label.element.classList.remove('occluded');
       }
     }
-  } else if (currentStats.cells > 500) {
+  } else if ((currentStats.cells ?? 0) > 500) {
     if (packState.labels.length > 0 && packState.labels[0].element.classList.contains('occluded')) {
       packState.labels.forEach((l) => l.element.classList.remove('occluded'));
     }

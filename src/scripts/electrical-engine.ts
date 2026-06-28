@@ -14,7 +14,7 @@ const setActive = (field: ActiveField) => {
   resetTimer = window.setTimeout(() => {
     activeField = null;
     resetTimer = null;
-  }, 150);
+  }, 300);
 };
 
 const getCellNom = (): number => parseFloat($inp('c-volts')?.value ?? '3.6') || 3.6;

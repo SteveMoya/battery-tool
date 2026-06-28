@@ -40,11 +40,11 @@ const $btn = (id: string): HTMLButtonElement | null => document.getElementById(i
 function getMaxStripWidth(): number {
   const cellType = ($inp('cell-type') as HTMLInputElement | null)?.value ?? 'cylindrical';
   if (cellType === 'prismatic') {
-    return parseFloat($inp('c-prism-w')?.value ?? '148');
+    return parseFloat($inp('c-prism-w')?.value ?? '148') || 148;
   }
   // Cylindrical: positive terminal is ~40% of diameter.
   // Max strip = 50% of diameter to avoid bridging to negative casing.
-  const d = parseFloat($inp('c-diam')?.value ?? '18');
+  const d = parseFloat($inp('c-diam')?.value ?? '18') || 18;
   return Math.round(d * 0.5 * 10) / 10;
 }
 
@@ -263,18 +263,18 @@ export function setupPresetEvents() {
     if (!name) return;
     const isPrism = $inp('cell-type')?.value === 'prismatic';
     const newData: any = {
-      d: parseFloat($inp('c-diam')?.value ?? '0'),
-      l: parseFloat(isPrism ? ($inp('c-len-p')?.value ?? '91') : ($inp('c-len')?.value ?? '65')),
-      w: parseFloat($inp('c-weight')?.value ?? '0'),
+      d: parseFloat($inp('c-diam')?.value ?? '0') || 0,
+      l: parseFloat(isPrism ? ($inp('c-len-p')?.value ?? '91') : ($inp('c-len')?.value ?? '65')) || (isPrism ? 91 : 65),
+      w: parseFloat($inp('c-weight')?.value ?? '0') || 0,
       cost: $inp('c-cost')?.value ?? '',
-      cap: parseFloat($inp('c-mah')?.value ?? '0'),
-      amp: parseFloat($inp('c-amp')?.value ?? '0'),
+      cap: parseFloat($inp('c-mah')?.value ?? '0') || 0,
+      amp: parseFloat($inp('c-amp')?.value ?? '0') || 0,
       type: 'li-ion' as const,
-      ir: parseFloat($inp('sim-cell-ir')?.value ?? '25'),
+      ir: parseFloat($inp('sim-cell-ir')?.value ?? '25') || 25,
     };
     if (isPrism) {
-      newData.pw = parseFloat($inp('c-prism-w')?.value ?? '148');
-      newData.pd = parseFloat($inp('c-prism-d')?.value ?? '27');
+      newData.pw = parseFloat($inp('c-prism-w')?.value ?? '148') || 148;
+      newData.pd = parseFloat($inp('c-prism-d')?.value ?? '27') || 27;
       newData.d = 0;
       newData.formFactor = 'prismatic';
     }
@@ -309,9 +309,9 @@ export function setupPresetEvents() {
     const name = prompt('Name for Chemistry preset:');
     if (!name) return;
     const newData = {
-      nom: parseFloat($inp('c-volts')?.value ?? '0'),
-      min: parseFloat($inp('c-min-v')?.value ?? '0'),
-      max: parseFloat($inp('c-max-v')?.value ?? '0'),
+      nom: parseFloat($inp('c-volts')?.value ?? '0') || 0,
+      min: parseFloat($inp('c-min-v')?.value ?? '0') || 0,
+      max: parseFloat($inp('c-max-v')?.value ?? '0') || 0,
     };
     setUserChemPresets([...(getUserChemPresets() as ChemPreset[]), { name, group: 'My Saved Presets', data: newData } as any]);
     populatePresets();
@@ -429,8 +429,8 @@ export function updateBmsDisplay() {
   const chemId = ($inp('chem-selector')?.value !== 'custom'
     ? JSON.parse($inp('chem-selector')?.value ?? '{}')?.id
     : null) ?? 'li-ion';
-  const packIMax = parseFloat($inp('c-amp')?.value ?? '20') * packP;
-  const packAh = parseFloat($inp('c-mah')?.value ?? '2500') * packP / 1000;
+  const packIMax = (parseFloat($inp('c-amp')?.value ?? '20') || 20) * packP;
+  const packAh = (parseFloat($inp('c-mah')?.value ?? '2500') || 2500) * packP / 1000;
 
   const selected = sel.value;
 
@@ -544,7 +544,7 @@ export function applyChemPreset(data: ChemData, opts: { silent?: boolean } = {})
     }
   }
 
-  const cellNom = parseFloat($inp('c-volts')?.value ?? String(data.nom));
+  const cellNom = parseFloat($inp('c-volts')?.value ?? String(data.nom)) || data.nom;
   if (!isNaN(cellNom) && Math.abs(cellNom - data.nom) > 0.5) {
     warnings.push(`La celda actual (${cellNom}V nominal) no coincide con esta química; verificá.`);
   }
@@ -588,10 +588,10 @@ export function clearPitchWarning() {
 
 export function checkPitchTolerance() {
   const origin = (document.getElementById('cell-origin') as HTMLSelectElement | null)?.value ?? 'tier1';
-  const diam = parseFloat($inp('c-diam')?.value ?? '0');
-  const spacing = parseFloat($inp('c-spacing')?.value ?? '1');
-  const sCount = parseInt($inp('s-count')?.value ?? '10');
-  const pCount = parseInt($inp('p-count')?.value ?? '1');
+  const diam = parseFloat($inp('c-diam')?.value ?? '0') || 0;
+  const spacing = parseFloat($inp('c-spacing')?.value ?? '1') || 1;
+  const sCount = parseInt($inp('s-count')?.value ?? '10') || 10;
+  const pCount = parseInt($inp('p-count')?.value ?? '1') || 1;
   const totalCells = sCount * pCount;
 
   if (diam < 20 || origin === 'tier1') {
@@ -627,12 +627,12 @@ export function generatePack() {
   const targetAh = parseFloat($inp('gen-target-ah')?.value ?? '');
   if (isNaN(targetV) || isNaN(targetAh) || targetV <= 0 || targetAh <= 0) return;
 
-  const cellNomV = parseFloat($inp('c-volts')?.value ?? '3.6');
-  const cellMinV = parseFloat($inp('c-min-v')?.value ?? '2.5');
-  const cellMah = parseFloat($inp('c-mah')?.value ?? '2500');
+  const cellNomV = parseFloat($inp('c-volts')?.value ?? '3.6') || 3.6;
+  const cellMinV = parseFloat($inp('c-min-v')?.value ?? '2.5') || 2.5;
+  const cellMah = parseFloat($inp('c-mah')?.value ?? '2500') || 2500;
   const cellAh = cellMah / 1000;
   const lvcEl = $('sys-cutoff') as HTMLInputElement | null;
-  const lvcCell = lvcEl ? parseFloat(lvcEl.value) : cellMinV;
+  const lvcCell = lvcEl ? parseFloat(lvcEl.value) || cellMinV : cellMinV;
 
   if (cellAh <= 0 || cellNomV <= 0) return;
 
@@ -778,12 +778,12 @@ const identityFields = ['c-diam', 'c-len', 'c-mah', 'c-amp', 'c-volts', 'c-weigh
 
 function attemptReverseLookup() {
   const current = {
-    d: parseFloat($inp('c-diam')?.value ?? '0'),
-    l: parseFloat($inp('c-len')?.value ?? '0'),
-    cap: parseFloat($inp('c-mah')?.value ?? '0'),
-    amp: parseFloat($inp('c-amp')?.value ?? '0'),
-    v: parseFloat($inp('c-volts')?.value ?? '0'),
-    w: parseFloat($inp('c-weight')?.value ?? '0'),
+    d: parseFloat($inp('c-diam')?.value ?? '0') || 0,
+    l: parseFloat($inp('c-len')?.value ?? '0') || 0,
+    cap: parseFloat($inp('c-mah')?.value ?? '0') || 0,
+    amp: parseFloat($inp('c-amp')?.value ?? '0') || 0,
+    v: parseFloat($inp('c-volts')?.value ?? '0') || 0,
+    w: parseFloat($inp('c-weight')?.value ?? '0') || 0,
     cost: $inp('c-cost')?.value ?? '',
     ir: parseFloat($inp('sim-cell-ir')?.value ?? '25') || 25,
   };
@@ -962,9 +962,9 @@ export function attachAllInputs() {
   // Cell V input → SoC reverse
   const simCellVoltInput = $inp('sim-cell-volt-input');
   simCellVoltInput?.addEventListener('input', () => {
-    const cellMin = parseFloat($inp('c-min-v')?.value ?? '2.5');
-    const cellMax = parseFloat($inp('c-max-v')?.value ?? '4.2');
-    const cellNom = parseFloat($inp('c-volts')?.value ?? '3.6');
+    const cellMin = parseFloat($inp('c-min-v')?.value ?? '2.5') || 2.5;
+    const cellMax = parseFloat($inp('c-max-v')?.value ?? '4.2') || 4.2;
+    const cellNom = parseFloat($inp('c-volts')?.value ?? '3.6') || 3.6;
     let val = parseFloat(simCellVoltInput.value); if (isNaN(val)) return;
     if (val < cellMin) val = cellMin; if (val > cellMax) val = cellMax;
     let low = 0, high = 1;
@@ -1914,9 +1914,9 @@ import {
 function updatePowerConnectorDisplay() {
   const packS = parseInt($inp('s-count')?.value ?? '1') || 1;
   const packP = parseInt($inp('p-count')?.value ?? '1') || 1;
-  const cellNom = parseFloat($inp('c-volts')?.value ?? '3.6');
-  const cellAh = parseFloat($inp('c-mah')?.value ?? '2500') / 1000;
-  const packIMax = parseFloat($inp('c-amp')?.value ?? '20') * packP;
+  const cellNom = parseFloat($inp('c-volts')?.value ?? '3.6') || 3.6;
+  const cellAh = (parseFloat($inp('c-mah')?.value ?? '2500') || 2500) / 1000;
+  const packIMax = (parseFloat($inp('c-amp')?.value ?? '20') || 20) * packP;
 
   // Get max current from simulation slider if available
   const simSlider = $inp('sim-load-slider');

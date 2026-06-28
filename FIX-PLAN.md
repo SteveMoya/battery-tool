@@ -197,7 +197,7 @@ Cada paso es atómico, independiente, y puede delegarse a un sub-agente.
 - **Apply to**: `userChemPresets` as well
 - **Verify**: TypeScript compiles without errors
 
-### FIX-18: Type currentStats properly
+### ✅ FIX-18: Type currentStats properly
 - **File**: `src/scripts/pack-builder.ts`
 - **Line**: 18
 - **Current**: `let currentStats: any = {}`
@@ -214,7 +214,7 @@ Cada paso es atómico, independiente, y puede delegarse a un sub-agente.
   ```
 - **Verify**: TypeScript compiles, all `currentStats.*` accesses are safe
 
-### FIX-19: Remove unnecessary `as any` casts on Three.js names
+### ✅ FIX-19: Remove unnecessary `as any` casts on Three.js names
 - **File**: `src/scripts/pack-builder.ts`
 - **Lines**: 593-606
 - **Current**: `(meshCells as any).name = 'cells'`
@@ -225,7 +225,7 @@ Cada paso es atómico, independiente, y puede delegarse a un sub-agente.
 
 ## Fase 6 — Edge Cases
 
-### FIX-20: Guard all parseFloat/parseInt against NaN
+### ✅ FIX-20: Guard all parseFloat/parseInt against NaN
 - **Files**: ALL scripts
 - **Pattern**: Replace `parseFloat(x ?? 'default')` with `parseFloat(x ?? 'default') || defaultValue`
 - **Files to audit**:
@@ -236,7 +236,7 @@ Cada paso es atómico, independiente, y puede delegarse a un sub-agente.
   - `ui.ts` — lines 427-433, 630-635, 1911-1915
 - **Verify**: Clear every input field one by one → no NaN anywhere in UI
 
-### FIX-21: Anti-loop timer too short
+### ✅ FIX-21: Anti-loop timer too short
 - **File**: `src/scripts/electrical-engine.ts`
 - **Line**: 16
 - **Current**: `150` ms
