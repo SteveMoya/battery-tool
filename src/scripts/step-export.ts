@@ -32,7 +32,7 @@ class StepBuilder {
       'FILE_NAME(\'bca_spacers.step\',',
       `  \'${new Date().toISOString()}\',`,
       '  (\'BCA Tool\'),',
-      '  (\'Pack Architect\'),',
+      '  (\'Battery Tool\'),',
       '  \'\',',
       '  \'\',',
       '  \'\');',

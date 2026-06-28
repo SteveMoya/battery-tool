@@ -11,16 +11,16 @@ export interface Props {
 
 const {
   title,
-  description = 'Free 3D Battery Pack Simulator and Designer. Calculate voltage sag, heat, and efficiency for 18650/21700 packs. Export to STL for 3D printing.',
-  image = 'https://lmf5000.github.io/battery-pack-architect/preview.jpg',
-  canonical = 'https://lmf5000.github.io/battery-pack-architect/',
+  description = 'Free 3D Battery Tool - Simulator and Designer. Create a Custom Battery Pack with real-time electrical and physical stats.',
+  image = '',
+  canonical = '',
   noindex = false,
 } = Astro.props;
 
 const siteUrl = canonical;
-const siteName = 'Battery Pack Architect';
-const author = 'Luke Formosa';
-const keywords = 'battery pack designer, 18650 calculator, 21700 designer, battery visualization, DIY battery pack, battery series parallel, battery pack architect';
+const siteName = 'Battery Tool';
+const author = 'Steve Moya Cepeda';
+const keywords = 'battery pack designer, 18650 calculator, 21700 designer, battery visualization, DIY battery pack, battery series parallel, battery tool';
 ---
 
 <!doctype html>
@@ -28,7 +28,6 @@ const keywords = 'battery pack designer, 18650 calculator, 21700 designer, batte
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="generator" content={Astro.generator} />
 
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -36,8 +35,6 @@ const keywords = 'battery pack designer, 18650 calculator, 21700 designer, batte
     <meta name="author" content={author} />
     <link rel="canonical" href={siteUrl} />
     {noindex && <meta name="robots" content="noindex,nofollow" />}
-
-    <meta name="google-site-verification" content="b0jXxeymRk3QwID_-c3mRkYiOUdeD-RAZqVG166e6Kk" />
 
     <meta property="og:type" content="website" />
     <meta property="og:url" content={siteUrl} />
@@ -48,7 +45,7 @@ const keywords = 'battery pack designer, 18650 calculator, 21700 designer, batte
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={`${title} — Design lithium battery packs in 3D with real-time electrical and physical stats.`} />
+    <meta name="twitter:description" content={`${title} — ${description} `} />
     <meta name="twitter:image" content={image} />
 
     <script type="application/ld+json" set:html={JSON.stringify({
