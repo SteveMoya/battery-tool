@@ -72,9 +72,15 @@ export function rescaleLoadSlider() {
   const cellMax = parseFloat(inputs['c-max-v']?.value ?? '4.2') || 4.2;
   const cellMah = parseFloat(inputs['c-mah']?.value ?? '2500') || 2500;
 
+  const cellNom = parseFloat(inputs['c-volts']?.value ?? '3.6') || 3.6;
+  let maxChargeC = 1.0; // default NMC
+  if (cellNom >= 3.15 && cellNom <= 3.45) maxChargeC = 2.0;      // LFP
+  else if (cellNom >= 2.0 && cellNom <= 2.8) maxChargeC = 3.0;   // LTO
+  else if (cellNom >= 2.9 && cellNom <= 3.1) maxChargeC = 0.5;   // Na-Ion
+
   const dischargeMaxA = (P * cellAmp) * 1.5;
   const packAh = (P * cellMah) / 1000;
-  const chargeMaxA = packAh * 5.0;
+  const chargeMaxA = packAh * maxChargeC;
   const maxA = mode === 'discharge' ? dischargeMaxA : chargeMaxA;
 
   const unit = $('sim-input-unit');
