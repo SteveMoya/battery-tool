@@ -1,4 +1,5 @@
 import { inputs } from './dom';
+import { updatePack } from './pack-builder';
 
 type ActiveField = 's-count' | 'target-v' | 'p-count' | 'target-ah' | null;
 
@@ -60,10 +61,12 @@ export function setupElectricalEngine() {
   cNom?.addEventListener('change', () => {
     if (activeField === 'target-v') vToS(sInp, vInp);
     else sToV(sInp, vInp);
+    updatePack();
   });
   cAh?.addEventListener('change', () => {
     if (activeField === 'target-ah') ahToP(pInp, ahInp);
     else pToAh(pInp, ahInp);
+    updatePack();
   });
 
   sToV(sInp, vInp);

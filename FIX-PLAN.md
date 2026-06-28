@@ -78,7 +78,7 @@ Cada paso es atómico, independiente, y puede delegarse a un sub-agente.
 - **Fix**: Add `updatePack()` call after LVC sync in both handlers
 - **Verify**: Change LVC Pack → BMS validation panel updates
 
-### FIX-07: cNom/cAh change handlers don't trigger updatePack
+### ✅ FIX-07: cNom/cAh change handlers don't trigger updatePack
 - **File**: `src/scripts/electrical-engine.ts`
 - **Lines**: 60-67
 - **Bug**: `cNom` and `cAh` change events only recalculate S/V or P/Ah
