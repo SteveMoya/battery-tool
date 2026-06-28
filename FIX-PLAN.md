@@ -27,7 +27,7 @@ Cada paso es atómico, independiente, y puede delegarse a un sub-agente.
   3. Replace `packS * 3.6` with `packS * cellNom`
 - **Verify**: Select LFP (3.2V) → BMS cable gauge changes vs NMC (3.6V)
 
-### FIX-03: parseInt/parseFloat with empty string produces NaN
+### ✅ FIX-03: parseInt/parseFloat with empty string produces NaN
 - **Files**: `src/scripts/simulation.ts`, `src/scripts/pack-builder.ts`
 - **Lines**: simulation.ts:125-131, pack-builder.ts:456-459
 - **Bug**: `parseInt('')` → NaN, `??` only handles null/undefined
