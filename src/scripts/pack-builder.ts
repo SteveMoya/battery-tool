@@ -6,7 +6,7 @@ import { DEFAULT_SIZE_PRESETS, DEFAULT_CHEM_PRESETS, type SizePreset, type ChemP
 import { inputs, $ } from './dom';
 import { getOpenCircuitVoltage, rescaleLoadSlider, updateSimulation, renderCurrentStats } from './simulation';
 import { checkPacking, renderPackingIndicator } from './safety-indicators';
-import { getAllBms } from './bms-database';
+import { getAllBms, recommendBms, type CellType as BmsCellType } from './bms-database';
 
 let userSizePresets: SizePreset[] = JSON.parse(localStorage.getItem('batt_vis_presets_size_v40') || '[]');
 let userChemPresets: ChemPreset[] = JSON.parse(localStorage.getItem('batt_vis_presets_chem_v40') || '[]');
@@ -975,7 +975,30 @@ function getSelectedBmsDimensions(): { w: number; d: number; h: number } | null 
   const sel = inputs['bms-selector'] as HTMLSelectElement | null;
   if (!sel) return null;
   const name = sel.value;
-  if (name === 'auto' || name === 'none' || name === 'custom-add') return null;
+  if (name === 'none' || name === 'custom-add') return null;
+
+  // When 'auto', use the recommended BMS for the current pack configuration
+  if (name === 'auto') {
+    const packS = parseInt(inputs['s-count']?.value ?? '1') || 1;
+    const packP = parseInt(inputs['p-count']?.value ?? '1') || 1;
+    const cellAh = (parseFloat(inputs['c-mah']?.value ?? '2500') || 2500) / 1000;
+    const cellAmp = parseFloat(inputs['c-amp']?.value ?? '20') || 20;
+    const packIMax = cellAmp * packP;
+    const packAh = cellAh * packP;
+
+    const chemEl = inputs['chem-selector'] as HTMLSelectElement | null;
+    const chemId: BmsCellType = (chemEl && chemEl.value !== 'custom'
+      ? JSON.parse(chemEl.value ?? '{}')?.id
+      : null) ?? 'li-ion';
+
+    const recs = recommendBms(packS, chemId, packIMax, packAh);
+    if (recs.length > 0) {
+      const bms = recs[0].bms;
+      return { w: bms.w, d: bms.d, h: bms.h };
+    }
+    return null;
+  }
+
   const allBms = getAllBms();
   const bms = allBms.find((b) => b.name === name);
   if (!bms) return null;
