@@ -781,7 +781,7 @@ export function updatePack() {
         }
       }
       if (ly > 0 && lastLayerEndCells.length > 0) {
-        const prevBaseY = (ly - 1) * (l + physLayerSpace + visualLayerSpace);
+        const prevBaseY = (ly - 1) * (l + physLayerSpace + barleyThickness + visualLayerSpace);
         const prevOutTop = !inputIsBottom;
         const yStart = prevOutTop ? (prevBaseY + l + offset) : (prevBaseY - offset);
         const yEnd = inputIsBottom ? (layerYBase - offset) : (layerYBase + l + offset);
