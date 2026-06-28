@@ -39,7 +39,7 @@ Cada paso es atómico, independiente, y puede delegarse a un sub-agente.
 - **Apply to ALL parseInt/parseFloat calls in both files that use `??` default**
 - **Verify**: Clear an input field → no NaN in stats panel
 
-### FIX-04: Diagnostic panel reads levels via CSS color strings
+### ✅ FIX-04: Diagnostic panel reads levels via CSS color strings
 - **File**: `src/scripts/diagnostic.ts`
 - **Lines**: 121-128
 - **Bug**: `readLevel()` parses `borderColor` hex strings — fragile
