@@ -40,6 +40,16 @@ import HelpIcon from '../HelpIcon.astro';
           <input id="sim-strip-t" type="number" value="0.15" min="0.05" step="0.05" class="control-input" />
         </div>
       </div>
+      <div class="flex flex-col mt-1.5">
+        <label class="control-label flex items-center gap-1">
+          Ambient Temp (°C)
+          <HelpIcon position="right" width="200px" align="left">
+            <strong>Ambient Temperature</strong><br />
+            Used for thermal risk estimation (Joule heat & strip thermal).
+          </HelpIcon>
+        </label>
+        <input id="sim-tamb" type="number" value="25" min="-20" max="60" step="1" class="control-input" />
+      </div>
     </div>
   </details>
 

@@ -144,17 +144,18 @@ export function checkStripThermal(packCurrentA: number, P: number): StripThermal
   const sp = parseFloat(inputs['c-spacing']?.value ?? '1') / 1000;
   const wStrip = parseFloat(inputs['sim-strip-w']?.value ?? '7') / 1000;
   const tStrip = parseFloat(inputs['sim-strip-t']?.value ?? '0.15') / 1000;
+  const tAmb = parseFloat(inputs['sim-tamb']?.value ?? '25') || 25;
 
   const L_seg = d + sp;
   const R_seg = (rho * L_seg) / (wStrip * tStrip);
   const Q_seg = perSeg * perSeg * R_seg;
   const A_surface = 2 * (wStrip + tStrip) * L_seg;
   const dT = A_surface > 0 ? Q_seg / (H_CONVECTION * A_surface) : 0;
-  const T_strip = T_AMB + dT;
+  const T_strip = tAmb + dT;
 
   const tMax = MATERIAL_T_MAX[rhoRaw] ?? 150;
-  const range = tMax - T_AMB;
-  const pct = range > 0 ? Math.max(0, Math.min(100, ((T_strip - T_AMB) / range) * 100)) : 0;
+  const range = tMax - tAmb;
+  const pct = range > 0 ? Math.max(0, Math.min(100, ((T_strip - tAmb) / range) * 100)) : 0;
 
   let level: SafetyLevel = 'green';
   if (pct >= 80) level = 'red';

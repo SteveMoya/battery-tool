@@ -308,7 +308,8 @@ export function updateSimulation(e?: Event) {
   renderStripThermalIndicator(stripResult);
 
   // F16 — Joule Heat thermal estimation + diagnostic global
-  const jouleResult = checkJouleHeat(heatTotal, S, P);
+  const tAmb = parseFloat(inputs['sim-tamb']?.value ?? '25') || 25;
+  const jouleResult = checkJouleHeat(heatTotal, S, P, tAmb);
   renderJouleHeatIndicator(jouleResult);
   const diagReport = computeDiagnostic(jouleResult);
   renderDiagnosticGlobal(diagReport);
