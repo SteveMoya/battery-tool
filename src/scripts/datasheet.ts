@@ -38,7 +38,7 @@ const SECTION_H = 8;
 /* ── Helper: read DOM input value ── */
 function inp(id: string, fallback: string): string {
   const el = $(id) as HTMLInputElement | null;
-  return el?.value ?? fallback;
+  return (el?.value ?? '') || fallback;
 }
 
 function inpNum(id: string, fallback: number): number {
@@ -351,7 +351,7 @@ export function drawDatasheetPage(pdf: jsPDF, data: PackData): void {
   const contentW = pw - mx * 2;
   const colGap = 8;
   const colW = (contentW - colGap) / 2;
-  const kvGap = 4.5;
+  const kvGap = 3.8;
 
   /* HEADER */
   const headerH = 14;
@@ -372,7 +372,7 @@ export function drawDatasheetPage(pdf: jsPDF, data: PackData): void {
 
   /* ROW 1 */
   let row1Y = my + headerH + 4;
-  const row1H = 46;
+  const row1H = 47;
   drawSection(pdf, mx, row1Y, colW, row1H, 'Electrical Specifications');
   let ky = row1Y + SECTION_H + 4;
   drawKV(pdf, mx + 3, ky, colW, 'Nominal Voltage', `${data.nomV.toFixed(1)} V`); ky += kvGap;
@@ -383,8 +383,7 @@ export function drawDatasheetPage(pdf: jsPDF, data: PackData): void {
   drawKV(pdf, mx + 3, ky, colW, 'Max Charge', `${data.maxChargeA.toFixed(1)} A`); ky += kvGap;
   drawKV(pdf, mx + 3, ky, colW, 'C-rate (max)', `${data.cRate.toFixed(2)}C`); ky += kvGap;
   drawKV(pdf, mx + 3, ky, colW, 'Energy Density (Wh/kg)', data.energyDensityWhPerKg === 'N/A' ? 'N/A' : `${data.energyDensityWhPerKg.toFixed(1)}`); ky += kvGap;
-  drawKV(pdf, mx + 3, ky, colW, 'Energy Density (Wh/L)', data.energyDensityWhPerL === 'N/A' ? 'N/A' : `${data.energyDensityWhPerL.toFixed(1)}`); ky += kvGap;
-  drawKV(pdf, mx + 3, ky, colW, 'Strip', `${data.stripWidth}×${data.stripThickness}mm ${data.stripMaterial}`);
+  drawKV(pdf, mx + 3, ky, colW, 'Energy Density (Wh/L)', data.energyDensityWhPerL === 'N/A' ? 'N/A' : `${data.energyDensityWhPerL.toFixed(1)}`);
 
   const col2X = mx + colW + colGap;
   drawSection(pdf, col2X, row1Y, colW, row1H, 'Physical Specifications');
@@ -452,7 +451,7 @@ export function drawDatasheetPage(pdf: jsPDF, data: PackData): void {
 
   /* ROW 4 */
   let row4Y = row3Y + row3H + 4;
-  const row4H = 28;
+  const row4H = 31;
   drawSection(pdf, mx, row4Y, colW, row4H, 'Simulation Results');
   ky = row4Y + SECTION_H + 4;
   drawKV(pdf, mx + 3, ky, colW, 'Load Current', `${data.simCurrent.toFixed(1)} A`); ky += kvGap;
@@ -465,6 +464,7 @@ export function drawDatasheetPage(pdf: jsPDF, data: PackData): void {
   ky = row4Y + SECTION_H + 4;
   drawKV(pdf, col2X + 3, ky, colW, 'Nickel Strip (total)', `${data.nickelTotal.toFixed(2)} m`); ky += kvGap;
   drawKV(pdf, col2X + 3, ky, colW, 'Cell Count', `${data.cellCount} units`); ky += kvGap;
+  drawKV(pdf, col2X + 3, ky, colW, 'Strip Config', `${data.stripWidth}×${data.stripThickness}mm ${data.stripMaterial}`); ky += kvGap;
   drawKV(pdf, col2X + 3, ky, colW, 'Packing Efficiency', `${(data.packingPct).toFixed(1)}%`);
 
   /* FOOTER */
