@@ -742,6 +742,7 @@ export function applyCellData(data: Cell) {
   const cPulse = $inp('c-pulse-amp'); if (cPulse) cPulse.value = data.pulseAmp != null ? String(data.pulseAmp) : '';
   const cCharge = $inp('c-charge-amp'); if (cCharge) cCharge.value = data.chargeAmp != null ? String(data.chargeAmp) : '';
   const ir = $inp('sim-cell-ir'); if (ir) ir.value = String(data.ir || 25);
+  const rThEl = $inp('sim-rth'); if (rThEl) rThEl.value = String(data.rTh ?? 7);
 
   const sel = $sel('preset-selector');
   if (!sel) return;

@@ -11,7 +11,7 @@ export const INPUT_IDS = [
   'exploded-view','pack-name','calc-ladder',
   'barley-paper','barley-thickness',
   'gen-target-v','gen-target-ah',
-  'sim-cell-ir','sim-strip-mat','sim-strip-w','sim-strip-t','sim-tamb','sim-load-slider',
+  'sim-cell-ir','sim-strip-mat','sim-strip-w','sim-strip-t','sim-tamb','sim-rth','sim-load-slider',
   'col-cell','col-bg','met-cell','col-cap','col-spacer','col-bus','col-inter','met-inter','met-cap','met-bus','met-spacer',
   'bms-selector',
   // F11b: Custom BMS modal inputs
