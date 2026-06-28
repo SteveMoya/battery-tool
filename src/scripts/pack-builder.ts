@@ -919,9 +919,6 @@ export function updatePack() {
     }
   }
 
-  // Overflow detection
-  const overflowCells = 0; // Always fits since pack is computed from cells
-
   calculateStats(bW, bD, physHeight, S_Total, P, Layers, {
     fillRatio,
     theoMax,
