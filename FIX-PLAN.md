@@ -52,7 +52,7 @@ Cada paso es atómico, independiente, y puede delegarse a un sub-agente.
   ```
 - **Verify**: Change CSS colors → diagnostic panel still works
 
-### FIX-05: Charge rate hardcoded to 5C regardless of chemistry
+### ✅ FIX-05: Charge rate hardcoded to 5C regardless of chemistry
 - **File**: `src/scripts/simulation.ts`
 - **Line**: 77
 - **Bug**: `const chargeMaxA = packAh * 5.0;`
