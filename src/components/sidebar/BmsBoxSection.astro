@@ -5,7 +5,7 @@ import HelpIcon from '../HelpIcon.astro';
 <section class="group-box">
   <div class="flex justify-between items-center mb-1.5">
     <h2 class="section-title m-0">6. BMS Bounding Box</h2>
-    <HelpIcon tooltip="Visualize the selected BMS enclosure in 3D attached to the pack face" />
+    <HelpIcon tip="Visualize the selected BMS enclosure in 3D attached to the pack face" />
   </div>
 
   <div class="toggle-row mb-2">
@@ -15,13 +15,13 @@ import HelpIcon from '../HelpIcon.astro';
 
   <div id="bms-box-dims" class="hidden">
     <!-- BMS Dimensions (read-only from selected BMS) -->
-    <div id="bms-box-info" class="bg-slate-50 border border-slate-200 rounded-md p-2 mb-2">
-      <div class="text-[0.65rem] font-bold text-slate-400 uppercase mb-1 tracking-wide">BMS Dimensions</div>
-      <div id="bms-box-dims-text" class="text-[0.72rem] font-mono font-semibold text-slate-700">Select a BMS in section 5</div>
+    <div id="bms-box-info" class="rounded-md p-2 mb-2" style="background: var(--bg-tertiary); border-color: var(--border-primary); border-width: 1px; border-style: solid;">
+      <div class="text-[0.65rem] font-bold uppercase mb-1 tracking-wide" style="color: var(--text-muted);">BMS Dimensions</div>
+      <div id="bms-box-dims-text" class="text-[0.72rem] font-mono font-semibold" style="color: var(--text-primary);">Select a BMS in section 5</div>
     </div>
 
     <!-- Position: 6 faces -->
-    <div class="text-[0.65rem] font-bold text-slate-400 uppercase mb-1 tracking-wide">
+    <div class="text-[0.65rem] font-bold uppercase mb-1 tracking-wide" style="color: var(--text-muted);">
       Position
       <HelpIcon position="right" width="180px" align="left">
         <strong>BMS Position</strong><br />
@@ -29,20 +29,20 @@ import HelpIcon from '../HelpIcon.astro';
       </HelpIcon>
     </div>
     <div class="grid grid-cols-3 gap-1 mb-2">
-      <button id="bms-pos-top" type="button" class="bms-pos-btn px-2 py-1.5 rounded border border-slate-300 bg-white text-[0.65rem] font-semibold text-slate-600 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors">Top</button>
-      <button id="bms-pos-bottom" type="button" class="bms-pos-btn px-2 py-1.5 rounded border border-slate-300 bg-white text-[0.65rem] font-semibold text-slate-600 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors">Bottom</button>
+      <button id="bms-pos-top" type="button" class="bms-pos-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;">Top</button>
+      <button id="bms-pos-bottom" type="button" class="bms-pos-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;">Bottom</button>
       <div></div>
-      <button id="bms-pos-left" type="button" class="bms-pos-btn px-2 py-1.5 rounded border border-slate-300 bg-white text-[0.65rem] font-semibold text-slate-600 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors">Left</button>
-      <button id="bms-pos-right" type="button" class="bms-pos-btn px-2 py-1.5 rounded border border-slate-300 bg-white text-[0.65rem] font-semibold text-slate-600 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors">Right</button>
+      <button id="bms-pos-left" type="button" class="bms-pos-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;">Left</button>
+      <button id="bms-pos-right" type="button" class="bms-pos-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;">Right</button>
       <div></div>
-      <button id="bms-pos-front" type="button" class="bms-pos-btn px-2 py-1.5 rounded border border-slate-300 bg-white text-[0.65rem] font-semibold text-slate-600 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors">Front</button>
-      <button id="bms-pos-back" type="button" class="bms-pos-btn px-2 py-1.5 rounded border border-slate-300 bg-white text-[0.65rem] font-semibold text-slate-600 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors">Back</button>
+      <button id="bms-pos-front" type="button" class="bms-pos-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;">Front</button>
+      <button id="bms-pos-back" type="button" class="bms-pos-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;">Back</button>
       <div></div>
     </div>
     <input id="bms-box-position" type="hidden" value="right" />
 
     <!-- Rotation -->
-    <div class="text-[0.65rem] font-bold text-slate-400 uppercase mb-1 tracking-wide">
+    <div class="text-[0.65rem] font-bold uppercase mb-1 tracking-wide" style="color: var(--text-muted);">
       Rotation
       <HelpIcon position="right" width="180px" align="left">
         <strong>BMS Rotation</strong><br />
@@ -50,14 +50,14 @@ import HelpIcon from '../HelpIcon.astro';
       </HelpIcon>
     </div>
     <div class="grid grid-cols-2 gap-1 mb-2">
-      <button id="bms-rot-left" type="button" class="bms-rot-btn px-2 py-1.5 rounded border border-slate-300 bg-white text-[0.65rem] font-semibold text-slate-600 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors">⟲ Rotate Left</button>
-      <button id="bms-rot-right" type="button" class="bms-rot-btn px-2 py-1.5 rounded border border-slate-300 bg-white text-[0.65rem] font-semibold text-slate-600 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors">⟳ Rotate Right</button>
+      <button id="bms-rot-left" type="button" class="bms-rot-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;">⟲ Rotate Left</button>
+      <button id="bms-rot-right" type="button" class="bms-rot-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;">⟳ Rotate Right</button>
     </div>
     <input id="bms-box-rotation" type="hidden" value="0" />
 
     <!-- Offset from pack edge -->
     <div class="flex items-center justify-between mb-1">
-      <span class="text-[0.65rem] font-bold text-slate-400 uppercase tracking-wide">Gap from Pack Edge</span>
+      <span class="text-[0.65rem] font-bold uppercase tracking-wide" style="color: var(--text-muted);">Gap from Pack Edge</span>
       <HelpIcon position="left" width="200px" align="right">
         <strong>Gap from Pack Edge</strong><br />
         Distance (mm) between the pack face and the BMS box. Increase to add clearance for wires or connectors.
@@ -79,8 +79,8 @@ import HelpIcon from '../HelpIcon.astro';
 
 <style>
   .bms-pos-btn.active, .bms-rot-btn.active {
-    background-color: rgb(59 130 246 / 0.1);
-    border-color: rgb(59 130 246);
-    color: rgb(37 99 235);
+    background-color: color-mix(in srgb, var(--accent-primary) 10%, transparent);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
   }
 </style>

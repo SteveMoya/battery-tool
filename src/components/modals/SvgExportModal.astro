@@ -4,58 +4,59 @@
 <div id="svg-export-overlay" class="modal-base-overlay">
   <div
     id="svg-export-box"
-    class="bg-white w-[90%] max-w-[420px] max-h-[90vh] rounded-lg shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col"
+    class="w-[90%] max-w-[420px] max-h-[90vh] rounded-lg shadow-lg flex flex-col"
+    style="background: var(--bg-secondary);"
   >
     <!-- Header -->
-    <div class="px-5 py-3 border-b border-slate-200 flex justify-between items-center flex-shrink-0">
-      <h3 class="m-0 text-slate-800 text-[0.95rem]">Export 2D Projection</h3>
-      <button id="btn-close-svg-export" class="border-none bg-none text-[1.5rem] cursor-pointer leading-none text-slate-400 hover:text-slate-600">×</button>
+    <div class="px-5 py-3 border-b flex justify-between items-center flex-shrink-0" style="border-color: var(--border-primary);">
+      <h3 class="m-0 text-[0.95rem]" style="color: var(--text-primary);">Export 2D Projection</h3>
+      <button id="btn-close-svg-export" class="border-none bg-none text-[1.5rem] cursor-pointer leading-none" style="color: var(--text-muted);">×</button>
     </div>
 
     <!-- Body -->
     <div class="px-5 py-4 overflow-y-auto flex-1">
       <!-- Format -->
-      <div class="border border-slate-200 rounded-md p-2.5 mb-3">
-        <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-2">Format</div>
+      <div class="border rounded-md p-2.5 mb-3" style="border-color: var(--border-primary);">
+        <div class="text-[0.68rem] font-extrabold uppercase mb-2" style="color: var(--text-muted);">Format</div>
         <div class="flex gap-4">
           <label class="flex items-center gap-1.5 cursor-pointer">
             <input type="radio" name="svg-format" value="svg" checked />
-            <span class="text-[0.75rem] font-semibold text-slate-600">SVG (vector)</span>
+            <span class="text-[0.75rem] font-semibold" style="color: var(--text-tertiary);">SVG (vector)</span>
           </label>
           <label class="flex items-center gap-1.5 cursor-pointer">
             <input type="radio" name="svg-format" value="pdf" />
-            <span class="text-[0.75rem] font-semibold text-slate-600">PDF (1:1 print)</span>
+            <span class="text-[0.75rem] font-semibold" style="color: var(--text-tertiary);">PDF (1:1 print)</span>
           </label>
         </div>
       </div>
 
       <!-- Paper size (only for PDF) -->
-      <div id="svg-pdf-options" class="border border-slate-200 rounded-md p-2.5 mb-3 hidden">
-        <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-2">Paper</div>
+      <div id="svg-pdf-options" class="border rounded-md p-2.5 mb-3 hidden" style="border-color: var(--border-primary);">
+        <div class="text-[0.68rem] font-extrabold uppercase mb-2" style="color: var(--text-muted);">Paper</div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <div class="text-[0.65rem] font-semibold text-slate-500 mb-1">Size</div>
+            <div class="text-[0.65rem] font-semibold mb-1" style="color: var(--text-muted);">Size</div>
             <div class="flex gap-3">
               <label class="flex items-center gap-1 cursor-pointer">
                 <input type="radio" name="svg-paper" value="a4" checked />
-                <span class="text-[0.7rem] text-slate-600">A4</span>
+                <span class="text-[0.7rem]" style="color: var(--text-tertiary);">A4</span>
               </label>
               <label class="flex items-center gap-1 cursor-pointer">
                 <input type="radio" name="svg-paper" value="letter" />
-                <span class="text-[0.7rem] text-slate-600">Letter</span>
+                <span class="text-[0.7rem]" style="color: var(--text-tertiary);">Letter</span>
               </label>
             </div>
           </div>
           <div>
-            <div class="text-[0.65rem] font-semibold text-slate-500 mb-1">Orientation</div>
+            <div class="text-[0.65rem] font-semibold mb-1" style="color: var(--text-muted);">Orientation</div>
             <div class="flex gap-3">
               <label class="flex items-center gap-1 cursor-pointer">
                 <input type="radio" name="svg-orient" value="portrait" checked />
-                <span class="text-[0.7rem] text-slate-600">Portrait</span>
+                <span class="text-[0.7rem]" style="color: var(--text-tertiary);">Portrait</span>
               </label>
               <label class="flex items-center gap-1 cursor-pointer">
                 <input type="radio" name="svg-orient" value="landscape" />
-                <span class="text-[0.7rem] text-slate-600">Landscape</span>
+                <span class="text-[0.7rem]" style="color: var(--text-tertiary);">Landscape</span>
               </label>
             </div>
           </div>
@@ -63,36 +64,36 @@
       </div>
 
       <!-- Layers -->
-      <div class="border border-slate-200 rounded-md p-2.5 mb-3">
-        <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-2">Layers</div>
+      <div class="border rounded-md p-2.5 mb-3" style="border-color: var(--border-primary);">
+        <div class="text-[0.68rem] font-extrabold uppercase mb-2" style="color: var(--text-muted);">Layers</div>
         <div class="flex flex-col gap-1.5">
           <label class="flex items-center gap-2 cursor-pointer">
             <input id="svg-cells" type="checkbox" checked />
-            <span class="text-[0.75rem] font-semibold text-slate-600">Cells (circles / rectangles)</span>
+            <span class="text-[0.75rem] font-semibold" style="color: var(--text-tertiary);">Cells (circles / rectangles)</span>
           </label>
           <label class="flex items-center gap-2 cursor-pointer">
             <input id="svg-busbars" type="checkbox" checked />
-            <span class="text-[0.75rem] font-semibold text-slate-600">Busbars (parallel + series)</span>
+            <span class="text-[0.75rem] font-semibold" style="color: var(--text-tertiary);">Busbars (parallel + series)</span>
           </label>
           <label class="flex items-center gap-2 cursor-pointer">
             <input id="svg-arrows" type="checkbox" checked />
-            <span class="text-[0.75rem] font-semibold text-slate-600">Current direction arrows</span>
+            <span class="text-[0.75rem] font-semibold" style="color: var(--text-tertiary);">Current direction arrows</span>
           </label>
           <label class="flex items-center gap-2 cursor-pointer">
             <input id="svg-welds" type="checkbox" />
-            <span class="text-[0.75rem] font-semibold text-slate-600">Spot weld marks (Ø3mm)</span>
+            <span class="text-[0.75rem] font-semibold" style="color: var(--text-tertiary);">Spot weld marks (Ø3mm)</span>
           </label>
           <label class="flex items-center gap-2 cursor-pointer">
             <input id="svg-polarity" type="checkbox" checked />
-            <span class="text-[0.75rem] font-semibold text-slate-600">Polarity markers (+/−)</span>
+            <span class="text-[0.75rem] font-semibold" style="color: var(--text-tertiary);">Polarity markers (+/−)</span>
           </label>
           <label class="flex items-center gap-2 cursor-pointer">
             <input id="svg-dims" type="checkbox" checked />
-            <span class="text-[0.75rem] font-semibold text-slate-600">Dimension lines</span>
+            <span class="text-[0.75rem] font-semibold" style="color: var(--text-tertiary);">Dimension lines</span>
           </label>
           <label class="flex items-center gap-2 cursor-pointer">
             <input id="svg-grid" type="checkbox" />
-            <span class="text-[0.75rem] font-semibold text-slate-600">Grid overlay (10mm)</span>
+            <span class="text-[0.75rem] font-semibold" style="color: var(--text-tertiary);">Grid overlay (10mm)</span>
           </label>
         </div>
       </div>
@@ -102,7 +103,7 @@
         <button id="btn-do-svg-export" class="flex-1 bg-app-blue text-white border-none py-2.5 rounded-md font-bold text-[0.8rem] cursor-pointer hover:bg-app-blue-dark transition-colors">
           Download
         </button>
-        <button id="btn-cancel-svg-export" class="flex-1 bg-slate-100 text-slate-600 border border-slate-300 py-2.5 rounded-md font-bold text-[0.8rem] cursor-pointer hover:bg-slate-200 transition-colors">
+        <button id="btn-cancel-svg-export" class="flex-1 text-[0.8rem] font-bold cursor-pointer transition-colors" style="background: var(--bg-quaternary); color: var(--text-tertiary); border: 1px solid var(--border-primary); border-radius: 0.375rem; padding: 0.625rem;">
           Cancel
         </button>
       </div>

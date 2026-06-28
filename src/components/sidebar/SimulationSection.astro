@@ -9,7 +9,7 @@ import HelpIcon from '../HelpIcon.astro';
 
   <details>
     <summary>⚙️ Click for Advanced Strip Parameters</summary>
-    <div class="px-2.5 py-2.5 border-t border-slate-200">
+    <div class="px-2.5 py-2.5 border-t" style="border-color: var(--border-primary);">
       <div class="flex flex-col">
         <label class="control-label flex items-center gap-1">
           Strip Material
@@ -46,7 +46,7 @@ import HelpIcon from '../HelpIcon.astro';
   <input type="hidden" id="sim-mode-val" value="discharge" />
   <input type="hidden" id="sim-load-type" value="cc" />
 
-  <div class="bg-slate-50 border border-slate-200 p-2 rounded-md mb-2">
+  <div class="p-2 rounded-md mb-2" style="background: var(--bg-tertiary); border-color: var(--border-primary); border-width: 1px; border-style: solid;">
     <div class="control-item full-width mb-2">
       <label class="flex justify-between mb-0.5">
         <span>Current SoC (Starting Point)</span>
@@ -72,7 +72,7 @@ import HelpIcon from '../HelpIcon.astro';
 
     <div class="flex justify-between items-end mb-1">
       <div class="flex flex-col">
-        <span class="text-[0.7rem] font-bold text-slate-600 mb-0.5 flex items-center">
+        <span class="text-[0.7rem] font-bold mb-0.5 flex items-center" style="color: var(--text-tertiary);">
           Load
           <HelpIcon position="right" width="240px" align="left">
             <strong>Slider Limits</strong>
@@ -94,8 +94,8 @@ import HelpIcon from '../HelpIcon.astro';
         </div>
       </div>
       <div class="text-right">
-        <div id="lbl-sim-c" class="text-[0.7rem] text-slate-500 font-bold">0.00 C</div>
-        <div id="lbl-load-perc" class="text-[0.65rem] text-slate-400 font-semibold">0% of max current</div>
+        <div id="lbl-sim-c" class="text-[0.7rem] font-bold" style="color: var(--text-tertiary);">0.00 C</div>
+        <div id="lbl-load-perc" class="text-[0.65rem] font-semibold" style="color: var(--text-muted);">0% of max current</div>
       </div>
     </div>
 
@@ -108,17 +108,17 @@ import HelpIcon from '../HelpIcon.astro';
     </div>
   </div>
 
-  <div id="sim-results" class="grid grid-cols-[1.1fr_1px_0.9fr] gap-0 bg-white border border-slate-200 rounded-md p-0 mt-2 overflow-visible">
+  <div id="sim-results" class="grid grid-cols-[1.1fr_1px_0.9fr] gap-0 rounded-md p-0 mt-2 overflow-visible" style="background: var(--bg-secondary); border-color: var(--border-primary); border-width: 1px; border-style: solid;">
     <div class="res-col p-1.5 px-2.5 flex flex-col gap-0.5">
-      <div class="flex justify-between items-center mb-1 pb-1 border-b border-slate-100">
-        <span class="res-lbl text-slate-700 font-semibold text-[0.68rem]">Mode:</span>
+      <div class="flex justify-between items-center mb-1 pb-1 border-b" style="border-color: var(--border-primary);">
+        <span class="res-lbl font-semibold text-[0.68rem]" style="color: var(--text-primary);">Mode:</span>
         <div id="toggle-sim-mode" class="inline-toggle">
           <span class="it-opt active warn" data-val="discharge">Disch</span>
           <span class="it-opt" data-val="charge">Chg</span>
         </div>
       </div>
       <div class="res-row flex justify-between items-baseline min-h-4">
-        <span id="lbl-sim-sag" class="res-lbl text-slate-500 font-semibold text-[0.68rem] flex items-center">
+        <span id="lbl-sim-sag" class="res-lbl font-semibold text-[0.68rem] flex items-center" style="color: var(--text-tertiary);">
           Sag
           <HelpIcon position="right" align="left">
             <strong>Voltage Sag (Ohmic)</strong><br />
@@ -128,12 +128,12 @@ import HelpIcon from '../HelpIcon.astro';
         <span id="out-sim-sag" class="res-val font-mono font-bold text-[0.75rem] tracking-[-0.3px] c-red">0.00 V</span>
       </div>
       <div class="res-row flex justify-between items-baseline min-h-4">
-        <span id="lbl-sim-net" class="res-lbl text-slate-500 font-semibold text-[0.68rem] flex items-center">Net Output</span>
+        <span id="lbl-sim-net" class="res-lbl font-semibold text-[0.68rem] flex items-center" style="color: var(--text-tertiary);">Net Output</span>
         <span id="out-sim-netv" class="res-val font-mono font-bold text-[0.75rem] tracking-[-0.3px] c-blue">0.0 V</span>
       </div>
-      <div id="row-lvc-inputs" class="mt-1 pt-1 border-t border-dashed border-slate-100">
+      <div id="row-lvc-inputs" class="mt-1 pt-1 border-t border-dashed" style="border-color: var(--border-primary);">
         <div class="flex justify-between items-center mt-0.5">
-          <span class="res-lbl text-slate-500 font-semibold text-[0.68rem] flex items-center">
+          <span class="res-lbl font-semibold text-[0.68rem] flex items-center" style="color: var(--text-tertiary);">
             LVC (Cell)
             <HelpIcon position="right" align="left">
               <strong>Low Voltage Cutoff</strong><br />
@@ -146,7 +146,7 @@ import HelpIcon from '../HelpIcon.astro';
           </div>
         </div>
         <div class="flex justify-between items-center mt-0.5">
-          <span class="res-lbl text-slate-500 font-semibold text-[0.68rem]">LVC (Pack)</span>
+          <span class="res-lbl font-semibold text-[0.68rem]" style="color: var(--text-tertiary);">LVC (Pack)</span>
           <div class="smart-input-wrap w-[75px]">
             <input id="sys-cutoff-pack" type="number" value="30.0" step="0.5" />
             <span class="unit">V</span>
@@ -154,11 +154,11 @@ import HelpIcon from '../HelpIcon.astro';
         </div>
       </div>
       <div id="row-usable-cap" class="res-row flex justify-between items-baseline min-h-4 mt-1">
-        <span class="res-lbl text-slate-500 font-semibold text-[0.68rem]">Usable Cap</span>
+        <span class="res-lbl font-semibold text-[0.68rem]" style="color: var(--text-tertiary);">Usable Cap</span>
         <span id="out-sim-usable" class="res-val font-mono font-bold text-[0.75rem] c-teal">100%</span>
       </div>
       <div id="row-runtime" class="res-row flex justify-between items-baseline min-h-4">
-        <span id="lbl-runtime" class="res-lbl text-slate-500 font-semibold text-[0.68rem] flex items-center">
+        <span id="lbl-runtime" class="res-lbl font-semibold text-[0.68rem] flex items-center" style="color: var(--text-tertiary);">
           Runtime
           <HelpIcon position="right" align="left">
             Estimated time until battery hits LVC or 0% SoC.
@@ -167,34 +167,34 @@ import HelpIcon from '../HelpIcon.astro';
         <span id="out-sim-runtime" class="res-val font-mono font-bold text-[0.75rem] c-dark">--</span>
       </div>
     </div>
-    <div class="w-px bg-slate-100 my-1"></div>
+      <div class="w-px my-1" style="background: var(--border-primary);"></div>
     <div class="res-col p-1.5 px-2.5 flex flex-col gap-0.5">
       <div class="res-row flex justify-between items-baseline min-h-4">
-        <span class="res-lbl text-slate-500 font-semibold text-[0.68rem]">Current</span>
+        <span class="res-lbl font-semibold text-[0.68rem]" style="color: var(--text-tertiary);">Current</span>
         <span id="out-sim-amps" class="res-val font-mono font-bold text-[0.75rem] c-indigo">0.0 A</span>
       </div>
       <div class="res-row flex justify-between items-baseline min-h-4">
-        <span class="res-lbl text-slate-500 font-semibold text-[0.68rem]">Total Pwr</span>
+        <span class="res-lbl font-semibold text-[0.68rem]" style="color: var(--text-tertiary);">Total Pwr</span>
         <span id="out-sim-power-total" class="res-val font-mono font-bold text-[0.75rem] c-violet">0 W</span>
       </div>
       <div class="res-row flex justify-between items-baseline min-h-4">
-        <span class="res-lbl text-slate-500 font-semibold text-[0.68rem]">Useful Pwr</span>
+        <span class="res-lbl font-semibold text-[0.68rem]" style="color: var(--text-tertiary);">Useful Pwr</span>
         <span id="out-sim-power-useful" class="res-val font-mono font-bold text-[0.75rem] c-blue">0 W</span>
       </div>
       <div class="res-row flex justify-between items-baseline min-h-4 mt-1">
-        <span class="res-lbl text-slate-500 font-semibold text-[0.68rem]">Heat (cells)</span>
+        <span class="res-lbl font-semibold text-[0.68rem]" style="color: var(--text-tertiary);">Heat (cells)</span>
         <span id="out-sim-heat-cell" class="res-val font-mono font-bold text-[0.75rem] c-orange">0 W</span>
       </div>
       <div class="res-row flex justify-between items-baseline min-h-4">
-        <span class="res-lbl text-slate-500 font-semibold text-[0.68rem]">Heat (strips)</span>
+        <span class="res-lbl font-semibold text-[0.68rem]" style="color: var(--text-tertiary);">Heat (strips)</span>
         <span id="out-sim-heat-strip" class="res-val font-mono font-bold text-[0.75rem] c-red">0 W</span>
       </div>
       <div class="res-row flex justify-between items-baseline min-h-4">
         <span class="res-lbl font-bold text-app-red-dark">Total Waste</span>
         <span id="out-sim-heat-total" class="res-val font-mono font-extrabold text-[0.75rem] c-red">0 W</span>
       </div>
-      <div class="res-row flex justify-between items-baseline min-h-4 mt-auto pt-1 border-t border-dashed border-slate-100">
-        <span class="res-lbl text-slate-500 font-semibold text-[0.68rem]">Efficiency</span>
+      <div class="res-row flex justify-between items-baseline min-h-4 mt-auto pt-1 border-t border-dashed" style="border-color: var(--border-primary);">
+        <span class="res-lbl font-semibold text-[0.68rem]" style="color: var(--text-tertiary);">Efficiency</span>
         <span id="out-sim-eff" class="res-val font-mono font-bold text-[0.75rem] c-green">100%</span>
       </div>
       <div id="row-status" class="res-row flex justify-end items-center min-h-[14px]">

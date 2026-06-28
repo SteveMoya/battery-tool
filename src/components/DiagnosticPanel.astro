@@ -4,17 +4,19 @@
 
 <aside
   id="diagnostic-panel"
-  class="diag-panel h-full bg-white border-l border-slate-200 flex flex-col shadow-[-4px_0_20px_rgba(0,0,0,0.03)] z-20 flex-shrink-0 transition-all duration-300"
+  class="diag-panel h-full flex flex-col z-20 flex-shrink-0 transition-all duration-300"
+  style="background: var(--bg-secondary); border-color: var(--border-primary); border-width: 0 0 0 1px; border-style: solid; box-shadow: -4px 0 20px rgba(0,0,0,0.03);"
 >
   <!-- Header -->
-  <div class="diag-header flex items-center justify-between px-3 py-2 border-b border-slate-200 bg-slate-50">
+  <div class="diag-header flex items-center justify-between px-3 py-2 border-b" style="border-color: var(--border-primary); background: var(--bg-tertiary);">
     <div class="flex items-center gap-1.5">
       <span id="diag-global-status" class="text-lg leading-none">⚪</span>
-      <span class="text-[0.72rem] font-extrabold text-slate-600 uppercase tracking-wide">Diagnostic</span>
+      <span class="text-[0.72rem] font-extrabold uppercase tracking-wide" style="color: var(--text-tertiary);">Diagnostic</span>
     </div>
     <button
       id="diag-toggle-btn"
-      class="diag-collapse-btn text-slate-400 hover:text-slate-600 transition-colors"
+      class="diag-collapse-btn transition-colors"
+      style="color: var(--text-muted);"
       title="Collapse panel"
     >
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -28,7 +30,7 @@
     <!-- Global Status -->
     <div class="diag-section mb-3">
       <div class="flex items-center justify-between mb-1">
-        <span class="text-[0.65rem] font-bold text-slate-500 uppercase">Global Status</span>
+        <span class="text-[0.65rem] font-bold uppercase" style="color: var(--text-muted);">Global Status</span>
         <span id="diag-global-label" class="text-[0.68rem] font-extrabold">NO DATA</span>
       </div>
       <div class="diag-bar-track">
@@ -36,14 +38,14 @@
       </div>
     </div>
 
-    <div class="border-t border-dashed border-slate-200 mb-2"></div>
+    <div class="border-t border-dashed mb-2" style="border-color: var(--border-primary);"></div>
 
     <!-- Voltage Sag (F6) — reuses DOM IDs from safety-indicators.ts -->
-    <div id="safety-voltage-sag" class="diag-metric mb-2 p-1.5 rounded border border-slate-200 bg-white" style="color: #94a3b8; border-color: #94a3b8;" data-level="neutral">
+    <div id="safety-voltage-sag" class="diag-metric mb-2 p-1.5 rounded border" style="color: #94a3b8; border-color: var(--border-primary); background: var(--bg-secondary);" data-level="neutral">
       <div class="flex items-center justify-between mb-0.5">
         <div class="flex items-center gap-1">
           <span class="safety-emoji text-[0.7rem] leading-none">⚪</span>
-          <span class="text-[0.65rem] font-bold text-slate-700">Voltage Sag</span>
+          <span class="text-[0.65rem] font-bold" style="color: var(--text-primary);">Voltage Sag</span>
         </div>
         <span class="diag-pct text-[0.65rem] font-mono font-bold">0%</span>
       </div>
@@ -52,17 +54,17 @@
         <div class="diag-bar-fill" style="width: 0%; background: #94a3b8;"></div>
       </div>
       <div class="flex justify-between mt-0.5">
-        <span class="text-[0.55rem] text-slate-400">TTC:</span>
-        <span id="safety-time-to-cutoff" class="text-[0.55rem] font-mono text-slate-400">--</span>
+        <span class="text-[0.55rem]" style="color: var(--text-muted);">TTC:</span>
+        <span id="safety-time-to-cutoff" class="text-[0.55rem] font-mono" style="color: var(--text-muted);">--</span>
       </div>
     </div>
 
     <!-- Joule Heat (F16 — NEW) -->
-    <div id="safety-joule-heat" class="diag-metric mb-2 p-1.5 rounded border border-slate-200 bg-white" style="color: #94a3b8; border-color: #94a3b8;" data-level="neutral">
+    <div id="safety-joule-heat" class="diag-metric mb-2 p-1.5 rounded border" style="color: #94a3b8; border-color: var(--border-primary); background: var(--bg-secondary);" data-level="neutral">
       <div class="flex items-center justify-between mb-0.5">
         <div class="flex items-center gap-1">
           <span class="safety-emoji text-[0.7rem] leading-none">⚪</span>
-          <span class="text-[0.65rem] font-bold text-slate-700">Joule Heat</span>
+          <span class="text-[0.65rem] font-bold" style="color: var(--text-primary);">Joule Heat</span>
         </div>
         <span class="diag-pct text-[0.65rem] font-mono font-bold">0%</span>
       </div>
@@ -73,11 +75,11 @@
     </div>
 
     <!-- Ampacity (F10a) — reuses DOM ID -->
-    <div id="safety-ampacity" class="diag-metric mb-2 p-1.5 rounded border border-slate-200 bg-white" style="color: #94a3b8; border-color: #94a3b8;" data-level="neutral">
+    <div id="safety-ampacity" class="diag-metric mb-2 p-1.5 rounded border" style="color: #94a3b8; border-color: var(--border-primary); background: var(--bg-secondary);" data-level="neutral">
       <div class="flex items-center justify-between mb-0.5">
         <div class="flex items-center gap-1">
           <span class="safety-emoji text-[0.7rem] leading-none">⚪</span>
-          <span class="text-[0.65rem] font-bold text-slate-700">Ampacity</span>
+          <span class="text-[0.65rem] font-bold" style="color: var(--text-primary);">Ampacity</span>
         </div>
         <span class="diag-pct text-[0.65rem] font-mono font-bold">0%</span>
       </div>
@@ -89,11 +91,11 @@
     </div>
 
     <!-- Micah Toll (F10b) — reuses DOM ID -->
-    <div id="safety-micah" class="diag-metric mb-2 p-1.5 rounded border border-slate-200 bg-white" style="color: #94a3b8; border-color: #94a3b8;" data-level="neutral">
+    <div id="safety-micah" class="diag-metric mb-2 p-1.5 rounded border" style="color: #94a3b8; border-color: var(--border-primary); background: var(--bg-secondary);" data-level="neutral">
       <div class="flex items-center justify-between mb-0.5">
         <div class="flex items-center gap-1">
           <span class="safety-emoji text-[0.7rem] leading-none">⚪</span>
-          <span class="text-[0.65rem] font-bold text-slate-700">Strip Safety</span>
+          <span class="text-[0.65rem] font-bold" style="color: var(--text-primary);">Strip Safety</span>
         </div>
         <span class="diag-pct text-[0.65rem] font-mono font-bold">0%</span>
       </div>
@@ -104,11 +106,11 @@
     </div>
 
     <!-- Strip Thermal (F9) — reuses DOM ID -->
-    <div id="safety-strip-thermal" class="diag-metric mb-2 p-1.5 rounded border border-slate-200 bg-white" style="color: #94a3b8; border-color: #94a3b8;" data-level="neutral">
+    <div id="safety-strip-thermal" class="diag-metric mb-2 p-1.5 rounded border" style="color: #94a3b8; border-color: var(--border-primary); background: var(--bg-secondary);" data-level="neutral">
       <div class="flex items-center justify-between mb-0.5">
         <div class="flex items-center gap-1">
           <span class="safety-emoji text-[0.7rem] leading-none">⚪</span>
-          <span class="text-[0.65rem] font-bold text-slate-700">Strip Thermal</span>
+          <span class="text-[0.65rem] font-bold" style="color: var(--text-primary);">Strip Thermal</span>
         </div>
         <span class="diag-pct text-[0.65rem] font-mono font-bold">N/A</span>
       </div>
@@ -116,11 +118,11 @@
     </div>
 
     <!-- Packing Efficiency (F7) — reuses DOM ID -->
-    <div id="safety-packing" class="diag-metric p-1.5 rounded border border-slate-200 bg-white" style="color: #94a3b8; border-color: #94a3b8;" data-level="neutral">
+    <div id="safety-packing" class="diag-metric p-1.5 rounded border" style="color: #94a3b8; border-color: var(--border-primary); background: var(--bg-secondary);" data-level="neutral">
       <div class="flex items-center justify-between mb-0.5">
         <div class="flex items-center gap-1">
           <span class="safety-emoji text-[0.7rem] leading-none">⚪</span>
-          <span class="text-[0.65rem] font-bold text-slate-700">Packing Eff.</span>
+          <span class="text-[0.65rem] font-bold" style="color: var(--text-primary);">Packing Eff.</span>
         </div>
         <span class="diag-pct text-[0.65rem] font-mono font-bold">0%</span>
       </div>
@@ -164,7 +166,7 @@
     flex-shrink: 0;
   }
   .diag-collapse-btn:hover {
-    background: #e2e8f0;
+    background: var(--bg-hover);
   }
   .diag-panel.collapsed .diag-collapse-btn svg {
     transform: rotate(180deg);
@@ -172,7 +174,7 @@
   .diag-bar-track {
     width: 100%;
     height: 6px;
-    background: #e2e8f0;
+    background: var(--border-primary);
     border-radius: 3px;
     overflow: hidden;
   }

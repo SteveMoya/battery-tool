@@ -2,11 +2,11 @@
 ---
 
 <div id="custom-bms-overlay" class="modal-base-overlay">
-  <div id="custom-bms-box" class="bg-white w-[90%] max-w-[440px] max-h-[90vh] rounded-lg shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col">
+  <div id="custom-bms-box" class="w-[90%] max-w-[440px] max-h-[90vh] rounded-lg shadow-lg flex flex-col" style="background: var(--bg-secondary);">
     <!-- Header -->
-    <div class="px-5 py-3 border-b border-slate-200 flex justify-between items-center flex-shrink-0">
-      <h3 id="custom-bms-title" class="m-0 text-slate-800 text-[0.95rem]">Custom BMS Configuration</h3>
-      <button id="btn-close-custom-bms" class="border-none bg-none text-[1.5rem] cursor-pointer leading-none text-slate-400 hover:text-slate-600">×</button>
+    <div class="px-5 py-3 border-b flex justify-between items-center flex-shrink-0" style="border-color: var(--border-primary);">
+      <h3 id="custom-bms-title" class="m-0 text-[0.95rem]" style="color: var(--text-primary);">Custom BMS Configuration</h3>
+      <button id="btn-close-custom-bms" class="border-none bg-none text-[1.5rem] cursor-pointer leading-none" style="color: var(--text-muted);">×</button>
     </div>
 
     <!-- Body -->
@@ -32,8 +32,8 @@
       </div>
 
       <!-- S Count Range -->
-      <div class="border border-slate-200 rounded-md p-2.5 mb-3">
-        <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-2">S Count Range</div>
+      <div class="border rounded-md p-2.5 mb-3" style="border-color: var(--border-primary);">
+        <div class="text-[0.68rem] font-extrabold uppercase mb-2" style="color: var(--text-muted);">S Count Range</div>
         <div class="grid grid-cols-3 gap-2 items-end">
           <div class="flex flex-col">
             <label class="control-label" for="bms-s-min">Min S</label>
@@ -47,15 +47,15 @@
             <label class="control-label">&nbsp;</label>
             <label class="flex items-center gap-1.5 cursor-pointer h-[25px]">
               <input id="bms-smart" type="checkbox" checked />
-              <span class="text-[0.7rem] font-semibold text-slate-600">Smart</span>
+              <span class="text-[0.7rem] font-semibold" style="color: var(--text-tertiary);">Smart</span>
             </label>
           </div>
         </div>
       </div>
 
       <!-- Electrical -->
-      <div class="border border-slate-200 rounded-md p-2.5 mb-3">
-        <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-2">Electrical</div>
+      <div class="border rounded-md p-2.5 mb-3" style="border-color: var(--border-primary);">
+        <div class="text-[0.68rem] font-extrabold uppercase mb-2" style="color: var(--text-muted);">Electrical</div>
         <div class="grid grid-cols-3 gap-2">
           <div class="flex flex-col">
             <label class="control-label" for="bms-max-a-input">Max Current (A)</label>
@@ -73,58 +73,58 @@
       </div>
 
       <!-- Balance Type -->
-      <div class="border border-slate-200 rounded-md p-2.5 mb-3">
-        <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-2">Balance Type</div>
+      <div class="border rounded-md p-2.5 mb-3" style="border-color: var(--border-primary);">
+        <div class="text-[0.68rem] font-extrabold uppercase mb-2" style="color: var(--text-muted);">Balance Type</div>
         <div class="flex flex-wrap gap-x-4 gap-y-1">
           <label class="flex items-center gap-1.5 cursor-pointer">
             <input type="radio" name="bms-balance" value="pasivo" checked />
-            <span class="text-[0.7rem] font-semibold text-slate-600">Passive</span>
+            <span class="text-[0.7rem] font-semibold" style="color: var(--text-tertiary);">Passive</span>
           </label>
           <label class="flex items-center gap-1.5 cursor-pointer">
             <input type="radio" name="bms-balance" value="activo-capacitivo" />
-            <span class="text-[0.7rem] font-semibold text-slate-600">Active-Cap</span>
+            <span class="text-[0.7rem] font-semibold" style="color: var(--text-tertiary);">Active-Cap</span>
           </label>
           <label class="flex items-center gap-1.5 cursor-pointer">
             <input type="radio" name="bms-balance" value="activo-inductivo" />
-            <span class="text-[0.7rem] font-semibold text-slate-600">Active-Ind</span>
+            <span class="text-[0.7rem] font-semibold" style="color: var(--text-tertiary);">Active-Ind</span>
           </label>
           <label class="flex items-center gap-1.5 cursor-pointer">
             <input type="radio" name="bms-balance" value="sin-balanceo" />
-            <span class="text-[0.7rem] font-semibold text-slate-600">None</span>
+            <span class="text-[0.7rem] font-semibold" style="color: var(--text-tertiary);">None</span>
           </label>
         </div>
       </div>
 
       <!-- Chemistry -->
-      <div class="border border-slate-200 rounded-md p-2.5 mb-3">
-        <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-2">Compatible Chemistry</div>
+      <div class="border rounded-md p-2.5 mb-3" style="border-color: var(--border-primary);">
+        <div class="text-[0.68rem] font-extrabold uppercase mb-2" style="color: var(--text-muted);">Compatible Chemistry</div>
         <div class="flex flex-wrap gap-x-3 gap-y-1">
           <label class="flex items-center gap-1.5 cursor-pointer">
             <input id="bms-chem-nmc" type="checkbox" checked />
-            <span class="text-[0.7rem] font-semibold text-slate-600">NMC</span>
+            <span class="text-[0.7rem] font-semibold" style="color: var(--text-tertiary);">NMC</span>
           </label>
           <label class="flex items-center gap-1.5 cursor-pointer">
             <input id="bms-chem-lfp" type="checkbox" checked />
-            <span class="text-[0.7rem] font-semibold text-slate-600">LFP</span>
+            <span class="text-[0.7rem] font-semibold" style="color: var(--text-tertiary);">LFP</span>
           </label>
           <label class="flex items-center gap-1.5 cursor-pointer">
             <input id="bms-chem-lto" type="checkbox" />
-            <span class="text-[0.7rem] font-semibold text-slate-600">LTO</span>
+            <span class="text-[0.7rem] font-semibold" style="color: var(--text-tertiary);">LTO</span>
           </label>
           <label class="flex items-center gap-1.5 cursor-pointer">
             <input id="bms-chem-naion" type="checkbox" />
-            <span class="text-[0.7rem] font-semibold text-slate-600">Na-Ion</span>
+            <span class="text-[0.7rem] font-semibold" style="color: var(--text-tertiary);">Na-Ion</span>
           </label>
           <label class="flex items-center gap-1.5 cursor-pointer">
             <input id="bms-chem-nimh" type="checkbox" />
-            <span class="text-[0.7rem] font-semibold text-slate-600">NiMH</span>
+            <span class="text-[0.7rem] font-semibold" style="color: var(--text-tertiary);">NiMH</span>
           </label>
         </div>
       </div>
 
       <!-- Dimensions -->
-      <div class="border border-slate-200 rounded-md p-2.5 mb-3">
-        <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-2">Dimensions (mm)</div>
+      <div class="border rounded-md p-2.5 mb-3" style="border-color: var(--border-primary);">
+        <div class="text-[0.68rem] font-extrabold uppercase mb-2" style="color: var(--text-muted);">Dimensions (mm)</div>
         <div class="grid grid-cols-3 gap-2">
           <div class="flex flex-col">
             <label class="control-label" for="bms-dim-w">W</label>
@@ -142,19 +142,19 @@
       </div>
 
       <!-- Validation Summary -->
-      <div id="custom-bms-validation" class="bg-slate-50 border border-slate-200 rounded-md p-2.5 mb-3 hidden">
-        <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-1.5 border-b border-slate-200 pb-1">Live Validation</div>
+      <div id="custom-bms-validation" class="border rounded-md p-2.5 mb-3 hidden" style="background: var(--bg-tertiary); border-color: var(--border-primary);">
+        <div class="text-[0.68rem] font-extrabold uppercase mb-1.5 border-b pb-1" style="color: var(--text-muted); border-color: var(--border-primary);">Live Validation</div>
         <div id="custom-bms-val-s" class="flex items-center gap-1.5 mb-1">
           <span class="custom-val-emoji text-[0.75rem]">⚪</span>
-          <span class="custom-val-text text-[0.65rem] font-semibold text-slate-600">S Count: --</span>
+          <span class="custom-val-text text-[0.65rem] font-semibold" style="color: var(--text-tertiary);">S Count: --</span>
         </div>
         <div id="custom-bms-val-chem" class="flex items-center gap-1.5 mb-1">
           <span class="custom-val-emoji text-[0.75rem]">⚪</span>
-          <span class="custom-val-text text-[0.65rem] font-semibold text-slate-600">Chemistry: --</span>
+          <span class="custom-val-text text-[0.65rem] font-semibold" style="color: var(--text-tertiary);">Chemistry: --</span>
         </div>
         <div id="custom-bms-val-current" class="flex items-center gap-1.5">
           <span class="custom-val-emoji text-[0.75rem]">⚪</span>
-          <span class="custom-val-text text-[0.65rem] font-semibold text-slate-600">MOSFET: --</span>
+          <span class="custom-val-text text-[0.65rem] font-semibold" style="color: var(--text-tertiary);">MOSFET: --</span>
         </div>
       </div>
 
@@ -171,15 +171,15 @@
           <button id="btn-save-custom-bms" class="flex-1 bg-app-blue text-white border-none py-2 rounded-md font-bold text-[0.8rem] cursor-pointer hover:bg-app-blue-dark transition-colors">
             Save
           </button>
-          <button id="btn-cancel-custom-bms" class="flex-1 bg-slate-100 text-slate-600 border border-slate-300 py-2 rounded-md font-bold text-[0.8rem] cursor-pointer hover:bg-slate-200 transition-colors">
+          <button id="btn-cancel-custom-bms" class="flex-1 text-[0.8rem] font-bold cursor-pointer transition-colors" style="background: var(--bg-quaternary); color: var(--text-tertiary); border: 1px solid var(--border-primary); border-radius: 0.375rem; padding: 0.5rem;">
             Cancel
           </button>
         </div>
         <div class="flex gap-2">
-          <button id="btn-export-custom-bms" class="flex-1 bg-slate-100 text-slate-600 border border-slate-300 py-1.5 rounded-md text-[0.7rem] font-semibold cursor-pointer hover:bg-slate-200 transition-colors">
+          <button id="btn-export-custom-bms" class="flex-1 text-[0.7rem] font-semibold cursor-pointer transition-colors" style="background: var(--bg-quaternary); color: var(--text-tertiary); border: 1px solid var(--border-primary); border-radius: 0.375rem; padding: 0.375rem;">
             Export JSON
           </button>
-          <button id="btn-import-custom-bms" class="flex-1 bg-slate-100 text-slate-600 border border-slate-300 py-1.5 rounded-md text-[0.7rem] font-semibold cursor-pointer hover:bg-slate-200 transition-colors">
+          <button id="btn-import-custom-bms" class="flex-1 text-[0.7rem] font-semibold cursor-pointer transition-colors" style="background: var(--bg-quaternary); color: var(--text-tertiary); border: 1px solid var(--border-primary); border-radius: 0.375rem; padding: 0.375rem;">
             Import JSON
           </button>
         </div>

@@ -1,7 +1,7 @@
 ---
 ---
 
-<div id="snapshot-area" class="border-t border-slate-200 bg-slate-50 p-2 px-3 flex flex-col gap-2 flex-shrink-0">
+<div id="snapshot-area" class="border-t p-2 px-3 flex flex-col gap-2 flex-shrink-0" style="border-color: var(--border-primary); background: var(--bg-tertiary);">
   <div class="snap-controls flex gap-1.5">
     <button
       id="btn-snap"
@@ -11,7 +11,8 @@
     </button>
     <button
       id="btn-compare"
-      class="btn-action flex-1 py-1.5 rounded text-[0.75rem] font-semibold cursor-pointer text-center bg-white border border-slate-300 text-slate-700"
+      class="btn-action flex-1 py-1.5 rounded text-[0.75rem] font-semibold cursor-pointer text-center border"
+      style="background: var(--bg-secondary); border-color: var(--border-primary); color: var(--text-primary);"
     >
       Compare All (<span id="snap-count">0</span>)
     </button>

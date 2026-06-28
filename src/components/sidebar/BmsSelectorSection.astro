@@ -5,7 +5,7 @@ import HelpIcon from '../HelpIcon.astro';
 <section class="group-box">
   <div class="flex justify-between items-center mb-1.5">
     <h2 class="section-title m-0">5. BMS Selection</h2>
-    <HelpIcon tooltip="Battery Management System selector with auto-validation" />
+    <HelpIcon tip="Battery Management System selector with auto-validation" />
   </div>
 
   <div class="flex flex-col">
@@ -18,57 +18,57 @@ import HelpIcon from '../HelpIcon.astro';
 
   <!-- Custom BMS Actions (shown when custom BMS selected) -->
   <div id="bms-custom-actions" class="flex gap-1.5 mt-1.5 hidden">
-    <button id="btn-edit-custom-bms" type="button" class="flex-1 bg-slate-100 text-slate-600 border border-slate-300 py-1 rounded text-[0.65rem] font-semibold cursor-pointer hover:bg-slate-200 transition-colors">Edit</button>
-    <button id="btn-dup-custom-bms" type="button" class="flex-1 bg-slate-100 text-slate-600 border border-slate-300 py-1 rounded text-[0.65rem] font-semibold cursor-pointer hover:bg-slate-200 transition-colors">Duplicate</button>
+    <button id="btn-edit-custom-bms" type="button" class="flex-1 py-1 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="background: var(--bg-quaternary); color: var(--text-tertiary); border-color: var(--border-primary); border-width: 1px; border-style: solid;">Edit</button>
+    <button id="btn-dup-custom-bms" type="button" class="flex-1 py-1 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="background: var(--bg-quaternary); color: var(--text-tertiary); border-color: var(--border-primary); border-width: 1px; border-style: solid;">Duplicate</button>
     <button id="btn-del-custom-bms" type="button" class="flex-1 bg-red-50 text-red-600 border border-red-200 py-1 rounded text-[0.65rem] font-semibold cursor-pointer hover:bg-red-100 transition-colors">Delete</button>
   </div>
 
   <!-- BMS Info Card -->
-  <div id="bms-info" class="bg-slate-50 border border-slate-200 rounded-md p-2 mt-2 hidden">
+  <div id="bms-info" class="rounded-md p-2 mt-2 hidden" style="background: var(--bg-tertiary); border-color: var(--border-primary); border-width: 1px; border-style: solid;">
     <div class="flex justify-between items-center mb-1">
-      <span id="bms-name" class="text-[0.72rem] font-extrabold text-slate-700">--</span>
-      <span id="bms-badge" class="text-[0.55rem] font-bold px-1.5 py-0.5 rounded bg-slate-200 text-slate-600">--</span>
+      <span id="bms-name" class="text-[0.72rem] font-extrabold" style="color: var(--text-primary);">--</span>
+      <span id="bms-badge" class="text-[0.55rem] font-bold px-1.5 py-0.5 rounded" style="background: var(--bg-quaternary); color: var(--text-tertiary);">--</span>
     </div>
     <div class="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[0.62rem]">
-      <span class="text-slate-500">S Range</span>
-      <span id="bms-s-range" class="font-mono font-semibold text-slate-700">--</span>
-      <span class="text-slate-500">Chemistry</span>
-      <span id="bms-chem" class="font-mono font-semibold text-slate-700">--</span>
-      <span class="text-slate-500">MOSFET</span>
-      <span id="bms-max-a" class="font-mono font-semibold text-slate-700">--</span>
-      <span class="text-slate-500">Balance</span>
-      <span id="bms-balance" class="font-mono font-semibold text-slate-700">--</span>
-      <span class="text-slate-500">Protocol</span>
-      <span id="bms-protocol" class="font-mono font-semibold text-slate-700">--</span>
-      <span class="text-slate-500">Dimensions</span>
-      <span id="bms-dims" class="font-mono font-semibold text-slate-700">--</span>
+      <span style="color: var(--text-tertiary);">S Range</span>
+      <span id="bms-s-range" class="font-mono font-semibold" style="color: var(--text-primary);">--</span>
+      <span style="color: var(--text-tertiary);">Chemistry</span>
+      <span id="bms-chem" class="font-mono font-semibold" style="color: var(--text-primary);">--</span>
+      <span style="color: var(--text-tertiary);">MOSFET</span>
+      <span id="bms-max-a" class="font-mono font-semibold" style="color: var(--text-primary);">--</span>
+      <span style="color: var(--text-tertiary);">Balance</span>
+      <span id="bms-balance" class="font-mono font-semibold" style="color: var(--text-primary);">--</span>
+      <span style="color: var(--text-tertiary);">Protocol</span>
+      <span id="bms-protocol" class="font-mono font-semibold" style="color: var(--text-primary);">--</span>
+      <span style="color: var(--text-tertiary);">Dimensions</span>
+      <span id="bms-dims" class="font-mono font-semibold" style="color: var(--text-primary);">--</span>
     </div>
   </div>
 
   <!-- Validation Vectors (F12) -->
-  <div id="bms-validation" class="bg-slate-50 border border-slate-200 rounded-md p-2 mt-2 hidden">
-    <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-1.5 border-b border-slate-200 pb-1">Validation</div>
+  <div id="bms-validation" class="rounded-md p-2 mt-2 hidden" style="background: var(--bg-tertiary); border-color: var(--border-primary); border-width: 1px; border-style: solid;">
+    <div class="text-[0.68rem] font-extrabold uppercase mb-1.5 border-b pb-1" style="color: var(--text-muted); border-color: var(--border-primary);">Validation</div>
 
-    <div id="bms-val-s" class="bms-val-row flex items-start gap-1.5 mb-1.5 p-1.5 rounded border border-slate-200 bg-white" style="color: #94a3b8; border-color: #94a3b8;">
+    <div id="bms-val-s" class="bms-val-row flex items-start gap-1.5 mb-1.5 p-1.5 rounded border" style="color: #94a3b8; border-color: var(--border-primary); background: var(--bg-secondary);">
       <span class="bms-val-emoji text-[0.75rem] leading-none mt-px">⚪</span>
       <div class="flex-1 min-w-0">
-        <span class="text-[0.68rem] font-bold text-slate-700">S Count Match</span>
+        <span class="text-[0.68rem] font-bold" style="color: var(--text-primary);">S Count Match</span>
         <span class="bms-val-text text-[0.65rem] font-semibold leading-tight block">N/A</span>
       </div>
     </div>
 
-    <div id="bms-val-chem" class="bms-val-row flex items-start gap-1.5 mb-1.5 p-1.5 rounded border border-slate-200 bg-white" style="color: #94a3b8; border-color: #94a3b8;">
+    <div id="bms-val-chem" class="bms-val-row flex items-start gap-1.5 mb-1.5 p-1.5 rounded border" style="color: #94a3b8; border-color: var(--border-primary); background: var(--bg-secondary);">
       <span class="bms-val-emoji text-[0.75rem] leading-none mt-px">⚪</span>
       <div class="flex-1 min-w-0">
-        <span class="text-[0.68rem] font-bold text-slate-700">Chemistry</span>
+        <span class="text-[0.68rem] font-bold" style="color: var(--text-primary);">Chemistry</span>
         <span class="bms-val-text text-[0.65rem] font-semibold leading-tight block">N/A</span>
       </div>
     </div>
 
-    <div id="bms-val-current" class="bms-val-row flex items-start gap-1.5 p-1.5 rounded border border-slate-200 bg-white" style="color: #94a3b8; border-color: #94a3b8;">
+    <div id="bms-val-current" class="bms-val-row flex items-start gap-1.5 p-1.5 rounded border" style="color: #94a3b8; border-color: var(--border-primary); background: var(--bg-secondary);">
       <span class="bms-val-emoji text-[0.75rem] leading-none mt-px">⚪</span>
       <div class="flex-1 min-w-0">
-        <span class="text-[0.68rem] font-bold text-slate-700">MOSFET Margin</span>
+        <span class="text-[0.68rem] font-bold" style="color: var(--text-primary);">MOSFET Margin</span>
         <span class="bms-val-text text-[0.65rem] font-semibold leading-tight block">N/A</span>
       </div>
     </div>

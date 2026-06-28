@@ -48,6 +48,18 @@ const keywords = 'battery pack designer, 18650 calculator, 21700 designer, batte
     <meta name="twitter:description" content={`${title} — ${description} `} />
     <meta name="twitter:image" content={image} />
 
+    <script is:inline>
+      (function() {
+        const stored = localStorage.getItem('battery-tool-theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = stored || (prefersDark ? 'dark' : 'light');
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+        document.documentElement.style.colorScheme = theme;
+      })();
+    </script>
+
     <script type="application/ld+json" set:html={JSON.stringify({
       '@context': 'https://schema.org',
       '@type': 'SoftwareApplication',
@@ -61,7 +73,7 @@ const keywords = 'battery pack designer, 18650 calculator, 21700 designer, batte
 
     <slot name="head" />
   </head>
-  <body class="bg-[#f0f2f5] text-slate-700">
+  <body>
     <slot />
   </body>
 </html>

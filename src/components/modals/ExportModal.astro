@@ -4,25 +4,26 @@
 <div id="export-overlay" class="modal-base-overlay">
   <div
     id="export-box"
-    class="bg-white w-[90%] max-w-[400px] rounded-lg p-5 shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+    class="w-[90%] max-w-[400px] rounded-lg p-5 shadow-lg"
+    style="background: var(--bg-secondary);"
   >
     <div class="flex justify-between items-center mb-4">
-      <h3 class="m-0 text-slate-800">Export 3D Model (STL)</h3>
-      <button id="btn-close-export" class="border-none bg-none text-[1.5rem] cursor-pointer leading-none">×</button>
+      <h3 class="m-0" style="color: var(--text-primary);">Export 3D Model (STL)</h3>
+      <button id="btn-close-export" class="border-none bg-none text-[1.5rem] cursor-pointer leading-none" style="color: var(--text-muted);">×</button>
     </div>
-    <p class="text-[0.8rem] text-slate-500 mt-0">Select parts to include in the STL file:</p>
+    <p class="text-[0.8rem] mt-0" style="color: var(--text-tertiary);">Select parts to include in the STL file:</p>
     <div class="flex flex-col gap-2.5 mb-5">
       <label class="flex items-center gap-2.5 cursor-pointer">
         <input id="ex-cells" type="checkbox" checked />
-        <span class="text-[0.9rem] font-semibold">Cells &amp; Caps</span>
+        <span class="text-[0.9rem] font-semibold" style="color: var(--text-primary);">Cells &amp; Caps</span>
       </label>
       <label class="flex items-center gap-2.5 cursor-pointer">
         <input id="ex-spacers" type="checkbox" checked />
-        <span class="text-[0.9rem] font-semibold">Spacers (Holders)</span>
+        <span class="text-[0.9rem] font-semibold" style="color: var(--text-primary);">Spacers (Holders)</span>
       </label>
       <label class="flex items-center gap-2.5 cursor-pointer">
         <input id="ex-bus" type="checkbox" checked />
-        <span class="text-[0.9rem] font-semibold">Busbars &amp; Wires</span>
+        <span class="text-[0.9rem] font-semibold" style="color: var(--text-primary);">Busbars &amp; Wires</span>
       </label>
     </div>
     <button
