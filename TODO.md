@@ -211,23 +211,15 @@ Implementación existente relevante:
   - ✅ Screenshot PNG del viewport 3D con fondo transparente
   - ✅ UI: camera toolbar en RenderArea, wireframe toggle + screenshot button en VisualSettingsSection
 
-- [ ] **F19 — Fix Export SVG/PDF + Ficha Técnica de Batería**
-  - **Fix SVG**: Corregir exportación SVG de la proyección 2D del pack (F15a) — verificar que todos los elementos se renderizan correctamente (celdas, busbars, dimensiones, leyendas)
-  - **Fix PDF**: Corregir exportación PDF (F15b) — asegurar que el contenido SVG se embebe correctamente sin cortes ni elementos faltantes
-  - **Ficha Técnica (Datasheet)**: Generar PDF con ficha técnica completa del paquete usando estándares de la industria:
-    - **Header**: Logo empresa, modelo, fecha, número de serie
-    - **Especificaciones eléctricas**: Voltage nominal, capacidad (Ah), energía (Wh), corriente max descarga, corriente max carga, C-rate por celda
-    - **Especificaciones físicas**: Dimensiones (L×W×H), peso estimado, tipo de celda, química
-    - **Configuración**: Series (S) × Paralelo (P), total celdas, distribución por capa
-    - **BMS**: Modelo seleccionado, tipo balance, rango S, corriente max, features
-    - **Conectores**: Conector principal推荐, calibre de cable, fusible, anti-spark
-    - **Seguridad**: Voltage sag %, joule heat %, ampacity por segmento, packing efficiency
-    - **Simulación**: Runtime estimado, curva de descarga, LVC cutoff, temperature range
-    - **BOM Resumen**: Materiales principales con cantidades y metraje
-    - **Normativas**: Referencias a IEC 62619, UN 38.3, UL 2580 (si aplicable)
-  - Formato: A4 landscape con grid layout, logos, tablas con bordes
-  - Export desde menú header: "📄 Technical Datasheet (PDF)"
-  - Datos capturados desde el estado actual del pack (sin re-cálculos)
+- [x] **F19 — Fix Export SVG/PDF + Ficha Técnica de Batería** ✅
+  - ✅ **Fix SVG**: `exportSvg(opts)` ahora acepta `SvgExportOptions` del modal
+  - ✅ **Fix PDF**: PDF export ahora genera **2 páginas**:
+    - **Página 1**: Ficha técnica completa (Electrical/Physical Specs, Configuration, BMS, Connectors, Safety Status, Simulation, BOM, Standards)
+    - **Página 2**: Proyección 2D del pack (celdas, busbars, dimensiones, leyenda)
+  - ✅ **Standalone Datasheet**: Menú "📄 Technical Datasheet" genera solo la página 1
+  - ✅ Refactorizado: `gatherPackData()` y `drawDatasheetPage(pdf, data)` exportados para reutilización
+  - ✅ **datasheet-fix** (SDD change 27-06-2026): Removed dead code (`datasheet-export.ts`), fixed duplicate "Fill Ratio" in BOM, added energy density metrics (Wh/kg, Wh/L) with zero/NaN guards, replaced fragile hex-string safety level reading with `data-level` attributes, added chemistry-aware `maxChargeA` defaults (LFP=1C, NMC=0.5C, LTO=2C, Na-Ion=0.5C). Build passes, 14/14 spec scenarios compliant.
+  - Archivos: `datasheet.ts`, `DatasheetModal.astro`, `svg-export.ts`, `ui.ts`, `app.ts`, `Header.astro`, `index.astro`, `DiagnosticPanel.astro`, `safety-indicators.ts`
 
 ### 🟢 Baja prioridad
 
