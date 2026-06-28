@@ -175,7 +175,7 @@ Cada paso es atómico, independiente, y puede delegarse a un sub-agente.
   3. Update CSV/JSON export to include the custom value
 - **Verify**: Change waste factor → BOM total recalculates
 
-### FIX-16: Thermal resistance from cell database
+### ✅ FIX-16: Thermal resistance from cell database
 - **File**: `src/scripts/diagnostic.ts`
 - **Line**: 24
 - **Current**: `DEFAULT_R_TH = 7` hardcoded
@@ -189,7 +189,7 @@ Cada paso es atómico, independiente, y puede delegarse a un sub-agente.
 
 ## Fase 5 — Type Safety
 
-### FIX-17: Type user presets properly
+### ✅ FIX-17: Type user presets properly
 - **File**: `src/scripts/pack-builder.ts`
 - **Lines**: 11-12
 - **Current**: `let userSizePresets: any[]`

@@ -2,14 +2,14 @@ import * as THREE from 'three';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CELL_DB } from './cell-database';
-import { DEFAULT_SIZE_PRESETS, DEFAULT_CHEM_PRESETS } from './presets';
+import { DEFAULT_SIZE_PRESETS, DEFAULT_CHEM_PRESETS, type SizePreset, type ChemPreset } from './presets';
 import { inputs, $ } from './dom';
 import { getOpenCircuitVoltage, rescaleLoadSlider, updateSimulation, renderCurrentStats } from './simulation';
 import { checkPacking, renderPackingIndicator } from './safety-indicators';
 import { getAllBms } from './bms-database';
 
-let userSizePresets: any[] = JSON.parse(localStorage.getItem('batt_vis_presets_size_v40') || '[]');
-let userChemPresets: any[] = JSON.parse(localStorage.getItem('batt_vis_presets_chem_v40') || '[]');
+let userSizePresets: SizePreset[] = JSON.parse(localStorage.getItem('batt_vis_presets_size_v40') || '[]');
+let userChemPresets: ChemPreset[] = JSON.parse(localStorage.getItem('batt_vis_presets_chem_v40') || '[]');
 
 /* ─── F7 — Theoretical packing densities ─── */
 const THEO_SQUARE = Math.PI / 4;               // ≈ 0.7854
