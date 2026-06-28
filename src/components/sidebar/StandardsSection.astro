@@ -1,0 +1,78 @@
+---
+import HelpIcon from '../HelpIcon.astro';
+---
+
+<section class="group-box">
+  <div class="flex justify-between items-center mb-1.5">
+    <h2 class="section-title m-0">8. Standards Compliance</h2>
+    <HelpIcon tip="Validates pack configuration against IEC 62619, UN 38.3, UL 2580, ISO 12405, SAE J2464 standards" />
+  </div>
+
+  <div class="mb-2">
+    <div class="flex items-center gap-2 mb-1.5">
+      <button
+        id="compliance-run-btn"
+        class="btn-primary text-[0.65rem] py-1 px-2.5"
+      >
+        Run Compliance Check
+      </button>
+      <span id="compliance-status-badge" class="text-[0.6rem] font-bold px-1.5 py-0.5 rounded hidden"></span>
+    </div>
+
+    <!-- Export options -->
+    <div id="compliance-export-options" class="flex items-center gap-3 mb-1.5 hidden">
+      <label class="flex items-center gap-1.5 cursor-pointer">
+        <input
+          id="compliance-export-toggle"
+          type="checkbox"
+          checked
+          class="w-3.5 h-3.5 rounded border-slate-300 text-app-blue focus:ring-app-blue cursor-pointer"
+        />
+        <span class="text-[0.62rem] font-semibold" style="color: var(--text-tertiary);">Include in datasheet PDF</span>
+      </label>
+      <button
+        id="compliance-export-btn"
+        class="text-[0.6rem] font-bold px-2 py-0.5 rounded bg-app-blue text-white hover:bg-app-blue-dark transition-colors cursor-pointer border-none"
+      >
+        Export Compliance Report
+      </button>
+    </div>
+
+    <!-- Summary -->
+    <div id="compliance-summary" class="rounded-md p-2 mb-2" style="background: var(--bg-tertiary); border-color: var(--border-primary); border-width: 1px; border-style: solid;">
+      <div class="text-[0.62rem] font-semibold" style="color: var(--text-muted);">
+        Click "Run Compliance Check" to validate your pack against industry standards.
+      </div>
+    </div>
+
+    <!-- Compliance results (populated by JS) -->
+    <div id="compliance-results"></div>
+  </div>
+
+  <!-- Standards reference -->
+  <details class="mt-2">
+    <summary class="text-[0.65rem] font-bold cursor-pointer" style="color: var(--text-muted);">Standards Reference</summary>
+    <div class="mt-1 space-y-1">
+      <div class="flex items-start gap-1.5 text-[0.55rem]">
+        <span class="font-extrabold" style="color: #3b82f6;">IEC 62619</span>
+        <span class="text-slate-500">— Secondary lithium cells for industrial applications</span>
+      </div>
+      <div class="flex items-start gap-1.5 text-[0.55rem]">
+        <span class="font-extrabold" style="color: #ef4444;">UN 38.3</span>
+        <span class="text-slate-500">— Transport of dangerous goods — lithium battery testing</span>
+      </div>
+      <div class="flex items-start gap-1.5 text-[0.55rem]">
+        <span class="font-extrabold" style="color: #f59e0b;">UL 2580</span>
+        <span class="text-slate-500">— Batteries for use in electric vehicles</span>
+      </div>
+      <div class="flex items-start gap-1.5 text-[0.55rem]">
+        <span class="font-extrabold" style="color: #8b5cf6;">ISO 12405</span>
+        <span class="text-slate-500">— EV battery pack performance testing</span>
+      </div>
+      <div class="flex items-start gap-1.5 text-[0.55rem]">
+        <span class="font-extrabold" style="color: #ec4899;">SAE J2464</span>
+        <span class="text-slate-500">— EV battery abuse testing</span>
+      </div>
+    </div>
+  </details>
+</section>

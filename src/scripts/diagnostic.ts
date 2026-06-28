@@ -1,4 +1,5 @@
 import type { SafetyLevel } from './safety-indicators';
+import type { ThermalResult } from './thermal-engine';
 
 /* ─────────────────────────────────────────────
    F16 — Diagnostic Monitor
@@ -93,6 +94,8 @@ export function renderJouleHeatIndicator(r: JouleHeatResult) {
 export interface DiagnosticReport {
   global: SafetyLevel;
   joule: JouleHeatResult;
+  compliance: SafetyLevel;
+  thermal: ThermalResult | null;
   metrics: { id: string; level: SafetyLevel; label: string; pct: number }[];
 }
 
@@ -136,11 +139,27 @@ export function computeDiagnostic(joule: JouleHeatResult): DiagnosticReport {
   const stripLevel = readLevel(stripEl);
   const packLevel = readLevel(packEl);
 
-  const allLevels = [sagLevel, joule.level, ampLevel, micahLevel, stripLevel, packLevel];
+  // F1 — Compliance level from stored report
+  let complianceLevel: SafetyLevel = 'neutral';
+  const complianceReport = (window as any).__complianceReport;
+  if (complianceReport?.summary) {
+    const s = complianceReport.summary.overallStatus;
+    if (s === 'pass') complianceLevel = 'green';
+    else if (s === 'warn') complianceLevel = 'yellow';
+    else if (s === 'fail') complianceLevel = 'red';
+  }
+
+  // F2 — Thermal level from stored result
+  const thermalResult: ThermalResult | null = (window as any).__thermalResult ?? null;
+  const thermalLevel: SafetyLevel = thermalResult?.level ?? 'neutral';
+
+  const allLevels = [sagLevel, joule.level, ampLevel, micahLevel, stripLevel, packLevel, complianceLevel, thermalLevel];
 
   return {
     global: worstLevel(allLevels),
     joule,
+    compliance: complianceLevel,
+    thermal: thermalResult,
     metrics: [
       { id: 'diag-voltage-sag', level: sagLevel, label: 'Voltage Sag', pct: readPct(sagEl) },
       { id: 'diag-joule-heat', level: joule.level, label: 'Joule Heat', pct: joule.pct },
@@ -148,6 +167,8 @@ export function computeDiagnostic(joule: JouleHeatResult): DiagnosticReport {
       { id: 'diag-micah', level: micahLevel, label: 'Strip Safety', pct: readPct(micahEl) },
       { id: 'diag-strip-thermal', level: stripLevel, label: 'Strip Thermal', pct: readPct(stripEl) },
       { id: 'diag-packing', level: packLevel, label: 'Packing Eff.', pct: readPct(packEl) },
+      { id: 'diag-compliance', level: complianceLevel, label: 'Compliance', pct: complianceLevel === 'green' ? 100 : complianceLevel === 'yellow' ? 50 : complianceLevel === 'red' ? 0 : -1 },
+      { id: 'diag-thermal', level: thermalLevel, label: 'Thermal', pct: thermalResult ? (thermalResult.level === 'green' ? 100 : thermalResult.level === 'yellow' ? 50 : 0) : -1 },
     ],
   };
 }

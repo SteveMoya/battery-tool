@@ -1,10 +1,13 @@
 import { initThree, updatePack, animate } from './pack-builder';
+import { initKeyboardShortcuts } from './keyboard-shortcuts';
+import { initConfigStorage } from './config-storage';
 import {
   initDisclaimer, setupModals, setupFileMenu, setupReset,
   setupPresetEvents, setupCellDbSearch,
   setupMetallicSliders, attachAllInputs, setupSnapshots,
   renderSnapList,   setupExportOverlay, setupStepExportOverlay, setupSvgExportOverlay, setupBomOverlay, setupDatasheetOverlay,
-  setupBmsBox, setupDiagnosticPanel, setupPowerConnectors, setupF18Controls,
+  setupBmsBox, setupDiagnosticPanel, setupPowerConnectors, setupF18Controls, setupStandardsCompliance,
+  setupProtectionSection, setupThermalSection, setupCoolingSection, setupEnclosureSection, setupDegradationSection, setupBalancingSection, setupParallelSection, setupTcoSection, setupIoTSection,
   populatePresets, selectInitialPresets,
   importStateFromFile, updateDeleteButtons,
 } from './ui';
@@ -64,10 +67,24 @@ export function initApp() {
   setupDiagnosticPanel();
   setupPowerConnectors();
   setupF18Controls();
+  setupStandardsCompliance();
+  setupProtectionSection();
+  setupThermalSection();
+  setupCoolingSection();
+  setupEnclosureSection();
+  setupDegradationSection();
+  setupBalancingSection();
+  setupParallelSection();
+  setupTcoSection();
+  setupIoTSection();
   renderSnapList();
   updateDeleteButtons();
 
   document.getElementById('import-file-input')?.addEventListener('change', importStateFromFile);
+
+  // F12: Keyboard shortcuts & config storage
+  initKeyboardShortcuts();
+  initConfigStorage();
 
   updatePack();
   requestAnimationFrame(animate);

@@ -1,0 +1,90 @@
+---
+import HelpIcon from '../HelpIcon.astro';
+---
+
+<section class="group-box">
+  <div class="flex justify-between items-center mb-1.5">
+    <h2 class="section-title m-0">11. Cooling System</h2>
+    <HelpIcon tip="Cooling system sizing, TIM selection, and thermal management recommendations" />
+  </div>
+
+  <div class="mb-2">
+    <div class="flex items-center gap-2 mb-1.5">
+      <button
+        id="cooling-run-btn"
+        class="btn-primary text-[0.65rem] py-1 px-2.5"
+      >
+        Analyze Cooling
+      </button>
+      <span id="cooling-status-badge" class="text-[0.6rem] font-bold px-1.5 py-0.5 rounded hidden"></span>
+    </div>
+
+    <!-- Inputs -->
+    <div id="cooling-inputs" class="rounded-md p-2 mb-2" style="background: var(--bg-tertiary); border-color: var(--border-primary); border-width: 1px; border-style: solid;">
+      <div class="grid grid-cols-2 gap-2">
+        <div class="flex flex-col">
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Cooling Method</label>
+          <select id="cooling-method" class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);">
+            <option value="passive">Passive (Natural)</option>
+            <option value="air">Air Cooled</option>
+            <option value="liquid">Liquid Cooled</option>
+          </select>
+        </div>
+        <div class="flex flex-col">
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Ambient Temp (°C)</label>
+          <input id="cooling-tamb" type="number" value="25" min="0" max="60" step="1"
+            class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);" />
+        </div>
+
+        <!-- Air cooling options -->
+        <div id="cooling-air-options" class="flex flex-col hidden">
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Number of Fans</label>
+          <input id="cooling-fan-count" type="number" value="2" min="1" max="10" step="1"
+            class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);" />
+        </div>
+        <div id="cooling-cfm-options" class="flex flex-col hidden">
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">CFM per Fan</label>
+          <input id="cooling-cfm" type="number" value="50" min="10" max="200" step="10"
+            class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);" />
+        </div>
+
+        <!-- Liquid cooling options -->
+        <div id="cooling-liquid-type" class="flex flex-col hidden">
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Coolant Type</label>
+          <select id="cooling-coolant" class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);">
+            <option value="water_glycol_50">Water/Glycol 50/50</option>
+            <option value="water_glycol_70">Water/Glycol 70/30</option>
+            <option value="silicone_oil">Silicone Oil</option>
+            <option value="dielectric_fluid">Dielectric Fluid</option>
+          </select>
+        </div>
+        <div id="cooling-flow-options" class="flex flex-col hidden">
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Flow Rate (LPM)</label>
+          <input id="cooling-flow" type="number" value="5" min="0.5" max="50" step="0.5"
+            class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);" />
+        </div>
+
+        <div class="flex flex-col">
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Pack Surface Area (m²)</label>
+          <input id="cooling-surface" type="number" value="0.5" min="0.01" max="10" step="0.01"
+            class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);" />
+        </div>
+      </div>
+    </div>
+
+    <div id="cooling-results"></div>
+  </div>
+</section>
+
+<script>
+  // Toggle cooling-specific options based on method
+  const methodSelect = document.getElementById('cooling-method') as HTMLSelectElement | null;
+  const airOptions = document.querySelectorAll('#cooling-air-options, #cooling-cfm-options');
+  const liquidOptions = document.querySelectorAll('#cooling-liquid-type, #cooling-flow-options');
+
+  methodSelect?.addEventListener('change', () => {
+    const v = methodSelect.value;
+    airOptions.forEach(el => el.classList.toggle('hidden', v !== 'air'));
+    liquidOptions.forEach(el => el.classList.toggle('hidden', v !== 'liquid'));
+  });
+</script>

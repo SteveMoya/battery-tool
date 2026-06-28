@@ -3,7 +3,23 @@ import { DEFAULT_SIZE_PRESETS, DEFAULT_CHEM_PRESETS, type SizePreset, type ChemP
 import { exportSTL } from './stl-export';
 import { exportStep } from './step-export';
 import { exportSvg, exportPdf, type PaperSize, type PaperOrientation } from './svg-export';
-import { exportDatasheet } from './datasheet';
+import { exportDatasheet, exportComplianceReport } from './datasheet';
+import {
+  checkCompliance,
+  renderComplianceCard,
+  getStatusColor,
+  getStatusEmoji,
+  type PackConfig,
+} from './standards-engine';
+import { recommendProtection, renderProtectionCard, type ProtectionReport } from './breaker-engine';
+import { analyzeThermal, renderThermalCard, type ThermalResult } from './thermal-engine';
+import { analyzeCooling, renderCoolingCard, type CoolingResult } from './cooling-engine';
+import { analyzeEnclosure, renderEnclosureCard, type EnclosureResult } from './enclosure-engine';
+import { analyzeDegradation, renderDegradationCard, type DegradationResult } from './degradation-engine';
+import { analyzeBalancing, renderBalancingCard, type BalancingResult } from './balancing-engine';
+import { analyzeParallel, renderParallelCard, type ParallelResult } from './parallel-engine';
+import { analyzeTco, renderTcoCard, type TcoResult } from './tco-engine';
+import { analyzeIoT, renderIoTCard, type IoTResult } from './iot-integration';
 import { INPUT_IDS, $ } from './dom';
 import {
   packState,
@@ -2041,4 +2057,808 @@ export function setupPowerConnectors() {
 
   // Initial render
   updatePowerConnectorDisplay();
+}
+
+/* ─── F1 — Standards Compliance ─── */
+
+function buildPackConfig(): PackConfig {
+  const s = parseInt($inp('s-count')?.value ?? '1') || 1;
+  const p = parseInt($inp('p-count')?.value ?? '1') || 1;
+  const cellNomV = parseFloat($inp('c-volts')?.value ?? '3.6') || 3.6;
+  const cellMinV = parseFloat($inp('c-min-v')?.value ?? '2.5') || 2.5;
+  const cellMaxV = parseFloat($inp('c-max-v')?.value ?? '4.2') || 4.2;
+  const cellAh = (parseFloat($inp('c-mah')?.value ?? '2500') || 2500) / 1000;
+  const cellMaxA = parseFloat($inp('c-amp')?.value ?? '20') || 20;
+  const packVoltage = s * cellNomV;
+  const packCapacityAh = cellAh * p;
+  const packIMax = cellMaxA * p;
+
+  const chemKey = (() => {
+    const v = $inp('chem-selector')?.value ?? '';
+    if (v && v !== 'custom') {
+      try { return JSON.parse(v)?.id ?? 'li-ion'; } catch { return 'li-ion'; }
+    }
+    return 'li-ion';
+  })();
+
+  const chemName = (() => {
+    const v = $inp('chem-selector')?.value ?? '';
+    if (!v || v === 'custom') return 'Custom';
+    try { return JSON.parse(v)?.name ?? chemKey; } catch { return chemKey; }
+  })();
+
+  const bmsSel = $sel('bms-selector');
+  let bmsMaxA = 0;
+  let hasBms = false;
+  let hasOvercharge = false;
+  let hasOverdischarge = false;
+  let hasShortCircuit = false;
+  let hasOvercurrent = false;
+
+  if (bmsSel && bmsSel.value !== 'none') {
+    hasBms = true;
+    const bmsEntry = BMS_DB.find(b => b.name === bmsSel.value)
+      ?? getCustomBms().find(b => b.name === bmsSel.value);
+    if (bmsEntry) {
+      bmsMaxA = bmsEntry.maxA;
+      hasOvercharge = true;
+      hasOverdischarge = true;
+      hasShortCircuit = true;
+      hasOvercurrent = true;
+    } else if (bmsSel.value === 'auto') {
+      // Auto-selected BMS from recommendation
+      const recs = recommendBms(s, chemKey as BmsCellType, packIMax, packCapacityAh);
+      if (recs.length > 0) {
+        bmsMaxA = recs[0].bms.maxA;
+        hasOvercharge = true;
+        hasOverdischarge = true;
+        hasShortCircuit = true;
+        hasOvercurrent = true;
+      }
+    } else {
+      // Generic BMS selected
+      bmsMaxA = packIMax * 1.5;
+      hasOvercharge = true;
+      hasOverdischarge = true;
+      hasShortCircuit = true;
+      hasOvercurrent = true;
+    }
+  }
+
+  const hasFuse = !!$('conn-fuse-rating')?.textContent;
+  const fuseRatingText = $('conn-fuse-rating')?.textContent ?? '0';
+  const fuseRating = parseFloat(fuseRatingText) || 0;
+
+  const appSelect = $sel('conn-application');
+  const application = (appSelect?.value ?? 'general') as string;
+
+  return {
+    s, p,
+    cellNomV, cellMinV, cellMaxV, cellAh, cellMaxA,
+    chemistry: chemName,
+    packVoltage, packCapacityAh, packIMax,
+    hasBms, bmsMaxA,
+    bmsHasOverchargeProtection: hasOvercharge,
+    bmsHasOverdischargeProtection: hasOverdischarge,
+    bmsHasShortCircuitProtection: hasShortCircuit,
+    bmsHasOvercurrentProtection: hasOvercurrent,
+    hasFuse: fuseRating > 0,
+    fuseRatingA: fuseRating,
+    hasContactor: false,
+    hasDisconnect: false,
+    hasPrecharge: false,
+    application,
+  };
+}
+
+function runComplianceCheck() {
+  const config = buildPackConfig();
+  const report = checkCompliance(config);
+
+  const resultsEl = $('compliance-results');
+  const summaryEl = $('compliance-summary');
+  const badgeEl = $('compliance-status-badge');
+  const exportOptionsEl = $('compliance-export-options');
+
+  if (resultsEl) {
+    resultsEl.innerHTML = renderComplianceCard(report);
+  }
+
+  const color = getStatusColor(report.summary.overallStatus);
+  const emoji = getStatusEmoji(report.summary.overallStatus);
+
+  if (summaryEl) {
+    summaryEl.innerHTML = `
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-[0.62rem] font-bold" style="color: var(--text-primary);">
+          ${emoji} ${report.summary.pass}/${report.summary.total} checks passed
+        </span>
+        <span class="text-[0.58rem] font-mono" style="color: var(--text-muted);">
+          ${config.s}S${config.p}P · ${config.packVoltage.toFixed(0)}V · ${config.packCapacityAh.toFixed(1)}Ah
+        </span>
+      </div>
+      <div class="flex gap-2 text-[0.58rem]">
+        <span style="color: #22c55e;">PASS ${report.summary.pass}</span>
+        <span style="color: #eab308;">WARN ${report.summary.warn}</span>
+        <span style="color: #ef4444;">FAIL ${report.summary.fail}</span>
+        <span style="color: #3b82f6;">INFO ${report.summary.info}</span>
+      </div>
+    `;
+  }
+
+  if (badgeEl) {
+    badgeEl.classList.remove('hidden');
+    badgeEl.style.background = `${color}20`;
+    badgeEl.style.color = color;
+    badgeEl.textContent = report.summary.overallStatus === 'pass'
+      ? 'COMPLIANT'
+      : report.summary.overallStatus === 'warn'
+        ? 'CAUTION'
+        : 'NON-COMPLIANT';
+  }
+
+  // Show export options after first run
+  if (exportOptionsEl) {
+    exportOptionsEl.classList.remove('hidden');
+  }
+
+  // Store report for datasheet integration
+  (window as any).__complianceReport = report;
+}
+
+export function setupStandardsCompliance() {
+  const btn = $('compliance-run-btn');
+  btn?.addEventListener('click', runComplianceCheck);
+
+  // Compliance export toggle — controls whether compliance section appears in datasheet PDF
+  const exportToggle = $('compliance-export-toggle') as HTMLInputElement | null;
+  exportToggle?.addEventListener('change', () => {
+    (window as any).__complianceExportEnabled = exportToggle.checked;
+  });
+  // Initialize to enabled
+  (window as any).__complianceExportEnabled = exportToggle?.checked ?? true;
+
+  // Export dedicated compliance report PDF
+  const exportBtn = $('compliance-export-btn');
+  exportBtn?.addEventListener('click', exportComplianceReport);
+
+  // Auto-run on simulation update
+  window.addEventListener('bca:sim-update', debounce(runComplianceCheck, 500));
+}
+
+/* ─────────────────────────────────────────────
+   F5 — Protection & Disconnect Section
+   ───────────────────────────────────────────── */
+
+function runProtectionCheck() {
+  const config = buildPackConfig();
+  const bms = (window as any).__selectedBms ?? null;
+
+  // Determine application from UI (same as F17 connector engine)
+  const appSelect = document.getElementById('conn-application') as HTMLSelectElement | null;
+  const application = (appSelect?.value || 'general') as ProtectionReport['recommendations'][0]['category'] extends string ? string : never;
+
+  const protectionConfig = {
+    packVoltage: config.packVoltage,
+    packCurrentA: config.iMax,
+    packCurrentPulse: config.iMax * 3, // typical pulse: 3× continuous
+    packCapacityAh: config.packCapacityAh,
+    sCount: config.s,
+    bms: bms,
+    application: (['ebike', 'powerwall', 'ev', 'drone', 'general', 'marine'].includes(application) ? application : 'general') as 'ebike' | 'powerwall' | 'ev' | 'drone' | 'general' | 'marine',
+  };
+
+  const report = recommendProtection(protectionConfig);
+
+  const resultsEl = $('protection-results');
+  const summaryEl = $('protection-summary');
+  const badgeEl = $('protection-status-badge');
+
+  if (resultsEl) {
+    resultsEl.innerHTML = renderProtectionCard(report);
+  }
+
+  const statusColor = report.summary.overallStatus === 'safe' ? '#22c55e' : report.summary.overallStatus === 'caution' ? '#eab308' : '#ef4444';
+
+  if (summaryEl) {
+    const components = report.recommendations.length;
+    const required = report.recommendations.filter(r => r.priority === 'required').length;
+    summaryEl.innerHTML = `
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-[0.62rem] font-bold" style="color: var(--text-primary);">
+          ${components} component(s) — ${required} required
+        </span>
+        <span class="text-[0.58rem] font-mono" style="color: var(--text-muted);">
+          ${config.s}S${config.p}P · ${config.packVoltage.toFixed(0)}V · ${config.iMax.toFixed(0)}A
+        </span>
+      </div>
+      <div class="flex gap-2 text-[0.58rem]">
+        <span style="color: #ef4444;">● ${report.summary.needsContactor ? 'Contactor' : '—'}</span>
+        <span style="color: #3b82f6;">● ${report.summary.needsBreaker ? 'Breaker' : '—'}</span>
+        <span style="color: #8b5cf6;">● ${report.summary.needsDisconnect ? 'Disconnect' : '—'}</span>
+        <span style="color: #f59e0b;">● ${report.summary.needsPrecharge ? 'Precharge' : '—'}</span>
+      </div>
+    `;
+  }
+
+  if (badgeEl) {
+    badgeEl.classList.remove('hidden');
+    badgeEl.style.background = `${statusColor}20`;
+    badgeEl.style.color = statusColor;
+    badgeEl.textContent = report.summary.overallStatus === 'safe'
+      ? 'SAFE'
+      : report.summary.overallStatus === 'caution'
+        ? 'CAUTION'
+        : 'DANGER';
+  }
+
+  // Store report for datasheet integration
+  (window as any).__protectionReport = report;
+}
+
+export function setupProtectionSection() {
+  const btn = $('protection-run-btn');
+  btn?.addEventListener('click', runProtectionCheck);
+
+  // Auto-run on simulation update
+  window.addEventListener('bca:sim-update', debounce(runProtectionCheck, 500));
+}
+
+/* ─────────────────────────────────────────────
+   F2 — Thermal Analysis Section
+   ───────────────────────────────────────────── */
+
+function runThermalAnalysis() {
+  const stats = getStats();
+  if (!stats || !stats.s || !stats.p) return;
+
+  const s = stats.s;
+  const p = stats.p;
+  const cellAh = inpNum('c-mah', 2500) / 1000;
+  const cellIR = inpNum('sim-cell-ir', 0.02);
+  const iMax = (window as any).__lastIMax ?? inpNum('c-amp', 20) * p;
+
+  const tAmb = inpNum('thermal-tamb', 25);
+  const tMax = inpNum('thermal-tmax', 55);
+  const coolingType = (inp('thermal-cooling', 'none') || 'none') as 'none' | 'air' | 'liquid';
+  const crateAvg = inpNum('thermal-crate', 1);
+  const dodAvg = inpNum('thermal-dod', 80) / 100;
+
+  // Determine chemistry from selector
+  const chemId = (() => {
+    const v = inp('chem-selector', '');
+    if (v && v !== 'custom') {
+      try { return JSON.parse(v)?.id ?? 'nmc'; } catch { return 'nmc'; }
+    }
+    return 'nmc';
+  })() as 'nmc' | 'lfp' | 'lto' | 'na-ion' | 'nca';
+
+  // Use chemistry from thermal section override if set
+  const thermalChem = (inp('thermal-chemistry', chemId) || chemId) as 'nmc' | 'lfp' | 'lto' | 'na-ion' | 'nca';
+
+  const config = {
+    tAmb,
+    tMax,
+    coolingType,
+    airflowCFM: 0,
+    coolantFlowLPM: 0,
+    chemistry: thermalChem,
+    sCount: s,
+    pCount: p,
+    cellAh,
+    iMax,
+    cellIR,
+    crateAvg,
+    dodAvg,
+  };
+
+  const result = analyzeThermal(config);
+
+  const resultsEl = $('thermal-results');
+  const badgeEl = $('thermal-status-badge');
+
+  if (resultsEl) {
+    resultsEl.innerHTML = renderThermalCard(result, config);
+  }
+
+  const statusColor = result.level === 'green' ? '#22c55e' : result.level === 'yellow' ? '#eab308' : '#ef4444';
+
+  if (badgeEl) {
+    badgeEl.classList.remove('hidden');
+    badgeEl.style.background = `${statusColor}20`;
+    badgeEl.style.color = statusColor;
+    badgeEl.textContent = result.level === 'green'
+      ? 'OK'
+      : result.level === 'yellow'
+        ? 'WARM'
+        : 'HOT';
+  }
+
+  // Store for diagnostic and datasheet
+  (window as any).__thermalResult = result;
+  (window as any).__thermalConfig = config;
+}
+
+export function setupThermalSection() {
+  const btn = $('thermal-run-btn');
+  btn?.addEventListener('click', runThermalAnalysis);
+
+  // Auto-run on simulation update
+  window.addEventListener('bca:sim-update', debounce(runThermalAnalysis, 500));
+}
+
+/* ─────────────────────────────────────────────
+   F3 — Cooling System Section
+   ───────────────────────────────────────────── */
+
+function runCoolingAnalysis() {
+  const thermalResult: ThermalResult | null = (window as any).__thermalResult;
+  if (!thermalResult) {
+    const resultsEl = $('cooling-results');
+    if (resultsEl) {
+      resultsEl.innerHTML = '<div class="text-[0.62rem] text-amber-600 font-semibold">Run Thermal Analysis first (Section 10)</div>';
+    }
+    return;
+  }
+
+  const method = (inp('cooling-method', 'passive') || 'passive') as 'passive' | 'air' | 'liquid';
+  const tAmb = inpNum('cooling-tamb', 25);
+  const fanCount = inpNum('cooling-fan-count', 2);
+  const cfmPerFan = inpNum('cooling-cfm', 50);
+  const coolantType = (inp('cooling-coolant', 'water_glycol_50') || 'water_glycol_50') as any;
+  const coolantFlowLPM = inpNum('cooling-flow', 5);
+  const surfaceAreaM2 = inpNum('cooling-surface', 0.5);
+
+  // Get pack electrical info
+  const stats = getStats();
+  const packVoltage = stats ? stats.s * inpNum('c-volts', 3.6) : 48;
+  const packCurrentA = (window as any).__lastIMax ?? inpNum('c-amp', 20);
+
+  const config = {
+    method,
+    fanCount,
+    cfmPerFan,
+    coolantType,
+    coolantFlowLPM,
+    radiatorSize: 'medium' as const,
+    heatGenerationW: thermalResult.heatGenerationW,
+    packVoltage,
+    packCurrentA,
+    ambientTemp: tAmb,
+    packSurfaceAreaM2: surfaceAreaM2,
+  };
+
+  const result = analyzeCooling(config);
+
+  const resultsEl = $('cooling-results');
+  const badgeEl = $('cooling-status-badge');
+
+  if (resultsEl) {
+    resultsEl.innerHTML = renderCoolingCard(result, config);
+  }
+
+  const statusColor = result.level === 'green' ? '#22c55e' : result.level === 'yellow' ? '#eab308' : '#ef4444';
+
+  if (badgeEl) {
+    badgeEl.classList.remove('hidden');
+    badgeEl.style.background = `${statusColor}20`;
+    badgeEl.style.color = statusColor;
+    badgeEl.textContent = result.level === 'green'
+      ? 'OK'
+      : result.level === 'yellow'
+        ? 'MARGINAL'
+        : 'INSUFFICIENT';
+  }
+
+  // Store for datasheet
+  (window as any).__coolingResult = result;
+}
+
+export function setupCoolingSection() {
+  const btn = $('cooling-run-btn');
+  btn?.addEventListener('click', runCoolingAnalysis);
+}
+
+/* ─────────────────────────────────────────────
+   F4 — Enclosure Design Section
+   ───────────────────────────────────────────── */
+
+function runEnclosureDesign() {
+  const stats = getStats();
+  if (!stats || !stats.s || !stats.p) return;
+
+  // Get pack dimensions from stats
+  const packWidthMm = (stats.widthMm ?? 150);
+  const packDepthMm = (stats.depthMm ?? 100);
+  const packHeightMm = (stats.heightMm ?? 80);
+  const packWeightKg = (stats.weightKg ?? 2);
+
+  const material = (inp('enclosure-material', 'aluminum') || 'aluminum') as 'aluminum' | 'steel' | 'plastic' | 'fiberglass';
+  const ipRating = (inp('enclosure-ip', 'ip65') || 'ip65') as 'ip20' | 'ip54' | 'ip65' | 'ip67' | 'ip68';
+  const wallThicknessMm = inpNum('enclosure-wall', 2);
+  const clearanceMm = inpNum('enclosure-clearance', 5);
+  const mountingType = (inp('enclosure-mounting', 'brackets') || 'brackets') as 'brackets' | 'rails' | 'custom';
+  const ventType = (inp('enclosure-vent', 'none') || 'none') as 'none' | 'filtered' | 'sealed' | 'conformal';
+
+  const packVoltage = stats.s * inpNum('c-volts', 3.6);
+  const packCurrentA = (window as any).__lastIMax ?? inpNum('c-amp', 20);
+
+  const config = {
+    material,
+    ipRating,
+    wallThicknessMm,
+    mountingType,
+    ventType,
+    packWidthMm,
+    packDepthMm,
+    packHeightMm,
+    packWeightKg,
+    packVoltage,
+    packCurrentA,
+    clearanceMm,
+  };
+
+  const result = analyzeEnclosure(config);
+
+  const resultsEl = $('enclosure-results');
+  const badgeEl = $('enclosure-status-badge');
+
+  if (resultsEl) {
+    resultsEl.innerHTML = renderEnclosureCard(result, config);
+  }
+
+  const statusColor = result.level === 'green' ? '#22c55e' : result.level === 'yellow' ? '#eab308' : '#ef4444';
+
+  if (badgeEl) {
+    badgeEl.classList.remove('hidden');
+    badgeEl.style.background = `${statusColor}20`;
+    badgeEl.style.color = statusColor;
+    badgeEl.textContent = result.level === 'green'
+      ? 'OK'
+      : result.level === 'yellow'
+        ? 'CAUTION'
+        : 'INCOMPATIBLE';
+  }
+
+  // Store for datasheet
+  (window as any).__enclosureResult = result;
+}
+
+export function setupEnclosureSection() {
+  const btn = $('enclosure-run-btn');
+  btn?.addEventListener('click', runEnclosureDesign);
+}
+
+/* ─────────────────────────────────────────────
+   F7 — Degradation & Cycle Life Section
+   ───────────────────────────────────────────── */
+
+function runDegradationAnalysis() {
+  const stats = getStats();
+  if (!stats || !stats.s || !stats.p) return;
+
+  const s = stats.s;
+  const p = stats.p;
+  const cellNom = inpNum('c-volts', 3.6);
+  const cellAh = inpNum('c-mah', 2500) / 1000;
+  const packCapacityKwh = (s * cellNom * p * cellAh) / 1000;
+  const packCostEur = inpNum('degradation-cost', 500);
+
+  const tempOperating = inpNum('degradation-temp', 30);
+  const crateAvg = inpNum('degradation-crate', 1);
+  const dodAvg = inpNum('degradation-dod', 80) / 100;
+  const cyclesPerYear = inpNum('degradation-cycles-yr', 365);
+
+  // Determine chemistry
+  const chemId = (() => {
+    const v = inp('chem-selector', '');
+    if (v && v !== 'custom') {
+      try { return JSON.parse(v)?.id ?? 'nmc'; } catch { return 'nmc'; }
+    }
+    return 'nmc';
+  })() as 'nmc' | 'lfp' | 'lto' | 'na-ion' | 'nca';
+
+  const thermalChem = (inp('degradation-chemistry', chemId) || chemId) as 'nmc' | 'lfp' | 'lto' | 'na-ion' | 'nca';
+
+  const config = {
+    chemistry: thermalChem,
+    tempOperating,
+    crateAvg,
+    dodAvg,
+    cyclesPerYear,
+    packCostEur,
+    packCapacityKwh,
+  };
+
+  const result = analyzeDegradation(config);
+
+  const resultsEl = $('degradation-results');
+  const badgeEl = $('degradation-status-badge');
+
+  if (resultsEl) {
+    resultsEl.innerHTML = renderDegradationCard(result, config);
+  }
+
+  if (badgeEl) {
+    badgeEl.classList.remove('hidden');
+    badgeEl.style.background = `${result.levelColor}20`;
+    badgeEl.style.color = result.levelColor;
+    badgeEl.textContent = result.level.toUpperCase();
+  }
+
+  // Store for datasheet
+  (window as any).__degradationResult = result;
+}
+
+export function setupDegradationSection() {
+  const btn = $('degradation-run-btn');
+  btn?.addEventListener('click', runDegradationAnalysis);
+}
+
+/* ─────────────────────────────────────────────
+   F6 — Cell Balancing Section
+   ───────────────────────────────────────────── */
+
+function runBalancingAnalysis() {
+  const stats = getStats();
+  if (!stats || !stats.s || !stats.p) return;
+
+  const s = stats.s;
+  const p = stats.p;
+  const cellNom = inpNum('c-volts', 3.6);
+  const cellAh = inpNum('c-mah', 2500) / 1000;
+
+  const balancingCurrentMa = inpNum('balancing-current', 200);
+  const mosfetRdsOhm = inpNum('balancing-mosfet-rds', 0.1);
+  const socSpread = inpNum('balancing-soc-spread', 5) / 100;
+  const channelCostEur = inpNum('balancing-channel-cost', 1.5);
+
+  const config = {
+    seriesGroups: s,
+    parallelCount: p,
+    cellNominalVoltage: cellNom,
+    cellCapacityAh: cellAh,
+    balancingCurrentMa,
+    mosfetRdsOhm,
+    socSpread,
+    channelCostEur,
+  };
+
+  const result = analyzeBalancing(config);
+
+  const resultsEl = $('balancing-results');
+  const badgeEl = $('balancing-status-badge');
+
+  if (resultsEl) {
+    resultsEl.innerHTML = renderBalancingCard(result, config);
+  }
+
+  if (badgeEl) {
+    badgeEl.classList.remove('hidden');
+    badgeEl.style.background = `${result.recommendationColor}20`;
+    badgeEl.style.color = result.recommendationColor;
+    badgeEl.textContent = result.recommendation.toUpperCase();
+  }
+
+  // Store for datasheet
+  (window as any).__balancingResult = result;
+}
+
+export function setupBalancingSection() {
+  const btn = $('balancing-run-btn');
+  btn?.addEventListener('click', runBalancingAnalysis);
+}
+
+/* ─────────────────────────────────────────────
+   F9 — Parallel Strings Section
+   ───────────────────────────────────────────── */
+
+function runParallelAnalysis() {
+  const stats = getStats();
+  if (!stats || !stats.s || !stats.p) return;
+
+  const s = stats.s;
+  const p = stats.p;
+  const cellNom = inpNum('c-volts', 3.6);
+  const cellAh = inpNum('c-mah', 2500) / 1000;
+
+  const cellIR = inpNum('parallel-cell-ir', 20);
+  const interconnectIR = inpNum('parallel-interconnect-ir', 5);
+  const totalCurrent = inpNum('parallel-total-current', 50);
+  const tempAmbient = inpNum('parallel-temp-ambient', 25);
+
+  if (p < 2) {
+    const resultsEl = $('parallel-results');
+    if (resultsEl) {
+      resultsEl.innerHTML = `
+        <div class="rounded-md p-2.5 mb-2" style="background: var(--bg-tertiary); border: 1px solid var(--border-primary);">
+          <div class="text-[0.65rem] font-bold" style="color: var(--text-muted);">
+            Single string — no parallel analysis needed
+          </div>
+        </div>
+      `;
+    }
+    return;
+  }
+
+  const config = {
+    seriesGroups: s,
+    parallelCount: p,
+    cellNominalVoltage: cellNom,
+    cellCapacityAh: cellAh,
+    cellIR,
+    interconnectResistance: interconnectIR,
+    totalCurrentA: totalCurrent,
+    tempAmbient,
+  };
+
+  const result = analyzeParallel(config);
+
+  const resultsEl = $('parallel-results');
+  const badgeEl = $('parallel-status-badge');
+
+  if (resultsEl) {
+    resultsEl.innerHTML = renderParallelCard(result, config);
+  }
+
+  if (badgeEl) {
+    badgeEl.classList.remove('hidden');
+    badgeEl.style.background = `${result.recommendationColor}20`;
+    badgeEl.style.color = result.recommendationColor;
+    badgeEl.textContent = result.recommendation.toUpperCase();
+  }
+
+  // Store for datasheet
+  (window as any).__parallelResult = result;
+}
+
+export function setupParallelSection() {
+  const btn = $('parallel-run-btn');
+  btn?.addEventListener('click', runParallelAnalysis);
+}
+
+/* ─────────────────────────────────────────────
+   F10 — Total Cost of Ownership Section
+   ───────────────────────────────────────────── */
+
+function runTcoAnalysis() {
+  const stats = getStats();
+  if (!stats || !stats.s || !stats.p) return;
+
+  const s = stats.s;
+  const p = stats.p;
+  const cellNom = inpNum('c-volts', 3.6);
+  const cellAh = inpNum('c-mah', 2500) / 1000;
+  const packCapacityKwh = (s * cellNom * p * cellAh) / 1000;
+  const packCostEur = inpNum('tco-pack-cost', 500);
+  const installationCostEur = inpNum('tco-install-cost', 100);
+  const electricityCostEurKwh = inpNum('tco-electricity-cost', 0.15);
+  const maintenanceCostPerYearEur = inpNum('tco-maintenance-cost', 50);
+  const replacementCostMultiplier = inpNum('tco-replacement-mult', 0.7);
+  const analysisYears = inpNum('tco-analysis-years', 10);
+  const discountRate = inpNum('tco-discount-rate', 5) / 100;
+  const efficiencyRoundtrip = inpNum('tco-efficiency', 92) / 100;
+
+  // Get degradation data if available
+  const degradationResult = (window as any).__degradationResult;
+  const cyclesToReplacement = degradationResult?.cyclesTo80pct ?? 2000;
+  const dodAvg = inpNum('degradation-dod', 80) / 100;
+  const cyclesPerYear = inpNum('degradation-cycles-yr', 365);
+
+  const config = {
+    packCapacityKwh,
+    packCostEur,
+    installationCostEur,
+    cyclesPerYear,
+    dodAvg,
+    cyclesToReplacement,
+    electricityCostEurKwh,
+    maintenanceCostPerYearEur,
+    replacementCostMultiplier,
+    analysisYears,
+    discountRate,
+    efficiencyRoundtrip,
+  };
+
+  const result = analyzeTco(config);
+
+  const resultsEl = $('tco-results');
+  const badgeEl = $('tco-status-badge');
+
+  if (resultsEl) {
+    resultsEl.innerHTML = renderTcoCard(result, config);
+  }
+
+  if (badgeEl) {
+    badgeEl.classList.remove('hidden');
+    badgeEl.style.background = `${result.levelColor}20`;
+    badgeEl.style.color = result.levelColor;
+    badgeEl.textContent = result.level.toUpperCase();
+  }
+
+  // Store for datasheet
+  (window as any).__tcoResult = result;
+}
+
+export function setupTcoSection() {
+  const btn = $('tco-run-btn');
+  btn?.addEventListener('click', runTcoAnalysis);
+}
+
+/* ─────────────────────────────────────────────
+   F11 — IoT & Monitoring Section
+   ───────────────────────────────────────────── */
+
+function runIoTAnalysis() {
+  const stats = getStats();
+  if (!stats || !stats.s || !stats.p) return;
+
+  const s = stats.s;
+  const p = stats.p;
+  const cellNom = inpNum('c-volts', 3.6);
+  const cellAh = inpNum('c-mah', 2500) / 1000;
+  const maxCurrent = inpNum('c-rate', 1) * cellAh * p;
+
+  const protocol = (inp('iot-protocol', 'mqtt') || 'mqtt') as 'mqtt' | 'modbus' | 'can';
+  const sampleRate = inpNum('iot-sample-rate', 5);
+  const tempSensors = inpNum('iot-temp-sensors', 4);
+
+  const packVoltage = s * cellNom;
+
+  const result = analyzeIoT(protocol, sampleRate, packVoltage, maxCurrent, s, tempSensors);
+
+  const resultsEl = $('iot-results');
+  const badgeEl = $('iot-status-badge');
+
+  if (resultsEl) {
+    resultsEl.innerHTML = renderIoTCard(result);
+
+    // Wire up export buttons
+    resultsEl.querySelectorAll('.iot-export-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const format = (btn as HTMLElement).dataset.format;
+        let content = '';
+        let filename = '';
+
+        if (format === 'mqtt') {
+          content = result.configJson;
+          filename = `mqtt-config-${Date.now()}.json`;
+        } else if (format === 'grafana') {
+          content = result.grafanaConfig;
+          filename = `grafana-dashboard-${Date.now()}.json`;
+        } else if (format === 'ha') {
+          content = result.homeAssistantConfig;
+          filename = `home-assistant-config-${Date.now()}.yaml`;
+        } else if (format === 'csv') {
+          content = result.datapointsCsv;
+          filename = `datapoints-${Date.now()}.csv`;
+        }
+
+        if (content) {
+          const blob = new Blob([content], { type: 'text/plain' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+      });
+    });
+  }
+
+  if (badgeEl) {
+    badgeEl.classList.remove('hidden');
+    badgeEl.style.background = `${result.levelColor}20`;
+    badgeEl.style.color = result.levelColor;
+    badgeEl.textContent = `${result.totalDataPoints} DPs`;
+  }
+
+  // Store for datasheet
+  (window as any).__iotResult = result;
+}
+
+export function setupIoTSection() {
+  const btn = $('iot-run-btn');
+  btn?.addEventListener('click', runIoTAnalysis);
 }

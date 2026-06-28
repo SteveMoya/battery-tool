@@ -1,0 +1,68 @@
+---
+import HelpIcon from '../HelpIcon.astro';
+---
+
+<section class="group-box">
+  <div class="flex justify-between items-center mb-1.5">
+    <h2 class="section-title m-0">10. Thermal Analysis</h2>
+    <HelpIcon tip="Cell temperature estimation, derating curves, and cycle life prediction based on chemistry and cooling" />
+  </div>
+
+  <div class="mb-2">
+    <div class="flex items-center gap-2 mb-1.5">
+      <button
+        id="thermal-run-btn"
+        class="btn-primary text-[0.65rem] py-1 px-2.5"
+      >
+        Analyze Thermal
+      </button>
+      <span id="thermal-status-badge" class="text-[0.6rem] font-bold px-1.5 py-0.5 rounded hidden"></span>
+    </div>
+
+    <!-- Inputs -->
+    <div id="thermal-inputs" class="rounded-md p-2 mb-2" style="background: var(--bg-tertiary); border-color: var(--border-primary); border-width: 1px; border-style: solid;">
+      <div class="grid grid-cols-2 gap-2">
+        <div class="flex flex-col">
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Ambient Temp (°C)</label>
+          <input id="thermal-tamb" type="number" value="25" min="0" max="60" step="1"
+            class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);" />
+        </div>
+        <div class="flex flex-col">
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Max Cell Temp (°C)</label>
+          <input id="thermal-tmax" type="number" value="55" min="40" max="80" step="1"
+            class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);" />
+        </div>
+        <div class="flex flex-col">
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Cooling Type</label>
+          <select id="thermal-cooling" class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);">
+            <option value="none">None (Passive)</option>
+            <option value="air">Air Cooled</option>
+            <option value="liquid">Liquid Cooled</option>
+          </select>
+        </div>
+        <div class="flex flex-col">
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Avg C-rate</label>
+          <input id="thermal-crate" type="number" value="1" min="0.1" max="5" step="0.1"
+            class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);" />
+        </div>
+        <div class="flex flex-col">
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Avg DoD (%)</label>
+          <input id="thermal-dod" type="number" value="80" min="10" max="100" step="5"
+            class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);" />
+        </div>
+        <div class="flex flex-col">
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Chemistry</label>
+          <select id="thermal-chemistry" class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);">
+            <option value="nmc">NMC</option>
+            <option value="lfp">LFP</option>
+            <option value="lto">LTO</option>
+            <option value="na-ion">Na-Ion</option>
+            <option value="nca">NCA</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div id="thermal-results"></div>
+  </div>
+</section>

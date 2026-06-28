@@ -312,6 +312,28 @@ export function updateSimulation(e?: Event) {
   const rTh = parseFloat(inputs['sim-rth']?.value ?? '7') || 7;
   const jouleResult = checkJouleHeat(heatTotal, S, P, tAmb, undefined, rTh);
   renderJouleHeatIndicator(jouleResult);
+
+  // F1 — Render compliance indicator if report available
+  const complianceReport = (window as any).__complianceReport;
+  if (complianceReport?.summary) {
+    const complianceEl = document.getElementById('diag-compliance');
+    if (complianceEl) {
+      const s = complianceReport.summary.overallStatus;
+      const level = s === 'pass' ? 'green' : s === 'warn' ? 'yellow' : s === 'fail' ? 'red' : 'neutral';
+      complianceEl.dataset.level = level;
+      const emoji = s === 'pass' ? '✅' : s === 'warn' ? '⚠️' : s === 'fail' ? '❌' : '⚪';
+      const emojiSpan = complianceEl.querySelector('.safety-emoji');
+      const textSpan = complianceEl.querySelector('.safety-text');
+      const pctEl = complianceEl.querySelector('.diag-pct');
+      if (emojiSpan) emojiSpan.textContent = emoji;
+      if (textSpan) textSpan.textContent = `${complianceReport.summary.pass}/${complianceReport.summary.total} checks passed`;
+      if (pctEl) pctEl.textContent = s === 'pass' ? '100%' : s === 'warn' ? '50%' : '0%';
+      const color = level === 'green' ? '#22c55e' : level === 'yellow' ? '#eab308' : level === 'red' ? '#ef4444' : '#94a3b8';
+      (complianceEl as HTMLElement).style.color = color;
+      (complianceEl as HTMLElement).style.borderColor = color;
+    }
+  }
+
   const diagReport = computeDiagnostic(jouleResult);
   renderDiagnosticGlobal(diagReport);
 
