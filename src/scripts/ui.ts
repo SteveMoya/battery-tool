@@ -894,7 +894,7 @@ export function attachAllInputs() {
       else if (el.type === 'range' || el.type === 'number' || el.type === 'text') debouncedUpdate();
       else updatePack();
     });
-    if (id !== 'sim-load-slider') el.addEventListener('change', () => updatePack());
+    if (id !== 'sim-load-slider' && id !== 'sim-cell-ir') el.addEventListener('change', () => updatePack());
   });
 
   // F5: Generative Mode button

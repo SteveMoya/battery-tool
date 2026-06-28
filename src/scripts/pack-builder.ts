@@ -23,6 +23,7 @@ let lastUserBusMode = 'both';
 let userHasTouchedBusColor = false;
 let perfToastTimer: number | null = null;
 let needsOcclusionUpdate = true;
+let lastOcclusionTime = 0;
 
 /* ─── F18 — 3D Visualization state ─── */
 let isWireframe = false;
@@ -433,19 +434,23 @@ export function updatePack() {
   });
   packState.labels.length = 0;
 
-  while (packState.packGroup.children.length > 0) {
-    const c: any = packState.packGroup.children[0];
-    if (c.geometry) c.geometry.dispose();
-    if (c.material) {
-      const isGlobal = (c.material === packState.cellMat || c.material === packState.capMat ||
-        c.material === packState.busMat || c.material === packState.spacerMat ||
-        c.material === packState.interConnMat);
+  // Dispose all geometries and non-global materials recursively
+  packState.packGroup.traverse((child) => {
+    const obj = child as any;
+    if (obj.geometry) obj.geometry.dispose();
+    if (obj.material) {
+      const isGlobal = (obj.material === packState.cellMat || obj.material === packState.capMat ||
+        obj.material === packState.busMat || obj.material === packState.spacerMat ||
+        obj.material === packState.interConnMat);
       if (!isGlobal) {
-        if (Array.isArray(c.material)) c.material.forEach((m: any) => m.dispose());
-        else c.material.dispose();
+        if (Array.isArray(obj.material)) obj.material.forEach((m: any) => m.dispose());
+        else obj.material.dispose();
       }
     }
-    packState.packGroup.remove(c);
+  });
+  // Clear all children
+  while (packState.packGroup.children.length > 0) {
+    packState.packGroup.remove(packState.packGroup.children[0]);
   }
   while (packState.dimGroup.children.length > 0) packState.dimGroup.remove(packState.dimGroup.children[0]);
   document.querySelectorAll('.label-tag, .dim-tag').forEach((el) => el.remove());
@@ -1478,7 +1483,9 @@ export function animate(_time: number) {
   packState.controls.update();
   packState.renderer.render(packState.scene, packState.camera);
 
-  if (needsOcclusionUpdate && currentStats.cells <= 500) {
+  const now = performance.now();
+  if (needsOcclusionUpdate && currentStats.cells <= 500 && now - lastOcclusionTime > 100) {
+    lastOcclusionTime = now;
     needsOcclusionUpdate = false;
     for (const label of packState.labels) {
       label.getWorldPosition(packState.v3);
