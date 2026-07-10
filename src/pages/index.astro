@@ -35,6 +35,7 @@ import CompareModal from '../components/modals/CompareModal.astro';
 import CustomBmsModal from '../components/modals/CustomBmsModal.astro';
   import BomModal from '../components/modals/BomModal.astro';
   import DatasheetModal from '../components/modals/DatasheetModal.astro';
+  import OnboardingOverlay from '../components/OnboardingOverlay.astro';
 ---
 
 <Layout
@@ -89,7 +90,10 @@ import CustomBmsModal from '../components/modals/CustomBmsModal.astro';
 
   <DiagnosticPanel />
 
+  <button id="sidebar-toggle" aria-label="Toggle sidebar">☰</button>
+
   <CompareModal />
+  <OnboardingOverlay />
   <LicenseModal />
   <DisclaimerModal />
   <FeedbackModal />

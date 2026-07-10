@@ -20,6 +20,7 @@ import { analyzeBalancing, renderBalancingCard, type BalancingResult } from './b
 import { analyzeParallel, renderParallelCard, type ParallelResult } from './parallel-engine';
 import { analyzeTco, renderTcoCard, type TcoResult } from './tco-engine';
 import { analyzeIoT, renderIoTCard, type IoTResult } from './iot-integration';
+import { restartTour } from './onboarding';
 import { INPUT_IDS, $ } from './dom';
 import {
   packState,
@@ -165,6 +166,11 @@ export function setupFileMenu() {
   document.getElementById('menu-export-stl')?.addEventListener('click', (e) => {
     e.preventDefault();
     ($('export-overlay') as HTMLElement).style.display = 'flex';
+    fileMenuDropdown()?.classList.remove('show');
+  });
+  document.getElementById('menu-restart-tour')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    restartTour();
     fileMenuDropdown()?.classList.remove('show');
   });
 }
@@ -2879,4 +2885,131 @@ function runIoTAnalysis() {
 export function setupIoTSection() {
   const btn = $('iot-run-btn');
   btn?.addEventListener('click', runIoTAnalysis);
+}
+
+/* ─────────────────────────────────────────────
+   F12 — Input Validation Visual Feedback
+   ───────────────────────────────────────────── */
+
+interface InputRule {
+  id: string;
+  validate: (val: number) => 'valid' | 'warning' | 'invalid';
+  hint?: (val: number) => string;
+}
+
+const VALIDATION_RULES: InputRule[] = [
+  {
+    id: 'c-diam',
+    validate: (v) => v <= 0 ? 'invalid' : v < 5 ? 'warning' : 'valid',
+    hint: (v) => v <= 0 ? 'Diameter is required' : v < 5 ? 'Unusually small diameter' : '',
+  },
+  {
+    id: 'c-height',
+    validate: (v) => v <= 0 ? 'invalid' : 'valid',
+    hint: (v) => v <= 0 ? 'Height is required' : '',
+  },
+  {
+    id: 'c-mah',
+    validate: (v) => v <= 0 ? 'invalid' : v > 15000 ? 'warning' : 'valid',
+    hint: (v) => v <= 0 ? 'Capacity is required' : v > 15000 ? 'Unusually high — verify datasheet' : '',
+  },
+  {
+    id: 'c-volts',
+    validate: (v) => v <= 0 ? 'invalid' : v < 1.5 || v > 5 ? 'warning' : 'valid',
+    hint: (v) => v <= 0 ? 'Nominal voltage is required' : v < 1.5 || v > 5 ? 'Outside typical Li-ion range (1.5–5V)' : '',
+  },
+  {
+    id: 'c-ir',
+    validate: (v) => v <= 0 ? 'invalid' : v > 100 ? 'warning' : 'valid',
+    hint: (v) => v <= 0 ? 'Internal resistance is required' : v > 100 ? 'Very high IR — check units (mΩ)' : '',
+  },
+  {
+    id: 's-count',
+    validate: (v) => v < 1 ? 'invalid' : v > 30 ? 'warning' : 'valid',
+    hint: (v) => v < 1 ? 'At least 1S required' : v > 30 ? 'High S-count — verify BMS supports this' : '',
+  },
+  {
+    id: 'p-count',
+    validate: (v) => v < 1 ? 'invalid' : 'valid',
+    hint: (v) => v < 1 ? 'At least 1P required' : '',
+  },
+  {
+    id: 'c-rate',
+    validate: (v) => v <= 0 ? 'invalid' : v > 10 ? 'warning' : 'valid',
+    hint: (v) => v <= 0 ? 'C-rate is required' : v > 10 ? 'Extreme C-rate — verify cell capability' : '',
+  },
+  {
+    id: 'c-spacing',
+    validate: (v) => v < 0 ? 'invalid' : v < 0.2 ? 'warning' : 'valid',
+    hint: (v) => v < 0 ? 'Spacing cannot be negative' : v < 0.2 ? 'Very tight spacing — thermal risk' : '',
+  },
+];
+
+function applyValidationClass(el: HTMLElement, status: 'valid' | 'warning' | 'invalid') {
+  el.classList.remove('input-valid', 'input-invalid', 'input-warning');
+  if (status === 'valid') el.classList.add('input-valid');
+  else if (status === 'warning') el.classList.add('input-warning');
+  else el.classList.add('input-invalid');
+}
+
+function removeValidationClass(el: HTMLElement) {
+  el.classList.remove('input-valid', 'input-invalid', 'input-warning');
+}
+
+export function validateInputs() {
+  for (const rule of VALIDATION_RULES) {
+    const el = $inp(rule.id);
+    if (!el) continue;
+
+    const val = parseFloat(el.value);
+    if (isNaN(val) || el.value.trim() === '') {
+      removeValidationClass(el);
+      // Remove any existing hint
+      const existingHint = el.parentElement?.querySelector('.input-hint');
+      if (existingHint) existingHint.remove();
+      continue;
+    }
+
+    const status = rule.validate(val);
+    applyValidationClass(el, status);
+
+    // Add/remove hint text
+    const parent = el.closest('.smart-input-wrap') || el.parentElement;
+    if (parent) {
+      const existingHint = parent.querySelector('.input-hint');
+      if (rule.hint) {
+        const msg = rule.hint(val);
+        if (msg) {
+          if (existingHint) {
+            existingHint.textContent = msg;
+            existingHint.className = `input-hint hint-${status === 'valid' ? 'ok' : status === 'warning' ? 'warn' : 'error'}`;
+          } else {
+            const hint = document.createElement('div');
+            hint.className = `input-hint hint-${status === 'valid' ? 'ok' : status === 'warning' ? 'warn' : 'error'}`;
+            hint.textContent = msg;
+            parent.appendChild(hint);
+          }
+        } else if (existingHint) {
+          existingHint.remove();
+        }
+      } else if (existingHint) {
+        existingHint.remove();
+      }
+    }
+  }
+}
+
+export function initInputValidation() {
+  // Run validation on initial load (after a short delay for DOM ready)
+  setTimeout(validateInputs, 300);
+
+  // Re-validate on any input change
+  document.addEventListener('input', (e) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'INPUT' && VALIDATION_RULES.some(r => r.id === target.id)) {
+      // Debounced validation
+      clearTimeout((window as any).__validationTimer);
+      (window as any).__validationTimer = setTimeout(validateInputs, 200);
+    }
+  });
 }

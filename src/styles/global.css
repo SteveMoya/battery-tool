@@ -400,4 +400,130 @@
   @media (max-width: 900px) {
     #diagnostic-panel { display: none !important; }
   }
+
+  /* ─── F12: Onboarding Tour ─── */
+  .onboarding-overlay {
+    @apply fixed inset-0 z-[200] items-center justify-center;
+  }
+  .onboarding-backdrop {
+    @apply absolute inset-0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(2px);
+  }
+  .onboarding-card {
+    @apply relative w-[90%] max-w-[420px] rounded-xl shadow-2xl flex flex-col overflow-hidden;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    animation: onboarding-enter 0.25s ease-out;
+  }
+  @keyframes onboarding-enter {
+    from { opacity: 0; transform: translateY(12px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .onboarding-header {
+    @apply flex items-center justify-between px-4 pt-3 pb-1;
+  }
+  .onboarding-step-dots {
+    @apply flex gap-1.5;
+  }
+  .onboarding-dot {
+    @apply w-2 h-2 rounded-full transition-all duration-200;
+    background: var(--border-secondary);
+  }
+  .onboarding-dot.active {
+    background: var(--accent-primary);
+    @apply scale-125;
+  }
+  .onboarding-dot.done {
+    background: var(--accent-primary);
+    opacity: 0.5;
+  }
+  .onboarding-close-btn {
+    @apply bg-transparent border-none text-xl cursor-pointer leading-none p-0.5 rounded transition-colors;
+    color: var(--text-muted);
+  }
+  .onboarding-close-btn:hover { color: var(--text-primary); }
+  .onboarding-body {
+    @apply px-6 py-5 text-center;
+  }
+  .onboarding-icon {
+    @apply text-4xl mb-3 block;
+  }
+  .onboarding-title {
+    @apply text-lg font-bold m-0 mb-2;
+    color: var(--text-primary);
+  }
+  .onboarding-desc {
+    @apply text-[0.85rem] leading-relaxed m-0;
+    color: var(--text-secondary);
+  }
+  .onboarding-footer {
+    @apply flex items-center justify-between px-4 py-3 border-t;
+    border-color: var(--border-primary);
+    background: var(--bg-tertiary);
+  }
+  .onboarding-footer-right {
+    @apply flex gap-2;
+  }
+  .onboarding-btn {
+    @apply text-[0.8rem] font-semibold py-2 px-4 rounded-md cursor-pointer transition-all border-none;
+  }
+  .onboarding-btn:disabled {
+    @apply opacity-40 cursor-not-allowed;
+  }
+  .onboarding-btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+  }
+  .onboarding-btn-ghost:hover { color: var(--text-primary); }
+  .onboarding-btn-outline {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-secondary) !important;
+  }
+  .onboarding-btn-outline:hover { border-color: var(--accent-primary) !important; color: var(--accent-primary); }
+  .onboarding-btn-primary {
+    background: var(--accent-primary);
+    color: #fff;
+  }
+  .onboarding-btn-primary:hover { background: var(--accent-hover); }
+
+  /* ─── F12: Input Validation Visual Feedback ─── */
+  .input-valid {
+    border-color: #22c55e !important;
+    box-shadow: 0 0 0 1px #22c55e33;
+  }
+  .input-invalid {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 1px #ef444433;
+  }
+  .input-warning {
+    border-color: #f59e0b !important;
+    box-shadow: 0 0 0 1px #f59e0b33;
+  }
+  .input-hint {
+    @apply text-[0.65rem] mt-0.5 leading-tight;
+  }
+  .input-hint.hint-error { color: #ef4444; }
+  .input-hint.hint-warn { color: #f59e0b; }
+  .input-hint.hint-ok { color: #22c55e; }
+
+  /* ─── F12: Mobile sidebar toggle ─── */
+  #sidebar-toggle {
+    @apply hidden;
+  }
+  @media (max-width: 768px) {
+    #sidebar-toggle {
+      @apply fixed bottom-4 right-4 z-[90] w-12 h-12 rounded-full flex items-center justify-center text-xl shadow-lg cursor-pointer border-none;
+      background: var(--accent-primary);
+      color: #fff;
+    }
+    #sidebar-toggle:hover { background: var(--accent-hover); }
+    #sidebar {
+      @apply transition-all duration-300;
+    }
+    #sidebar.sidebar-collapsed {
+      @apply -translate-x-full;
+    }
+  }
 }

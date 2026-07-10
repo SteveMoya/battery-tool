@@ -1,6 +1,7 @@
 import { initThree, updatePack, animate } from './pack-builder';
 import { initKeyboardShortcuts } from './keyboard-shortcuts';
 import { initConfigStorage } from './config-storage';
+import { initOnboarding } from './onboarding';
 import {
   initDisclaimer, setupModals, setupFileMenu, setupReset,
   setupPresetEvents, setupCellDbSearch,
@@ -10,6 +11,7 @@ import {
   setupProtectionSection, setupThermalSection, setupCoolingSection, setupEnclosureSection, setupDegradationSection, setupBalancingSection, setupParallelSection, setupTcoSection, setupIoTSection,
   populatePresets, selectInitialPresets,
   importStateFromFile, updateDeleteButtons,
+  initInputValidation,
 } from './ui';
 import { setupElectricalEngine } from './electrical-engine';
 import { toggleTheme } from './theme';
@@ -85,6 +87,17 @@ export function initApp() {
   // F12: Keyboard shortcuts & config storage
   initKeyboardShortcuts();
   initConfigStorage();
+  initOnboarding();
+  initInputValidation();
+
+  // F12: Mobile sidebar toggle
+  const sidebarToggle = document.getElementById('sidebar-toggle');
+  const sidebar = document.getElementById('sidebar');
+  if (sidebarToggle && sidebar) {
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('sidebar-collapsed');
+    });
+  }
 
   updatePack();
   requestAnimationFrame(animate);
