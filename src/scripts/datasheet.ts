@@ -25,6 +25,7 @@ const C = {
   sectionBg: [241, 245, 249] as const,
   sectionBorder: [203, 213, 225] as const,
   text: [30, 41, 59] as const,
+  textDark: [30, 41, 59] as const,
   textMuted: [100, 116, 139] as const,
   green: [34, 197, 94] as const,
   yellow: [234, 179, 8] as const,
@@ -329,17 +330,17 @@ export function gatherPackData(): PackData | null {
     name: stats.name || 'Battery Pack',
     model: `BCA-${s}S${p}P`,
     date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-    nomV: stats.v, minV: stats.vmin, maxV: stats.vmax,
-    capacity: stats.ah, energy: stats.wh,
+    nomV: stats.v ?? 0, minV: stats.vmin ?? 0, maxV: stats.vmax ?? 0,
+    capacity: stats.ah ?? 0, energy: stats.wh ?? 0,
     maxDischargeA: packIMax,
     maxChargeA: parseFloat(inp('c-charge-amp', String(cellAmp * defaultCRate))),
     cRate: packAh > 0 ? packIMax / packAh : 0,
-    width: stats.w, depth: stats.d, height: stats.h,
-    weight: stats.kg, volume: stats.vol,
+    width: stats.w ?? 0, depth: stats.d ?? 0, height: stats.h ?? 0,
+    weight: stats.kg ?? 0, volume: stats.vol ?? 0,
     cellType: cellDiam > 0 ? `${cellDiam}mm` : `${prismW}×${prismD}mm`,
     cellDiameter: cellDiam, cellLength: cellLen,
     chemistry: chemName, formFactor,
-    s, p, layers: stats.l, totalCells: stats.cells,
+    s, p, layers: stats.l ?? 0, totalCells: stats.cells ?? 0,
     gridType: hexMode ? 'Hexagonal' : 'Square',
     bmsName: bms?.name ?? 'None',
     bmsBalance: bms?.balanceType ?? '--',
@@ -685,7 +686,8 @@ export function drawDatasheetPage(pdf: jsPDF, data: PackData): void {
 
       pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(6);
-      pdf.setTextColor(...(rec.priority === 'required' ? C.red : rec.priority === 'recommended' ? C.yellow : C.textMuted));
+      const priorityColor: RGB = rec.priority === 'required' ? C.red : rec.priority === 'recommended' ? C.yellow : C.textMuted;
+      pdf.setTextColor(...priorityColor);
       pdf.text(`[${catIcon}] ${priorityMark}`, mx + 3, ky);
 
       pdf.setFont('helvetica', 'normal');
@@ -853,7 +855,7 @@ export function drawDatasheetPage(pdf: jsPDF, data: PackData): void {
     ky = row10Y + SECTION_H + 4;
 
     const degColor: RGB = dr.level === 'excellent' ? C.green
-      : dr.level === 'good' ? new RGB(59, 130, 246)
+      : dr.level === 'good' ? [59, 130, 246] as const
       : dr.level === 'fair' ? C.yellow : C.red;
 
     pdf.setFont('helvetica', 'bold');
@@ -872,7 +874,7 @@ export function drawDatasheetPage(pdf: jsPDF, data: PackData): void {
     pdf.setFontSize(6);
     pdf.setTextColor(...C.textDark);
     pdf.text(
-      `Fade: ${dr.capacityFadePerCycle.toFixed(4)}%/√cycle  |  Total Energy: ${(dr.cyclesTo80pct * data.packCapacityKwh / 1000).toFixed(0)} MWh over life`,
+      `Fade: ${dr.capacityFadePerCycle.toFixed(4)}%/√cycle  |  Total Energy: ${(dr.cyclesTo80pct * data.energy / 1000000).toFixed(0)} MWh over life`,
       mx + 3, ky,
     );
   }

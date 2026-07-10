@@ -63,8 +63,9 @@ export function analyzeTco(cfg: TcoConfig): TcoResult {
     let annualCost = (opex / cfg.analysisYears);
 
     // Check if replacement needed this year
+    // First replacement happens after cyclesToReplacement cycles
     const cyclesUpToYear = cfg.cyclesPerYear * y;
-    if (cyclesUpToYear % cfg.cyclesToReplacement < cfg.cyclesPerYear && y > 1) {
+    if (cyclesUpToYear >= cfg.cyclesToReplacement && cyclesUpToYear % cfg.cyclesToReplacement < cfg.cyclesPerYear) {
       annualCost += cfg.packCostEur * cfg.replacementCostMultiplier;
     }
 

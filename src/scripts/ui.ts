@@ -52,6 +52,16 @@ const $sel = (id: string): HTMLSelectElement | null => document.getElementById(i
 const $inp = (id: string): HTMLInputElement | null => document.getElementById(id) as HTMLInputElement | null;
 const $btn = (id: string): HTMLButtonElement | null => document.getElementById(id) as HTMLButtonElement | null;
 
+// Helper: read DOM input value
+function inp(id: string, fallback: string): string {
+  const el = document.getElementById(id) as HTMLInputElement | null;
+  return (el?.value ?? '') || fallback;
+}
+
+function inpNum(id: string, fallback: number): number {
+  return parseFloat(inp(id, String(fallback))) || fallback;
+}
+
 // Strip input validation: width ≤ cell contact, thickness ≥ 0.05mm
 function getMaxStripWidth(): number {
   const cellType = ($inp('cell-type') as HTMLInputElement | null)?.value ?? 'cylindrical';
@@ -802,6 +812,9 @@ function attemptReverseLookup() {
     w: parseFloat($inp('c-weight')?.value ?? '0') || 0,
     cost: $inp('c-cost')?.value ?? '',
     ir: parseFloat($inp('sim-cell-ir')?.value ?? '25') || 25,
+    formFactor: $inp('cell-type')?.value ?? 'cylindrical',
+    pw: parseFloat($inp('c-prism-w')?.value ?? '0') || 0,
+    pd: parseFloat($inp('c-prism-d')?.value ?? '0') || 0,
   };
   const sel = $sel('preset-selector');
   const dbInput = $inp('db-search-input');
@@ -2240,8 +2253,8 @@ function runProtectionCheck() {
 
   const protectionConfig = {
     packVoltage: config.packVoltage,
-    packCurrentA: config.iMax,
-    packCurrentPulse: config.iMax * 3, // typical pulse: 3× continuous
+    packCurrentA: config.packIMax,
+    packCurrentPulse: config.packIMax * 3, // typical pulse: 3× continuous
     packCapacityAh: config.packCapacityAh,
     sCount: config.s,
     bms: bms,
@@ -2269,7 +2282,7 @@ function runProtectionCheck() {
           ${components} component(s) — ${required} required
         </span>
         <span class="text-[0.58rem] font-mono" style="color: var(--text-muted);">
-          ${config.s}S${config.p}P · ${config.packVoltage.toFixed(0)}V · ${config.iMax.toFixed(0)}A
+          ${config.s}S${config.p}P · ${config.packVoltage.toFixed(0)}V · ${config.packIMax.toFixed(0)}A
         </span>
       </div>
       <div class="flex gap-2 text-[0.58rem]">
@@ -2315,8 +2328,13 @@ function runThermalAnalysis() {
   const s = stats.s;
   const p = stats.p;
   const cellAh = inpNum('c-mah', 2500) / 1000;
-  const cellIR = inpNum('sim-cell-ir', 0.02);
-  const iMax = (window as any).__lastIMax ?? inpNum('c-amp', 20) * p;
+  const cellIR = inpNum('sim-cell-ir', 25) / 1000; // Convert from mΩ to Ω
+
+  // Use actual operating current from simulation, not max rated current
+  const operatingCurrent = getLastAmps();
+  const cellMaxA = inpNum('c-amp', 20);
+  const packMaxIMax = cellMaxA * p;
+  const iMax = operatingCurrent > 0 ? operatingCurrent : packMaxIMax;
 
   const tAmb = inpNum('thermal-tamb', 25);
   const tMax = inpNum('thermal-tmax', 55);
@@ -2411,7 +2429,7 @@ function runCoolingAnalysis() {
 
   // Get pack electrical info
   const stats = getStats();
-  const packVoltage = stats ? stats.s * inpNum('c-volts', 3.6) : 48;
+  const packVoltage = stats?.s ? stats.s * inpNum('c-volts', 3.6) : 48;
   const packCurrentA = (window as any).__lastIMax ?? inpNum('c-amp', 20);
 
   const config = {
@@ -2468,10 +2486,10 @@ function runEnclosureDesign() {
   if (!stats || !stats.s || !stats.p) return;
 
   // Get pack dimensions from stats
-  const packWidthMm = (stats.widthMm ?? 150);
-  const packDepthMm = (stats.depthMm ?? 100);
-  const packHeightMm = (stats.heightMm ?? 80);
-  const packWeightKg = (stats.weightKg ?? 2);
+  const packWidthMm = (stats.w ?? 150);
+  const packDepthMm = (stats.d ?? 100);
+  const packHeightMm = (stats.h ?? 80);
+  const packWeightKg = (stats.kg ?? 2);
 
   const material = (inp('enclosure-material', 'aluminum') || 'aluminum') as 'aluminum' | 'steel' | 'plastic' | 'fiberglass';
   const ipRating = (inp('enclosure-ip', 'ip65') || 'ip65') as 'ip20' | 'ip54' | 'ip65' | 'ip67' | 'ip68';

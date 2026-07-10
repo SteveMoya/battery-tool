@@ -187,9 +187,10 @@ export function analyzeThermal(config: ThermalConfig): ThermalResult {
   estimatedCycles = Math.max(50, Math.min(10000, Math.round(estimatedCycles)));
 
   // Annual degradation (assuming 1 cycle/day = 365 cycles/year)
+  // estimatedCycles is to 80% SoH (20% fade), not 100% fade
   const cyclesPerYear = 365;
   const annualDegradation = estimatedCycles > 0
-    ? (100 / estimatedCycles) * cyclesPerYear
+    ? (20 / estimatedCycles) * cyclesPerYear
     : 100;
 
   // ── 6. Cooling power consumption ──

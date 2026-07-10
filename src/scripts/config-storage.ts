@@ -20,11 +20,14 @@ interface PackConfig {
 }
 
 function gatherConfig(): PackConfig {
+  const chemEl = document.querySelector('#chem-selector');
+  const bmsEl = document.getElementById('bms-select');
+
   return {
     version: 1,
     timestamp: new Date().toISOString(),
     cells: {
-      chemistry: (document.querySelector('#chem-selector') as HTMLSelectElement)?.value ?? '',
+      chemistry: (chemEl instanceof HTMLSelectElement ? chemEl.value : '') ?? '',
       voltage: parseFloat((document.getElementById('c-volts') as HTMLInputElement)?.value ?? '3.6'),
       capacityMah: parseFloat((document.getElementById('c-mah') as HTMLInputElement)?.value ?? '2500'),
     },
@@ -33,15 +36,15 @@ function gatherConfig(): PackConfig {
       parallel: parseInt((document.getElementById('num-p') as HTMLInputElement)?.value ?? '1', 10),
     },
     bms: {
-      selectedId: (document.getElementById('bms-select') as HTMLSelectElement)?.value ?? null,
+      selectedId: (bmsEl instanceof HTMLSelectElement ? bmsEl.value : null) ?? null,
     },
   };
 }
 
 function applyConfig(config: PackConfig): void {
   if (config.cells.chemistry) {
-    const chemSelector = document.getElementById('chem-selector') as HTMLSelectElement;
-    if (chemSelector) {
+    const chemSelector = document.getElementById('chem-selector');
+    if (chemSelector instanceof HTMLSelectElement) {
       chemSelector.value = config.cells.chemistry;
       chemSelector.dispatchEvent(new Event('change', { bubbles: true }));
     }
@@ -80,8 +83,8 @@ function applyConfig(config: PackConfig): void {
   }
 
   if (config.bms.selectedId) {
-    const bmsSelect = document.getElementById('bms-select') as HTMLSelectElement;
-    if (bmsSelect) {
+    const bmsSelect = document.getElementById('bms-select');
+    if (bmsSelect instanceof HTMLSelectElement) {
       bmsSelect.value = config.bms.selectedId;
       bmsSelect.dispatchEvent(new Event('change', { bubbles: true }));
     }

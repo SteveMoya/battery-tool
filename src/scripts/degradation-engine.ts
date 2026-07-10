@@ -23,7 +23,7 @@ interface DegradationParams {
 const DEGRADATION_PARAMS: Record<Chemistry, DegradationParams> = {
   nmc: {
     label: 'NMC',
-    k1Base: 0.02,
+    k1Base: 0.894,          // Calibrated: (20/0.894)² = 500 cycles
     ea: 24.6,
     nRef: 500,
     tRef: 25,
@@ -35,7 +35,7 @@ const DEGRADATION_PARAMS: Record<Chemistry, DegradationParams> = {
   },
   lfp: {
     label: 'LFP',
-    k1Base: 0.005,
+    k1Base: 0.447,          // Calibrated: (20/0.447)² = 2000 cycles
     ea: 20.0,
     nRef: 2000,
     tRef: 25,
@@ -47,7 +47,7 @@ const DEGRADATION_PARAMS: Record<Chemistry, DegradationParams> = {
   },
   lto: {
     label: 'LTO',
-    k1Base: 0.002,
+    k1Base: 0.224,          // Calibrated: (20/0.224)² = 8000 cycles
     ea: 15.0,
     nRef: 8000,
     tRef: 25,
@@ -59,7 +59,7 @@ const DEGRADATION_PARAMS: Record<Chemistry, DegradationParams> = {
   },
   'na-ion': {
     label: 'Na-Ion',
-    k1Base: 0.01,
+    k1Base: 0.632,          // Calibrated: (20/0.632)² = 1000 cycles
     ea: 22.0,
     nRef: 1000,
     tRef: 25,
@@ -71,7 +71,7 @@ const DEGRADATION_PARAMS: Record<Chemistry, DegradationParams> = {
   },
   nca: {
     label: 'NCA',
-    k1Base: 0.025,
+    k1Base: 1.0,            // Calibrated: (20/1.0)² = 400 cycles
     ea: 26.0,
     nRef: 400,
     tRef: 25,

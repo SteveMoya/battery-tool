@@ -19,6 +19,7 @@ interface MaterialProperties {
   costPerKg: number;      // EUR/kg
   emiShielding: boolean;
   maxIpRating: IpRating;
+  maxIpLabel: string;
   description: string;
 }
 
@@ -30,6 +31,7 @@ const MATERIAL_DB: Record<EnclosureMaterial, MaterialProperties> = {
     costPerKg: 4.5,
     emiShielding: true,
     maxIpRating: 'ip67',
+    maxIpLabel: 'IP67',
     description: 'Lightweight, good heat dissipation, EMI shielding',
   },
   steel: {
@@ -39,6 +41,7 @@ const MATERIAL_DB: Record<EnclosureMaterial, MaterialProperties> = {
     costPerKg: 2.0,
     emiShielding: true,
     maxIpRating: 'ip65',
+    maxIpLabel: 'IP65',
     description: 'Durable, cost-effective, good for stationary',
   },
   plastic: {
@@ -48,6 +51,7 @@ const MATERIAL_DB: Record<EnclosureMaterial, MaterialProperties> = {
     costPerKg: 3.0,
     emiShielding: false,
     maxIpRating: 'ip54',
+    maxIpLabel: 'IP54',
     description: 'Electrical insulation, lightweight, consumer electronics',
   },
   fiberglass: {
@@ -57,6 +61,7 @@ const MATERIAL_DB: Record<EnclosureMaterial, MaterialProperties> = {
     costPerKg: 8.0,
     emiShielding: false,
     maxIpRating: 'ip65',
+    maxIpLabel: 'IP65',
     description: 'Excellent electrical insulation, high-voltage applications',
   },
 };
@@ -129,7 +134,7 @@ export interface EnclosureResult {
   // Volume and weight
   internalVolumeM3: number;
   enclosureWeightKg: number;
-  totalWeightKg;
+  totalWeightKg: number;
   // Material
   material: MaterialProperties;
   materialLabel: string;

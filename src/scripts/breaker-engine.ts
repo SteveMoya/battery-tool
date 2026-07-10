@@ -207,7 +207,7 @@ export function recommendProtection(config: ProtectionConfig): ProtectionReport 
       recs.push({
         component: 'Precharge Resistor',
         partNumber: resistor.name,
-        ratingA: Math.round(resistor.wattage / resistor.resistanceOhm * 10) / 10,
+        ratingA: Math.round(Math.sqrt(resistor.wattage / resistor.resistanceOhm) * 10) / 10,
         voltageMax: packVoltage,
         reason: `Pack ${packVoltage.toFixed(0)}V with contactor — precharge required to limit inrush current and protect contactor contacts`,
         category: 'precharge',

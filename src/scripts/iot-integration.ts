@@ -96,6 +96,52 @@ function generateMqttConfig(dataPoints: IoTDataPoint[], sampleRateMs: number): s
   return JSON.stringify(config, null, 2);
 }
 
+function generateModbusConfig(dataPoints: IoTDataPoint[]): string {
+  const config = {
+    modbus: {
+      mode: 'RTU',
+      baudrate: 9600,
+      parity: 'none',
+      stopbits: 1,
+      slave_id: 1,
+    },
+    registers: dataPoints.map((dp, i) => ({
+      name: dp.name,
+      address: 100 + i * 2,
+      type: 'holding_register',
+      unit: dp.unit,
+      scale: 1,
+      readonly: true,
+    })),
+  };
+  return JSON.stringify(config, null, 2);
+}
+
+function generateCanConfig(dataPoints: IoTDataPoint[]): string {
+  const config = {
+    can: {
+      interface: 'can0',
+      bitrate: 500000,
+      sample_rate_ms: 100,
+    },
+    messages: dataPoints.map((dp, i) => ({
+      name: dp.name,
+      arbitration_id: 0x100 + i,
+      dlc: 8,
+      byte_order: 'little_endian',
+      signals: [{
+        name: dp.name,
+        start_bit: 0,
+        length: 16,
+        scale: 0.1,
+        offset: 0,
+        unit: dp.unit,
+      }],
+    })),
+  };
+  return JSON.stringify(config, null, 2);
+}
+
 function generateGrafanaConfig(dataPoints: IoTDataPoint[]): string {
   return JSON.stringify({
     dashboard: {
@@ -167,7 +213,20 @@ export function analyzeIoT(
     estimatedBandwidth = `${(bandwidthPerHourKb / 1024 / 1024).toFixed(2)} GB/hr`;
   }
 
-  const configJson = generateMqttConfig(dataPoints, samplingRateMs);
+  // Generate config based on selected protocol
+  let configJson: string;
+  switch (protocol) {
+    case 'modbus':
+      configJson = generateModbusConfig(dataPoints);
+      break;
+    case 'can':
+      configJson = generateCanConfig(dataPoints);
+      break;
+    case 'mqtt':
+    default:
+      configJson = generateMqttConfig(dataPoints, samplingRateMs);
+      break;
+  }
   const datapointsCsv = generateCsv(dataPoints);
   const homeAssistantConfig = generateHomeAssistantConfig(dataPoints);
   const grafanaConfig = generateGrafanaConfig(dataPoints);
