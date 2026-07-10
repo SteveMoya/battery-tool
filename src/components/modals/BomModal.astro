@@ -9,7 +9,7 @@
   >
     <!-- Header -->
     <div class="px-5 py-3 border-b flex justify-between items-center flex-shrink-0" style="border-color: var(--border-primary);">
-      <h3 class="m-0 text-[0.95rem]" style="color: var(--text-primary);">Bill of Materials — Linear Footage</h3>
+      <h3 class="m-0 text-[0.95rem]" style="color: var(--text-primary);" data-i18n="modals.bom.title">Bill of Materials — Linear Footage</h3>
       <button id="btn-close-bom" class="border-none bg-none text-[1.5rem] cursor-pointer leading-none" style="color: var(--text-muted);">×</button>
     </div>
 
@@ -17,23 +17,23 @@
     <div class="px-5 py-4 overflow-y-auto flex-1">
       <!-- Summary table -->
       <div class="border rounded-md p-3 mb-4" style="border-color: var(--border-primary);">
-        <div class="text-[0.68rem] font-extrabold uppercase mb-2" style="color: var(--text-muted);">Nickel Strip Summary</div>
+        <div class="text-[0.68rem] font-extrabold uppercase mb-2" style="color: var(--text-muted);" data-i18n="modals.bom.nickelStripSummary">Nickel Strip Summary</div>
         <table class="w-full text-[0.78rem] border-collapse">
           <tbody>
             <tr class="border-b" style="border-color: var(--border-primary);">
-              <td class="py-1.5 font-semibold" style="color: var(--text-muted);">In-pack length</td>
+              <td class="py-1.5 font-semibold" style="color: var(--text-muted);" data-i18n="modals.bom.inPackLength">In-pack length</td>
               <td id="bom-nickel-in-pack" class="py-1.5 text-right font-mono font-bold" style="color: var(--text-primary);">--</td>
             </tr>
             <tr id="bom-ladder-row" class="border-b hidden" style="border-color: var(--border-primary);">
-              <td class="py-1.5 font-semibold" style="color: var(--text-muted);">Ladder overhead</td>
+              <td class="py-1.5 font-semibold" style="color: var(--text-muted);" data-i18n="modals.bom.ladderOverhead">Ladder overhead</td>
               <td id="bom-ladder-overhead" class="py-1.5 text-right font-mono font-bold" style="color: var(--text-primary);">--</td>
             </tr>
             <tr class="border-b" style="border-color: var(--border-primary);">
-              <td id="bom-waste-label" class="py-1.5 font-semibold" style="color: var(--text-muted);">Waste factor (15%)</td>
+              <td id="bom-waste-label" class="py-1.5 font-semibold" style="color: var(--text-muted);" data-i18n="modals.bom.wasteFactor">Waste factor (15%)</td>
               <td id="bom-waste" class="py-1.5 text-right font-mono font-bold" style="color: var(--text-primary);">--</td>
             </tr>
             <tr>
-              <td class="py-2 font-extrabold" style="color: var(--text-primary);">Total to purchase</td>
+              <td class="py-2 font-extrabold" style="color: var(--text-primary);" data-i18n="modals.bom.totalToPurchase">Total to purchase</td>
               <td id="bom-total" class="py-2 text-right font-mono font-extrabold text-app-blue text-[0.9rem]">--</td>
             </tr>
           </tbody>
@@ -42,17 +42,17 @@
 
       <!-- Config info -->
       <div class="border rounded-md p-3 mb-4" style="border-color: var(--border-primary);">
-        <div class="text-[0.68rem] font-extrabold uppercase mb-2" style="color: var(--text-muted);">Pack Info</div>
+        <div class="text-[0.68rem] font-extrabold uppercase mb-2" style="color: var(--text-muted);" data-i18n="modals.bom.packInfo">Pack Info</div>
         <div class="flex justify-between text-[0.75rem] mb-1">
-          <span class="font-semibold" style="color: var(--text-muted);">Name</span>
+          <span class="font-semibold" style="color: var(--text-muted);" data-i18n="modals.bom.name">Name</span>
           <span id="bom-name" class="font-bold" style="color: var(--text-primary);">--</span>
         </div>
         <div class="flex justify-between text-[0.75rem] mb-1">
-          <span class="font-semibold" style="color: var(--text-muted);">Configuration</span>
+          <span class="font-semibold" style="color: var(--text-muted);" data-i18n="modals.bom.configuration">Configuration</span>
           <span id="bom-config" class="font-bold" style="color: var(--text-primary);">--</span>
         </div>
         <div class="flex justify-between text-[0.75rem]">
-          <span class="font-semibold" style="color: var(--text-muted);">Total cells</span>
+          <span class="font-semibold" style="color: var(--text-muted);" data-i18n="modals.bom.totalCells">Total cells</span>
           <span id="bom-cells" class="font-bold" style="color: var(--text-primary);">--</span>
         </div>
       </div>
@@ -60,14 +60,14 @@
       <!-- Export buttons -->
       <div class="flex gap-2">
         <button id="btn-bom-csv" class="flex-1 bg-emerald-600 text-white border-none py-2.5 rounded-md font-bold text-[0.8rem] cursor-pointer hover:bg-emerald-700 transition-colors">
-          Export CSV
+          <span data-i18n="modals.bom.exportCsv">Export CSV</span>
         </button>
         <button id="btn-bom-json" class="flex-1 bg-app-blue text-white border-none py-2.5 rounded-md font-bold text-[0.8rem] cursor-pointer hover:bg-app-blue-dark transition-colors">
-          Export JSON
+          <span data-i18n="modals.bom.exportJson">Export JSON</span>
         </button>
       </div>
       <button id="btn-cancel-bom" class="w-full mt-2 text-[0.8rem] font-bold cursor-pointer transition-colors" style="background: var(--bg-quaternary); color: var(--text-tertiary); border: 1px solid var(--border-primary); border-radius: 0.375rem; padding: 0.5rem;">
-        Close
+        <span data-i18n="modals.bom.close">Close</span>
       </button>
     </div>
   </div>

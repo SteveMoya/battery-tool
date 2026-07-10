@@ -15,6 +15,7 @@ import {
 } from './ui';
 import { setupElectricalEngine } from './electrical-engine';
 import { toggleTheme } from './theme';
+import { initI18n, setLocale, getLocale, updateDOMTranslations, onLocaleChange, type Locale } from '../i18n';
 
 function setupThemeToggle() {
   const btn = document.getElementById('btn-theme-toggle');
@@ -38,6 +39,32 @@ function setupThemeToggle() {
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateIcons);
 }
 
+function setupLangToggle() {
+  const btn = document.getElementById('btn-lang-toggle');
+  const label = document.getElementById('lang-label');
+  if (!btn || !label) return;
+
+  const updateLabel = () => {
+    label.textContent = getLocale() === 'en' ? 'EN' : 'ES';
+  };
+
+  updateLabel();
+
+  btn.addEventListener('click', () => {
+    const next: Locale = getLocale() === 'en' ? 'es' : 'en';
+    setLocale(next);
+    updateLabel();
+    updateDOMTranslations();
+    updatePack();
+  });
+
+  onLocaleChange(() => {
+    updateLabel();
+    updateDOMTranslations();
+    updatePack();
+  });
+}
+
 export function initApp() {
   const container = document.getElementById('render-area') as HTMLElement | null;
   if (!container) {
@@ -45,9 +72,11 @@ export function initApp() {
     return;
   }
 
+  initI18n();
   initThree(container);
 
   setupThemeToggle();
+  setupLangToggle();
   initDisclaimer();
   setupModals();
   setupFileMenu();

@@ -4,63 +4,63 @@ import HelpIcon from '../HelpIcon.astro';
 
 <section class="group-box">
   <div class="flex justify-between items-center mb-1.5">
-    <h2 class="section-title m-0">6. BMS Bounding Box</h2>
+    <h2 class="section-title m-0" data-i18n="sidebar.bmsBox.title">6. BMS Bounding Box</h2>
     <HelpIcon tip="Visualize the selected BMS enclosure in 3D attached to the pack face" />
   </div>
 
   <div class="toggle-row mb-2">
-    <label for="bms-box-visible" class="cursor-pointer">Show BMS Box</label>
+    <label for="bms-box-visible" class="cursor-pointer" data-i18n="sidebar.bmsBox.showBmsBox">Show BMS Box</label>
     <input id="bms-box-visible" type="checkbox" />
   </div>
 
   <div id="bms-box-dims" class="hidden">
     <!-- BMS Dimensions (read-only from selected BMS) -->
     <div id="bms-box-info" class="rounded-md p-2 mb-2" style="background: var(--bg-tertiary); border-color: var(--border-primary); border-width: 1px; border-style: solid;">
-      <div class="text-[0.65rem] font-bold uppercase mb-1 tracking-wide" style="color: var(--text-muted);">BMS Dimensions</div>
+      <div class="text-[0.65rem] font-bold uppercase mb-1 tracking-wide" style="color: var(--text-muted);" data-i18n="sidebar.bmsBox.bmsDimensions">BMS Dimensions</div>
       <div id="bms-box-dims-text" class="text-[0.72rem] font-mono font-semibold" style="color: var(--text-primary);">Select a BMS in section 5</div>
     </div>
 
     <!-- Position: 6 faces -->
     <div class="text-[0.65rem] font-bold uppercase mb-1 tracking-wide" style="color: var(--text-muted);">
-      Position
+      <span data-i18n="sidebar.bmsBox.position">Position</span>
       <HelpIcon position="right" width="180px" align="left">
-        <strong>BMS Position</strong><br />
-        Place the BMS box against one of the 6 faces of the battery pack.
+        <strong data-i18n-html="sidebar.bmsBox.help.positionTitle">BMS Position</strong><br />
+        <span data-i18n-html="sidebar.bmsBox.help.positionDesc">Place the BMS box against one of the 6 faces of the battery pack.</span>
       </HelpIcon>
     </div>
     <div class="grid grid-cols-3 gap-1 mb-2">
-      <button id="bms-pos-top" type="button" class="bms-pos-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;">Top</button>
-      <button id="bms-pos-bottom" type="button" class="bms-pos-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;">Bottom</button>
+      <button id="bms-pos-top" type="button" class="bms-pos-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;" data-i18n="sidebar.bmsBox.top">Top</button>
+      <button id="bms-pos-bottom" type="button" class="bms-pos-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;" data-i18n="sidebar.bmsBox.bottom">Bottom</button>
       <div></div>
-      <button id="bms-pos-left" type="button" class="bms-pos-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;">Left</button>
-      <button id="bms-pos-right" type="button" class="bms-pos-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;">Right</button>
+      <button id="bms-pos-left" type="button" class="bms-pos-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;" data-i18n="sidebar.bmsBox.left">Left</button>
+      <button id="bms-pos-right" type="button" class="bms-pos-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;" data-i18n="sidebar.bmsBox.right">Right</button>
       <div></div>
-      <button id="bms-pos-front" type="button" class="bms-pos-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;">Front</button>
-      <button id="bms-pos-back" type="button" class="bms-pos-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;">Back</button>
+      <button id="bms-pos-front" type="button" class="bms-pos-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;" data-i18n="sidebar.bmsBox.front">Front</button>
+      <button id="bms-pos-back" type="button" class="bms-pos-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;" data-i18n="sidebar.bmsBox.back">Back</button>
       <div></div>
     </div>
     <input id="bms-box-position" type="hidden" value="right" />
 
     <!-- Rotation -->
     <div class="text-[0.65rem] font-bold uppercase mb-1 tracking-wide" style="color: var(--text-muted);">
-      Rotation
+      <span data-i18n="sidebar.bmsBox.rotation">Rotation</span>
       <HelpIcon position="right" width="180px" align="left">
-        <strong>BMS Rotation</strong><br />
-        Rotate the BMS box 90° to swap its width and depth orientation on the pack face.
+        <strong data-i18n-html="sidebar.bmsBox.help.rotationTitle">BMS Rotation</strong><br />
+        <span data-i18n-html="sidebar.bmsBox.help.rotationDesc">Rotate the BMS box 90° to swap its width and depth orientation on the pack face.</span>
       </HelpIcon>
     </div>
     <div class="grid grid-cols-2 gap-1 mb-2">
-      <button id="bms-rot-left" type="button" class="bms-rot-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;">⟲ Rotate Left</button>
-      <button id="bms-rot-right" type="button" class="bms-rot-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;">⟳ Rotate Right</button>
+      <button id="bms-rot-left" type="button" class="bms-rot-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;" data-i18n="sidebar.bmsBox.rotateLeft">⟲ Rotate Left</button>
+      <button id="bms-rot-right" type="button" class="bms-rot-btn px-2 py-1.5 rounded text-[0.65rem] font-semibold cursor-pointer transition-colors" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-tertiary); border-width: 1px; border-style: solid;" data-i18n="sidebar.bmsBox.rotateRight">⟳ Rotate Right</button>
     </div>
     <input id="bms-box-rotation" type="hidden" value="0" />
 
     <!-- Offset from pack edge -->
     <div class="flex items-center justify-between mb-1">
-      <span class="text-[0.65rem] font-bold uppercase tracking-wide" style="color: var(--text-muted);">Gap from Pack Edge</span>
+      <span class="text-[0.65rem] font-bold uppercase tracking-wide" style="color: var(--text-muted);" data-i18n="sidebar.bmsBox.gapFromPackEdge">Gap from Pack Edge</span>
       <HelpIcon position="left" width="200px" align="right">
-        <strong>Gap from Pack Edge</strong><br />
-        Distance (mm) between the pack face and the BMS box. Increase to add clearance for wires or connectors.
+        <strong data-i18n-html="sidebar.bmsBox.help.gapTitle">Gap from Pack Edge</strong><br />
+        <span data-i18n-html="sidebar.bmsBox.help.gapDesc">Distance (mm) between the pack face and the BMS box. Increase to add clearance for wires or connectors.</span>
       </HelpIcon>
     </div>
     <div class="flex flex-col mb-2">

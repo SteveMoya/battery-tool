@@ -4,51 +4,54 @@
 <header class="header px-3 py-2.5 border-b flex items-center justify-between flex-nowrap sticky top-0 z-30 h-[50px] box-content" style="border-color: var(--border-primary); background: var(--bg-secondary);">
   <h1 class="m-0 text-[1rem] flex items-center gap-1 font-bold flex-shrink whitespace-nowrap overflow-hidden max-[420px]:hidden" style="color: var(--text-primary);">
     <span class="text-[1.2em] mr-1">🔋</span>
-    <span class="title-text tracking-[-0.3px]">Battery Tool</span>
+    <span class="title-text tracking-[-0.3px]" data-i18n="header.title">Battery Tool</span>
     <span class="version-span text-[0.75em] font-normal ml-0.5 px-1.5 py-px rounded inline-block" style="color: var(--text-muted); background: var(--bg-quaternary);">v85</span>
   </h1>
 
   <div class="header-actions flex gap-1.5 items-center flex-shrink-0 ml-auto">
-    <button id="btn-theme-toggle" class="btn-theme-toggle" title="Toggle theme" aria-label="Toggle light/dark theme">
+    <button id="btn-lang-toggle" class="btn-lang-toggle" title="Switch language" aria-label="Switch language" data-i18n-title="header.switchLanguage">
+      <span id="lang-label">EN</span>
+    </button>
+    <button id="btn-theme-toggle" class="btn-theme-toggle" title="Toggle theme" aria-label="Toggle light/dark theme" data-i18n-title="header.toggleTheme">
       <span id="theme-icon-light">🌙</span>
       <span id="theme-icon-dark" class="hidden">☀️</span>
     </button>
     <div class="dropdown">
       <button id="btn-file-menu" class="btn-hamburger" aria-label="File menu">☰</button>
       <div id="file-menu" class="dropdown-content">
-        <a href="#" id="menu-import">📂 Import Settings</a>
-        <a href="#" id="menu-export">💾 Export Settings</a>
-        <a href="#" id="menu-export-stl">
+        <a href="#" id="menu-import" data-i18n="header.importSettings">📂 Import Settings</a>
+        <a href="#" id="menu-export" data-i18n="header.exportSettings">💾 Export Settings</a>
+        <a href="#" id="menu-export-stl" data-i18n="header.exportSTL">
           🧊 Export 3D Model (STL)
-          <span class="text-[0.7em] font-semibold align-middle ml-1" style="color: var(--text-muted);">BETA</span>
+          <span class="text-[0.7em] font-semibold align-middle ml-1" style="color: var(--text-muted);" data-i18n="header.beta">BETA</span>
         </a>
-        <a href="#" id="menu-export-step">
+        <a href="#" id="menu-export-step" data-i18n="header.exportSTEP">
           🔧 Export CAD (STEP)
-          <span class="text-[0.7em] font-semibold align-middle ml-1" style="color: var(--text-muted);">NEW</span>
+          <span class="text-[0.7em] font-semibold align-middle ml-1" style="color: var(--text-muted);" data-i18n="header.new">NEW</span>
         </a>
-        <a href="#" id="menu-export-svg">
+        <a href="#" id="menu-export-svg" data-i18n="header.exportSVG">
           📐 Export 2D Projection
-          <span class="text-[0.7em] font-semibold align-middle ml-1" style="color: var(--text-muted);">NEW</span>
+          <span class="text-[0.7em] font-semibold align-middle ml-1" style="color: var(--text-muted);" data-i18n="header.new">NEW</span>
         </a>
-        <a href="#" id="menu-export-bom">
+        <a href="#" id="menu-export-bom" data-i18n="header.exportBOM">
           📋 Bill of Materials
-          <span class="text-[0.7em] font-semibold align-middle ml-1" style="color: var(--text-muted);">NEW</span>
+          <span class="text-[0.7em] font-semibold align-middle ml-1" style="color: var(--text-muted);" data-i18n="header.new">NEW</span>
         </a>
-        <a href="#" id="menu-datasheet">
+        <a href="#" id="menu-datasheet" data-i18n="header.datasheet">
           📄 Technical Datasheet
-          <span class="text-[0.7em] font-semibold align-middle ml-1" style="color: var(--text-muted);">NEW</span>
+          <span class="text-[0.7em] font-semibold align-middle ml-1" style="color: var(--text-muted);" data-i18n="header.new">NEW</span>
         </a>
-        <a href="#" id="menu-feedback" class="border-t" style="border-color: var(--border-primary);">💬 Send Feedback</a>
-        <a href="#" id="menu-restart-tour">🎯 Restart Tour</a>
-        <a href="#" id="menu-commercial">💼 Commercial Enquiries</a>
-        <a href="#" id="menu-license" class="border-t text-app-red-dark" style="border-color: var(--border-primary);">📜 View License (GPLv3)</a>
-        <a href="#" id="menu-disclaimer">⚠️ Safety &amp; Legal</a>
+        <a href="#" id="menu-feedback" class="border-t" style="border-color: var(--border-primary);" data-i18n="header.feedback">💬 Send Feedback</a>
+        <a href="#" id="menu-restart-tour" data-i18n="header.restartTour">🎯 Restart Tour</a>
+        <a href="#" id="menu-commercial" data-i18n="header.commercial">💼 Commercial Enquiries</a>
+        <a href="#" id="menu-license" class="border-t text-app-red-dark" style="border-color: var(--border-primary);" data-i18n="header.license">📜 View License (GPLv3)</a>
+        <a href="#" id="menu-disclaimer" data-i18n="header.disclaimer">⚠️ Safety &amp; Legal</a>
       </div>
     </div>
     <input type="file" id="import-file-input" class="hidden" accept=".json" />
     <a href="https://buymeacoffee.com/stevemoyacepeda" target="_blank" rel="noopener" class="no-underline flex-shrink-0">
-      <button id="btn-donate" class="btn-donate">☕ Donate</button>
+      <button id="btn-donate" class="btn-donate" data-i18n="header.donate">☕ Donate</button>
     </a>
-    <button id="btn-reset" class="btn-header">Reset</button>
+    <button id="btn-reset" class="btn-header" data-i18n="common.reset">Reset</button>
   </div>
 </header>

@@ -1,4 +1,5 @@
 import { inputs, $ } from './dom';
+import { t } from '../i18n';
 import {
   checkVoltageSag, checkAmpacity, checkMicahToll, checkStripThermal,
   renderVoltageSagIndicator, renderAmpacityIndicator, renderMicahTollIndicator, renderStripThermalIndicator,
@@ -147,11 +148,11 @@ export function updateSimulation(e?: Event) {
   if (mode === 'charge') {
     rowLVC?.classList.add('disabled');
     rowUsable?.classList.add('disabled');
-    const lblRuntime = $('lbl-runtime'); if (lblRuntime) lblRuntime.textContent = 'Chg Time';
+    const lblRuntime = $('lbl-runtime'); if (lblRuntime) lblRuntime.textContent = t('sidebar.simulation.chgTime');
   } else {
     rowLVC?.classList.remove('disabled');
     rowUsable?.classList.remove('disabled');
-    const lblRuntime = $('lbl-runtime'); if (lblRuntime) lblRuntime.textContent = 'Runtime';
+    const lblRuntime = $('lbl-runtime'); if (lblRuntime) lblRuntime.textContent = t('sidebar.simulation.runtime');
   }
 
   const irCell = parseFloat(inputs['sim-cell-ir']?.value ?? '25') / 1000 || 0.025;
@@ -222,13 +223,13 @@ export function updateSimulation(e?: Event) {
 
   const lblSag = $('lbl-sim-sag');
   if (mode === 'discharge') {
-    if (lblSag?.firstChild) lblSag.firstChild.nodeValue = 'Sag ';
+    if (lblSag?.firstChild) lblSag.firstChild.nodeValue = `${t('sidebar.simulation.sag')} `;
     const outSag = $('out-sim-sag'); if (outSag) outSag.textContent = `-${vDrop.toFixed(2)} V`;
-    const lblNet = $('lbl-sim-net'); if (lblNet) lblNet.textContent = 'Net Output';
+    const lblNet = $('lbl-sim-net'); if (lblNet) lblNet.textContent = t('sidebar.simulation.netOutput');
   } else {
-    if (lblSag?.firstChild) lblSag.firstChild.nodeValue = 'Rise ';
+    if (lblSag?.firstChild) lblSag.firstChild.nodeValue = t('sidebar.simulation.rise');
     const outSag = $('out-sim-sag'); if (outSag) outSag.textContent = `+${vDrop.toFixed(2)} V`;
-    const lblNet = $('lbl-sim-net'); if (lblNet) lblNet.textContent = 'Req. Voltage';
+    const lblNet = $('lbl-sim-net'); if (lblNet) lblNet.textContent = t('sidebar.simulation.reqVoltage');
   }
   const outNet = $('out-sim-netv'); if (outNet) outNet.textContent = `${vNet.toFixed(2)} V`;
   const outAmps = $('out-sim-amps'); if (outAmps) outAmps.textContent = `${I.toFixed(1)} A`;
@@ -240,7 +241,7 @@ export function updateSimulation(e?: Event) {
   const loadPerc = ratedMaxAmps > 0 ? (I / ratedMaxAmps) * 100 : 0;
   const percEl = $('lbl-load-perc');
   if (percEl) {
-    percEl.textContent = `${Math.round(loadPerc)}% of max current`;
+    percEl.textContent = `${Math.round(loadPerc)}% ${t('sidebar.simulation.percentOfMax')}`;
     (percEl as HTMLElement).style.color = loadPerc > 100 ? '#ef4444' : loadPerc > 80 ? '#f59e0b' : '#94a3b8';
   }
 
@@ -286,10 +287,10 @@ export function updateSimulation(e?: Event) {
   const statusText = $('status-text');
   let warn = false;
   if (mode === 'discharge') {
-    if (isCollapse) { warn = true; if (statusText) statusText.textContent = '⚠️ COLLAPSE'; }
-    else if (vNet < cutoffCompare) { warn = true; if (statusText) statusText.textContent = '⚠️ HIT LVC'; }
+    if (isCollapse) { warn = true; if (statusText) statusText.textContent = t('simulation.collapse'); }
+    else if (vNet < cutoffCompare) { warn = true; if (statusText) statusText.textContent = t('simulation.hitLvc'); }
   } else {
-    if (vNet > (cellMax * S)) { warn = true; if (statusText) statusText.textContent = '⚠️ OVER V'; }
+    if (vNet > (cellMax * S)) { warn = true; if (statusText) statusText.textContent = t('simulation.overV'); }
   }
   if (statusText) (statusText as HTMLElement).style.display = warn ? 'block' : 'none';
   if (outNet) (outNet as HTMLElement).style.color = warn ? '#d32f2f' : '#008cc9';

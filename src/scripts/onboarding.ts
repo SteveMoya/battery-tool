@@ -4,6 +4,8 @@
  * Persists completion state in localStorage.
  */
 
+import { t } from '../i18n';
+
 const STORAGE_KEY = 'bca-onboarding-done';
 const $ = (id: string) => document.getElementById(id);
 
@@ -14,38 +16,40 @@ interface TourStep {
   target: string;
 }
 
-const STEPS: TourStep[] = [
-  {
-    icon: '🔋',
-    title: 'Cell Specs',
-    description: 'Start by selecting your cell type, dimensions, and capacity. Use the Cell Database to search real models from Samsung, LG, Molicel, and more.',
-    target: 'cell-specs',
-  },
-  {
-    icon: '⚗️',
-    title: 'Chemistry',
-    description: 'Choose your battery chemistry. NMC for high energy density, LFP for long cycle life, LTO for fast charging. Voltages auto-adjust.',
-    target: 'chemistry-section',
-  },
-  {
-    icon: '🔧',
-    title: 'Pack Configuration',
-    description: 'Set series (S) and parallel (P) counts to reach your target voltage and capacity. Enable generative mode to auto-calculate from targets.',
-    target: 'pack-config',
-  },
-  {
-    icon: '📊',
-    title: 'Simulation',
-    description: 'Run load simulations to see voltage sag, heat generation, and efficiency in real-time. Adjust SoC and load to test edge cases.',
-    target: 'simulation',
-  },
-  {
-    icon: '💾',
-    title: 'Export & Share',
-    description: 'Export your design as 3D models (STL/STEP), technical datasheets, BOM, or SVG projections. Save configurations for later.',
-    target: null,
-  },
-];
+function getSteps(): TourStep[] {
+  return [
+    {
+      icon: '🔋',
+      title: t('onboarding.cellSpecs'),
+      description: t('onboarding.cellSpecsDesc'),
+      target: 'cell-specs',
+    },
+    {
+      icon: '⚗️',
+      title: t('onboarding.chemistry'),
+      description: t('onboarding.chemistryDesc'),
+      target: 'chemistry-section',
+    },
+    {
+      icon: '🔧',
+      title: t('onboarding.packConfig'),
+      description: t('onboarding.packConfigDesc'),
+      target: 'pack-config',
+    },
+    {
+      icon: '📊',
+      title: t('onboarding.simulation'),
+      description: t('onboarding.simulationDesc'),
+      target: 'simulation',
+    },
+    {
+      icon: '💾',
+      title: t('onboarding.exportShare'),
+      description: t('onboarding.exportShareDesc'),
+      target: null,
+    },
+  ];
+}
 
 let currentStep = 0;
 let overlay: HTMLElement | null = null;
@@ -53,13 +57,14 @@ let overlay: HTMLElement | null = null;
 function renderDots() {
   const dotsEl = $('onboarding-dots');
   if (!dotsEl) return;
-  dotsEl.innerHTML = STEPS.map((_, i) =>
+  dotsEl.innerHTML = getSteps().map((_, i) =>
     `<span class="onboarding-dot ${i === currentStep ? 'active' : ''} ${i < currentStep ? 'done' : ''}"></span>`
   ).join('');
 }
 
 function updateStep() {
-  const step = STEPS[currentStep];
+  const steps = getSteps();
+  const step = steps[currentStep];
   if (!step) return;
 
   const titleEl = $('onboarding-title');
@@ -74,7 +79,7 @@ function updateStep() {
 
   if (prevBtn) (prevBtn as HTMLButtonElement).disabled = currentStep === 0;
   if (nextBtn) {
-    (nextBtn as HTMLButtonElement).textContent = currentStep === STEPS.length - 1 ? 'Get Started' : 'Next →';
+    (nextBtn as HTMLButtonElement).textContent = currentStep === steps.length - 1 ? t('onboarding.getStarted') : t('onboarding.next');
   }
 
   renderDots();
@@ -97,7 +102,7 @@ function close() {
 }
 
 function nextStep() {
-  if (currentStep < STEPS.length - 1) {
+  if (currentStep < getSteps().length - 1) {
     currentStep++;
     updateStep();
   } else {

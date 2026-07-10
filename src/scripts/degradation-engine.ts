@@ -4,6 +4,7 @@
    ───────────────────────────────────────────── */
 
 import type { Chemistry } from './thermal-engine';
+import { t } from '../i18n';
 
 /* ── Chemistry degradation parameters ── */
 
@@ -22,7 +23,7 @@ interface DegradationParams {
 
 const DEGRADATION_PARAMS: Record<Chemistry, DegradationParams> = {
   nmc: {
-    label: 'NMC',
+    label: t('degradation.nmc'),
     k1Base: 0.894,          // Calibrated: (20/0.894)² = 500 cycles
     ea: 24.6,
     nRef: 500,
@@ -34,7 +35,7 @@ const DEGRADATION_PARAMS: Record<Chemistry, DegradationParams> = {
     calendarLifeRef: 10,
   },
   lfp: {
-    label: 'LFP',
+    label: t('degradation.lfp'),
     k1Base: 0.447,          // Calibrated: (20/0.447)² = 2000 cycles
     ea: 20.0,
     nRef: 2000,
@@ -46,7 +47,7 @@ const DEGRADATION_PARAMS: Record<Chemistry, DegradationParams> = {
     calendarLifeRef: 15,
   },
   lto: {
-    label: 'LTO',
+    label: t('degradation.lto'),
     k1Base: 0.224,          // Calibrated: (20/0.224)² = 8000 cycles
     ea: 15.0,
     nRef: 8000,
@@ -58,7 +59,7 @@ const DEGRADATION_PARAMS: Record<Chemistry, DegradationParams> = {
     calendarLifeRef: 20,
   },
   'na-ion': {
-    label: 'Na-Ion',
+    label: t('degradation.naIon'),
     k1Base: 0.632,          // Calibrated: (20/0.632)² = 1000 cycles
     ea: 22.0,
     nRef: 1000,
@@ -70,7 +71,7 @@ const DEGRADATION_PARAMS: Record<Chemistry, DegradationParams> = {
     calendarLifeRef: 8,
   },
   nca: {
-    label: 'NCA',
+    label: t('degradation.nca'),
     k1Base: 1.0,            // Calibrated: (20/1.0)² = 400 cycles
     ea: 26.0,
     nRef: 400,
@@ -163,19 +164,19 @@ export function analyzeDegradation(config: DegradationConfig): DegradationResult
 
   // ── 9. Warnings ──
   if (cyclesTo80pct < 500) {
-    warnings.push(`Low cycle life (${cyclesTo80pct} cycles) — consider LFP for longer life`);
+    warnings.push(t('degradation.lowCycleLife', { cycles: cyclesTo80pct }));
   }
 
   if (config.tempOperating > 45) {
-    warnings.push(`High operating temperature (${config.tempOperating}°C) significantly reduces cycle life`);
+    warnings.push(t('degradation.highTemp', { temp: config.tempOperating }));
   }
 
   if (config.crateAvg > 2) {
-    warnings.push(`High C-rate (${config.crateAvg}C) accelerates degradation — consider lower discharge rate`);
+    warnings.push(t('degradation.highCrate', { rate: config.crateAvg }));
   }
 
   if (config.dodAvg > 0.9) {
-    warnings.push(`Deep discharge (${(config.dodAvg * 100).toFixed(0)}% DoD) reduces cycle life — consider limiting to 80% DoD`);
+    warnings.push(t('degradation.deepDischarge', { dod: (config.dodAvg * 100).toFixed(0) }));
   }
 
   // ── 10. Level ──
@@ -196,7 +197,7 @@ export function analyzeDegradation(config: DegradationConfig): DegradationResult
   }
 
   // ── 11. Status text ──
-  const statusText = `${cyclesTo80pct.toLocaleString()} cycles to 80% SoH  |  ${calendarLifeYears}yr calendar life  |  €${costPerCycle.toFixed(2)}/cycle`;
+  const statusText = `${cyclesTo80pct.toLocaleString()} ${t('degradation.cyclesTo80SoH')}  |  ${calendarLifeYears}${t('degradation.calendarLife')}  |  €${costPerCycle.toFixed(2)}${t('degradation.perCycle')}`;
 
   return {
     capacityFadePerCycle: k1,
@@ -218,7 +219,7 @@ export function analyzeDegradation(config: DegradationConfig): DegradationResult
 export function renderDegradationCard(result: DegradationResult, config: DegradationConfig): string {
   const warningsHtml = result.warnings.length > 0 ? `
     <div class="bg-amber-50 border border-amber-200 rounded-md p-2 mt-2">
-      <div class="text-[0.68rem] font-extrabold text-amber-600 uppercase mb-1">Warnings</div>
+      <div class="text-[0.68rem] font-extrabold text-amber-600 uppercase mb-1">${t('degradation.warnings')}</div>
       ${result.warnings.map(w => `
         <div class="flex items-start gap-1 text-[0.58rem] leading-tight mt-0.5">
           <span class="text-amber-500 font-bold shrink-0">→</span>
@@ -233,39 +234,39 @@ export function renderDegradationCard(result: DegradationResult, config: Degrada
   return `
     <div class="bg-slate-50 border border-slate-200 rounded-md p-2 mt-2">
       <div class="flex justify-between items-center mb-1">
-        <span class="text-[0.68rem] font-extrabold text-slate-400 uppercase">Cycle Life Analysis</span>
+        <span class="text-[0.68rem] font-extrabold text-slate-400 uppercase">${t('degradation.cycleLifeAnalysis')}</span>
         <span class="text-[0.55rem] font-bold px-1.5 py-0.5 rounded" style="background: ${result.levelColor}20; color: ${result.levelColor};">
           ${result.level.toUpperCase()}
         </span>
       </div>
       <div class="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[0.62rem]">
-        <span class="text-slate-500">Cycles to 80% SoH</span>
+        <span class="text-slate-500">${t('degradation.cyclesTo80SoH')}</span>
         <span class="font-mono font-semibold text-slate-700">${result.cyclesTo80pct.toLocaleString()}</span>
-        <span class="text-slate-500">Cycles to 70% SoH</span>
+        <span class="text-slate-500">${t('degradation.cyclesTo70SoH')}</span>
         <span class="font-mono font-semibold text-slate-700">${result.cyclesTo70pct.toLocaleString()}</span>
-        <span class="text-slate-500">Calendar Life</span>
-        <span class="font-mono font-semibold text-slate-700">${result.calendarLifeYears} years</span>
-        <span class="text-slate-500">Capacity Fade</span>
-        <span class="font-mono font-semibold text-slate-700">${result.capacityFadePerCycle.toFixed(4)}% per √cycle</span>
+        <span class="text-slate-500">${t('degradation.calendarLifeLabel')}</span>
+        <span class="font-mono font-semibold text-slate-700">${result.calendarLifeYears} ${t('degradation.years')}</span>
+        <span class="text-slate-500">${t('degradation.capacityFade')}</span>
+        <span class="font-mono font-semibold text-slate-700">${result.capacityFadePerCycle.toFixed(4)}% ${t('degradation.perSqrtCycle')}</span>
       </div>
     </div>
 
     <div class="bg-slate-50 border border-slate-200 rounded-md p-2 mt-2">
-      <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-1">Cost Analysis</div>
+      <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-1">${t('degradation.costAnalysis')}</div>
       <div class="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[0.62rem]">
-        <span class="text-slate-500">Pack Cost</span>
+        <span class="text-slate-500">${t('degradation.packCost')}</span>
         <span class="font-mono font-semibold text-slate-700">€${config.packCostEur.toFixed(0)}</span>
-        <span class="text-slate-500">Cost per Cycle</span>
+        <span class="text-slate-500">${t('degradation.costPerCycle')}</span>
         <span class="font-mono font-semibold text-slate-700">€${result.costPerCycle.toFixed(2)}</span>
-        <span class="text-slate-500">Cost per kWh per Cycle</span>
+        <span class="text-slate-500">${t('degradation.costPerKwhCycle')}</span>
         <span class="font-mono font-semibold text-slate-700">€${result.costPerKwhCycle.toFixed(4)}</span>
-        <span class="text-slate-500">Total Energy (80% life)</span>
+        <span class="text-slate-500">${t('degradation.totalEnergy')}</span>
         <span class="font-mono font-semibold text-slate-700">${(result.cyclesTo80pct * config.packCapacityKwh).toFixed(0)} kWh</span>
       </div>
     </div>
 
     <div class="bg-slate-50 border border-slate-200 rounded-md p-2 mt-2">
-      <div class="text-[0.68rem] font-extrabold text-slate-400 mb-1">Degradation Curve</div>
+      <div class="text-[0.68rem] font-extrabold text-slate-400 mb-1">${t('degradation.degradationCurve')}</div>
       <div class="flex items-end gap-px" style="height: 40px;">
         ${chartPoints.map(p => {
           const h = Math.max(2, (p.capacityPct / 100) * 38);
@@ -275,7 +276,7 @@ export function renderDegradationCard(result: DegradationResult, config: Degrada
       </div>
       <div class="flex justify-between text-[0.5rem] text-slate-400 mt-0.5">
         <span>0</span>
-        <span>${maxCycle.toLocaleString()} cycles</span>
+        <span>${maxCycle.toLocaleString()} ${t('degradation.cycles')}</span>
       </div>
     </div>
 

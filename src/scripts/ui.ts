@@ -1,5 +1,6 @@
 import { CELL_DB, type Cell } from './cell-database';
 import { DEFAULT_SIZE_PRESETS, DEFAULT_CHEM_PRESETS, type SizePreset, type ChemPreset } from './presets';
+import { t, tf } from '../i18n';
 import { exportSTL } from './stl-export';
 import { exportStep } from './step-export';
 import { exportSvg, exportPdf, type PaperSize, type PaperOrientation } from './svg-export';
@@ -43,8 +44,8 @@ export const snapshots: { id: number; inputs: Record<string, any>; data: any }[]
 const fileMenuDropdown = () => document.querySelector<HTMLElement>('.dropdown');
 
 const debounce = (fn: (...a: any[]) => void, delay: number) => {
-  let t: number | null = null;
-  return (...args: any[]) => { if (t) clearTimeout(t); t = window.setTimeout(() => fn(...args), delay); };
+  let timer: number | null = null;
+  return (...args: any[]) => { if (timer) clearTimeout(timer); timer = window.setTimeout(() => fn(...args), delay); };
 };
 const debouncedUpdate = debounce(() => { updatePack(); checkPitchTolerance(); }, 50);
 
@@ -184,7 +185,7 @@ export function populatePresets() {
   const selSize = $sel('preset-selector');
   if (!selSize) return;
   const currentSizeVal = selSize.value;
-  selSize.innerHTML = '<option value="custom">Custom Cell</option>';
+  selSize.innerHTML = `<option value="custom">${t('sidebar.cellSpecs.customCell')}</option>`;
   const sizeGroups: Record<string, any[]> = {};
   [...DEFAULT_SIZE_PRESETS, ...getUserSizePresets()].forEach((p) => {
     const g = (p as any).group || 'My Saved Presets';
@@ -206,7 +207,7 @@ export function populatePresets() {
   const selChem = $sel('chem-selector');
   if (!selChem) return;
   const currentChemVal = selChem.value;
-  selChem.innerHTML = '<option value="custom">Custom Voltage</option>';
+  selChem.innerHTML = `<option value="custom">${t('sidebar.chemistry.customVoltage')}</option>`;
   const chemGroups: Record<string, ChemPreset[]> = {};
   [...DEFAULT_CHEM_PRESETS, ...(getUserChemPresets() as ChemPreset[])].forEach((p) => {
     const g = p.group || 'My Saved Presets';
@@ -291,7 +292,7 @@ export function setupPresetEvents() {
   });
 
   document.getElementById('btn-save-preset-size')?.addEventListener('click', () => {
-    const name = prompt('Name for Cell preset:');
+    const name = prompt(t('sidebar.cellSpecs.save') + ':');
     if (!name) return;
     const isPrism = $inp('cell-type')?.value === 'prismatic';
     const newData: any = {
@@ -318,7 +319,7 @@ export function setupPresetEvents() {
   });
 
   document.getElementById('btn-del-preset-size')?.addEventListener('click', () => {
-    if (!confirm('Delete this custom preset?')) return;
+    if (!confirm(t('common.delete') + '?')) return;
     const sel = $sel('preset-selector');
     if (!sel) return;
     const name = sel.options[sel.selectedIndex].text;
@@ -338,7 +339,7 @@ export function setupPresetEvents() {
   });
 
   document.getElementById('btn-save-preset-chem')?.addEventListener('click', () => {
-    const name = prompt('Name for Chemistry preset:');
+    const name = prompt(t('sidebar.chemistry.save') + ':');
     if (!name) return;
     const newData = {
       nom: parseFloat($inp('c-volts')?.value ?? '0') || 0,
@@ -352,7 +353,7 @@ export function setupPresetEvents() {
   });
 
   document.getElementById('btn-del-preset-chem')?.addEventListener('click', () => {
-    if (!confirm('Delete this custom preset?')) return;
+    if (!confirm(t('common.delete') + '?')) return;
     const sel = $sel('chem-selector');
     if (!sel) return;
     const txt = sel.options[sel.selectedIndex].text;
@@ -400,7 +401,7 @@ function repopulateBmsDropdown(sel: HTMLSelectElement) {
     groups[g].push(bms);
   });
 
-  sel.innerHTML = '<option value="auto">Auto-Recommend</option><option value="none">No BMS (manual)</option>';
+  sel.innerHTML = `<option value="auto">${t('sidebar.bms.autoRecommend')}</option><option value="none">${t('sidebar.bms.noBms')}</option>`;
 
   // Commercial groups
   for (const gName in groups) {
@@ -409,7 +410,7 @@ function repopulateBmsDropdown(sel: HTMLSelectElement) {
     groups[gName].forEach((bms) => {
       const opt = document.createElement('option');
       opt.value = bms.name;
-      opt.text = `${bms.name} (${bms.maxA}A, ${bms.smart ? 'Smart' : 'Fixed'})`;
+      opt.text = `${bms.name} (${bms.maxA}A, ${bms.smart ? t('sidebar.bms.smart') : t('sidebar.bms.fixed')})`;
       (opt as any).dataset.brand = bms.brand;
       grp.appendChild(opt);
     });
@@ -420,11 +421,11 @@ function repopulateBmsDropdown(sel: HTMLSelectElement) {
   const customList = getCustomBms();
   if (customList.length > 0) {
     const grp = document.createElement('optgroup');
-    grp.label = 'Custom BMS';
+    grp.label = t('sidebar.bms.customBms');
     customList.forEach((bms, idx) => {
       const opt = document.createElement('option');
       opt.value = bms.name;
-      opt.text = `${bms.name} (${bms.maxA}A, ${bms.smart ? 'Smart' : 'Fixed'})`;
+      opt.text = `${bms.name} (${bms.maxA}A, ${bms.smart ? t('sidebar.bms.smart') : t('sidebar.bms.fixed')})`;
       (opt as any).dataset.brand = 'Custom';
       (opt as any).dataset.customIdx = String(idx);
       grp.appendChild(opt);
@@ -435,7 +436,7 @@ function repopulateBmsDropdown(sel: HTMLSelectElement) {
   // "Add Custom BMS" option at the bottom
   const addOpt = document.createElement('option');
   addOpt.value = 'custom-add';
-  addOpt.text = '+ Add Custom BMS';
+  addOpt.text = t('sidebar.bms.addCustomBms');
   addOpt.style.fontWeight = 'bold';
   addOpt.style.color = '#2563eb';
   sel.appendChild(addOpt);
@@ -472,7 +473,7 @@ export function updateBmsDisplay() {
     recPanel?.classList.add('hidden');
     warnPanel?.classList.remove('hidden');
     const warnText = $('bms-warning-text');
-    if (warnText) warnText.textContent = 'No BMS — ensure external protection circuitry is installed';
+    if (warnText) warnText.textContent = t('sidebar.bms.noBmsWarning');
     return;
   }
 
@@ -484,14 +485,14 @@ export function updateBmsDisplay() {
       recPanel?.classList.remove('hidden');
       warnPanel?.classList.add('hidden');
       const recText = $('bms-rec-text');
-      if (recText) recText.textContent = `Recommended: ${recs[0].bms.name}`;
+      if (recText) recText.textContent = `${t('sidebar.bms.recommendedPrefix')} ${recs[0].bms.name}`;
     } else {
       infoCard?.classList.add('hidden');
       valPanel?.classList.add('hidden');
       recPanel?.classList.add('hidden');
       warnPanel?.classList.remove('hidden');
       const warnText = $('bms-warning-text');
-      if (warnText) warnText.textContent = 'No compatible BMS found — verify pack configuration';
+      if (warnText) warnText.textContent = t('sidebar.bms.noCompatibleBms');
     }
     return;
   }
@@ -515,11 +516,11 @@ function showBmsInfo(bms: BmsEntry) {
   const name = $('bms-name'); if (name) name.textContent = bms.name;
   const badge = $('bms-badge');
   if (badge) {
-    badge.textContent = bms.smart ? 'Smart' : 'Fixed';
+    badge.textContent = bms.smart ? t('sidebar.bms.smart') : t('sidebar.bms.fixed');
     badge.className = `text-[0.55rem] font-bold px-1.5 py-0.5 rounded ${bms.smart ? 'bg-app-blue-light text-app-blue-dark' : 'bg-slate-200 text-slate-600'}`;
   }
   const sRange = $('bms-s-range'); if (sRange) sRange.textContent = bms.sMin === bms.sMax ? `${bms.sMin}S` : `${bms.sMin}S-${bms.sMax}S`;
-  const chem = $('bms-chem'); if (chem) chem.textContent = bms.chem.length > 0 ? bms.chem.map(c => c.toUpperCase()).join(', ') : 'Any';
+  const chem = $('bms-chem'); if (chem) chem.textContent = bms.chem.length > 0 ? bms.chem.map(c => c.toUpperCase()).join(', ') : t('sidebar.bms.any');
   const maxA = $('bms-max-a'); if (maxA) maxA.textContent = `${bms.maxA}A`;
   const balance = $('bms-balance'); if (balance) balance.textContent = bms.balanceType.replace('-', ' ');
   const protocol = $('bms-protocol'); if (protocol) protocol.textContent = bms.protocol;
@@ -1095,7 +1096,7 @@ export function setupSnapshots() {
     const modal = $('modal-overlay'); const head = $('comp-head-row'); const body = $('comp-body');
     if (!modal || !head || !body) return;
     (modal as HTMLElement).style.display = 'flex';
-    head.innerHTML = '<th>Parameter</th>';
+    head.innerHTML = `<th>${t('modals.compare.parameter')}</th>`;
     snapshots.forEach((s) => {
       const th = document.createElement('th');
       let sub = `${s.data.s}S ${s.data.p}P`; if (s.data.l > 1) sub += ` ${s.data.l}L`;
@@ -1103,25 +1104,25 @@ export function setupSnapshots() {
       head.appendChild(th);
     });
     const rows: any[] = [
-      { label: 'Physical Specs', isHeader: true },
-      { label: 'Weight', key: 'kg', unit: ' kg', good: 'min' },
-      { label: 'Volume', key: 'vol', unit: ' L', good: 'min' },
-      { label: 'Dimensions', complex: (d: any) => `L:${d.w.toFixed(0)} W:${d.d.toFixed(0)} H:${d.h.toFixed(0)}` },
-      { label: 'Cell Count', key: 'cells', unit: '', good: 'neutral' },
-      { label: 'Layers', key: 'l', unit: '', good: 'neutral' },
-      { label: 'Strip Length', key: 'nickel', unit: ' m', good: 'min' },
-      { label: 'Electrical Specs', isHeader: true },
-      { label: 'Capacity', key: 'ah', unit: ' Ah', good: 'max' },
-      { label: 'Nominal V', key: 'v', unit: ' V', good: 'neutral' },
-      { label: 'V Range', complex: (d: any) => `${d.vmin.toFixed(1)} - ${d.vmax.toFixed(1)} V` },
-      { label: 'Max Current', key: 'amp', unit: ' A', good: 'max' },
-      { label: 'Max Power', key: 'kw', unit: ' kW', good: 'max' },
-      { label: 'Total Energy', key: 'wh', unit: ' Wh', good: 'max' },
-      { label: 'Value & Density', isHeader: true },
-      { label: 'Cell Cost', key: 'cost', unit: ' €', good: 'min' },
-      { label: 'Energy Density', complex: (d: any) => `${(d.wh / d.kg).toFixed(0)} Wh/kg`, good: 'max', val: (d: any) => d.wh / d.kg },
-      { label: 'Volumetric Efficiency', complex: (d: any) => `${(d.wh / d.vol).toFixed(0)} Wh/L`, good: 'max', val: (d: any) => d.wh / d.vol },
-      { label: 'Cost Efficiency', complex: (d: any) => `${(d.wh / d.cost).toFixed(1)} Wh/€`, good: 'max', val: (d: any) => d.wh / d.cost },
+      { label: t('modals.compare.physicalSpecs'), isHeader: true },
+      { label: t('modals.compare.weight'), key: 'kg', unit: ' kg', good: 'min' },
+      { label: t('modals.compare.volume'), key: 'vol', unit: ' L', good: 'min' },
+      { label: t('modals.compare.dimensions'), complex: (d: any) => `L:${d.w.toFixed(0)} W:${d.d.toFixed(0)} H:${d.h.toFixed(0)}` },
+      { label: t('modals.compare.cellCount'), key: 'cells', unit: '', good: 'neutral' },
+      { label: t('modals.compare.layers'), key: 'l', unit: '', good: 'neutral' },
+      { label: t('modals.compare.stripLength'), key: 'nickel', unit: ' m', good: 'min' },
+      { label: t('modals.compare.electricalSpecs'), isHeader: true },
+      { label: t('modals.compare.capacity'), key: 'ah', unit: ' Ah', good: 'max' },
+      { label: t('modals.compare.nominalV'), key: 'v', unit: ' V', good: 'neutral' },
+      { label: t('modals.compare.vRange'), complex: (d: any) => `${d.vmin.toFixed(1)} - ${d.vmax.toFixed(1)} V` },
+      { label: t('modals.compare.maxCurrent'), key: 'amp', unit: ' A', good: 'max' },
+      { label: t('modals.compare.maxPower'), key: 'kw', unit: ' kW', good: 'max' },
+      { label: t('modals.compare.totalEnergy'), key: 'wh', unit: ' Wh', good: 'max' },
+      { label: t('modals.compare.valueDensity'), isHeader: true },
+      { label: t('modals.compare.cellCost'), key: 'cost', unit: ' €', good: 'min' },
+      { label: t('modals.compare.energyDensity'), complex: (d: any) => `${(d.wh / d.kg).toFixed(0)} Wh/kg`, good: 'max', val: (d: any) => d.wh / d.kg },
+      { label: t('modals.compare.volumetricEfficiency'), complex: (d: any) => `${(d.wh / d.vol).toFixed(0)} Wh/L`, good: 'max', val: (d: any) => d.wh / d.vol },
+      { label: t('modals.compare.costEfficiency'), complex: (d: any) => `${(d.wh / d.cost).toFixed(1)} Wh/€`, good: 'max', val: (d: any) => d.wh / d.cost },
     ];
     body.innerHTML = '';
     rows.forEach((r) => {
@@ -1168,7 +1169,7 @@ export function renderSnapList() {
     let desc = `${snap.data.s}S${snap.data.p}P`;
     if (snap.data.l > 1) desc += `${snap.data.l}L`;
     desc += ` | ${Math.round(snap.data.wh)}Wh | €${Math.round(snap.data.cost)}`;
-    el.innerHTML = `<div class="snap-info"><div class="snap-name">${snap.data.name}</div><div class="snap-detail">${desc}</div></div><div class="snap-tools"><button class="tool-btn tool-load" title="Load">📂</button><button class="tool-btn tool-del" title="Delete">✕</button></div>`;
+    el.innerHTML = `<div class="snap-info"><div class="snap-name">${snap.data.name}</div><div class="snap-detail">${desc}</div></div><div class="snap-tools"><button class="tool-btn tool-load" title="${t('snapshot.load')}">📂</button><button class="tool-btn tool-del" title="${t('snapshot.delete')}">✕</button></div>`;
     el.querySelector('.tool-load')?.addEventListener('click', () => loadSnapshot(snap));
     el.querySelector('.tool-del')?.addEventListener('click', () => { snapshots.splice(idx, 1); renderSnapList(); });
     list.appendChild(el);
@@ -1350,7 +1351,7 @@ export function setupSvgExportOverlay() {
       }
       // Update button text
       const btn = $btn('btn-do-svg-export');
-      if (btn) btn.textContent = radio.value === 'pdf' ? 'Download PDF' : 'Download SVG';
+      if (btn) btn.textContent = radio.value === 'pdf' ? `${t('common.download')} PDF` : `${t('common.download')} SVG`;
     });
   });
 
@@ -1417,7 +1418,7 @@ function openBomModal() {
   setText('bom-waste', `+ ${fmt(bom.wasteFactor)} m`);
   setText('bom-waste-label', `Waste factor (${Math.round(bom.wasteFactorPct * 100)}%)`);
   setText('bom-total', `${fmt(bom.nickelMetersTotal)} m`);
-  setText('bom-name', bom.packName || 'Untitled');
+  setText('bom-name', bom.packName || t('modals.bom.untitled'));
   setText('bom-config', bom.configLabel);
   setText('bom-cells', String(bom.cellCount));
 
@@ -1447,13 +1448,13 @@ function setText(id: string, val: string) {
 function buildCsv(bom: ReturnType<typeof getBomData>): string {
   return [
     'Item,Value,Unit',
-    `Pack Name,"${bom.packName}",`,
-    `Configuration,"${bom.configLabel}",`,
-    `Cell Count,${bom.cellCount},`,
-    `Nickel In-Pack Length,${bom.nickelInPack.toFixed(2)},m`,
-    `Ladder Overhead,${bom.ladderOverhead.toFixed(2)},m`,
-    `Waste Factor (${bom.wasteFactorPct * 100}%),${bom.wasteFactor.toFixed(2)},m`,
-    `Total Nickel to Purchase,${bom.nickelMetersTotal.toFixed(2)},m`,
+    `${t('bom.packName')},"${bom.packName}",`,
+    `${t('bom.configuration')},"${bom.configLabel}",`,
+    `${t('bom.cellCount')},${bom.cellCount},`,
+    `${t('bom.nickelInPackLength')},${bom.nickelInPack.toFixed(2)},m`,
+    `${t('bom.ladderOverhead')},${bom.ladderOverhead.toFixed(2)},m`,
+    `${t('bom.wasteFactor')} (${bom.wasteFactorPct * 100}%),${bom.wasteFactor.toFixed(2)},m`,
+    `${t('bom.totalNickelToPurchase')},${bom.nickelMetersTotal.toFixed(2)},m`,
   ].join('\n');
 }
 
@@ -1522,7 +1523,7 @@ function openCustomBmsModal(idx: number | null = null) {
   if (!overlay) return;
 
   const title = $('custom-bms-title');
-  if (title) title.textContent = idx !== null ? 'Edit Custom BMS' : 'Add Custom BMS';
+  if (title) title.textContent = idx !== null ? t('sidebar.bms.editCustomBms') : t('sidebar.bms.addCustomBms');
 
   // Clear or populate form
   if (idx !== null) {
@@ -1595,7 +1596,7 @@ function populateCustomBmsForm(bms: BmsEntry) {
 
 function collectCustomBmsForm(): BmsEntry | null {
   const name = $inp('bms-name-input')?.value.trim();
-  if (!name) { alert('BMS name is required.'); return null; }
+  if (!name) { alert(t('sidebar.bms.bmsNameRequired')); return null; }
 
   const chem: BmsCellType[] = [];
   if ($inp('bms-chem-nmc')?.checked) chem.push('li-ion');
@@ -1656,13 +1657,13 @@ function updateCustomBmsValidation() {
     const text = sEl.querySelector('.custom-val-text');
     if (packS >= sMin && packS <= sMax) {
       if (emoji) emoji.textContent = '🟢';
-      if (text) text.textContent = `S Count: ${packS}S fits in ${sMin}-${sMax}S range`;
+      if (text) text.textContent = tf('sidebar.bms.fitsInRange', { s: packS, min: sMin, max: sMax });
     } else if (packS < sMin) {
       if (emoji) emoji.textContent = '🟡';
-      if (text) text.textContent = `S Count: ${packS}S is below min ${sMin}S`;
+      if (text) text.textContent = tf('sidebar.bms.isBelowMin', { s: packS, min: sMin });
     } else {
       if (emoji) emoji.textContent = '🔴';
-      if (text) text.textContent = `S Count: ${packS}S exceeds max ${sMax}S`;
+      if (text) text.textContent = tf('sidebar.bms.exceedsMax', { s: packS, max: sMax });
     }
   }
 
@@ -1673,10 +1674,10 @@ function updateCustomBmsValidation() {
     const text = chemEl.querySelector('.custom-val-text');
     if (chem.length === 0 || chem.includes(chemId as BmsCellType)) {
       if (emoji) emoji.textContent = '🟢';
-      if (text) text.textContent = 'Chemistry: Compatible';
+      if (text) text.textContent = t('sidebar.bms.chemistryCompatible');
     } else {
       if (emoji) emoji.textContent = '🟡';
-      if (text) text.textContent = `Chemistry: May not support ${chemId.toUpperCase()}`;
+      if (text) text.textContent = tf('sidebar.bms.chemistryMayNot', { chem: chemId.toUpperCase() });
     }
   }
 
@@ -1687,13 +1688,13 @@ function updateCustomBmsValidation() {
     const text = curEl.querySelector('.custom-val-text');
     if (packIMax <= maxA) {
       if (emoji) emoji.textContent = '🟢';
-      if (text) text.textContent = `MOSFET: ${packIMax}A draw ≤ ${maxA}A rating`;
+      if (text) text.textContent = tf('sidebar.bms.mosfetOk', { draw: packIMax, rating: maxA });
     } else if (packIMax <= maxA * 1.2) {
       if (emoji) emoji.textContent = '🟡';
-      if (text) text.textContent = `MOSFET: ${packIMax}A draw slightly exceeds ${maxA}A rating`;
+      if (text) text.textContent = tf('sidebar.bms.mosfetSlight', { draw: packIMax, rating: maxA });
     } else {
       if (emoji) emoji.textContent = '🔴';
-      if (text) text.textContent = `MOSFET: ${packIMax}A draw far exceeds ${maxA}A rating`;
+      if (text) text.textContent = tf('sidebar.bms.mosfetFar', { draw: packIMax, rating: maxA });
     }
   }
 }
@@ -1792,7 +1793,7 @@ function setupCustomBmsActions() {
 
   $('btn-del-custom-bms')?.addEventListener('click', () => {
     const idx = getSelectedCustomBmsIdx();
-    if (idx !== null && confirm('Delete this custom BMS?')) {
+    if (idx !== null && confirm(t('common.delete') + '?')) {
       removeCustomBms(idx);
       refreshBmsDropdown('auto');
     }
@@ -1831,14 +1832,14 @@ export function setupBmsBox() {
     if (!dimsText) return;
     const name = bmsSelector?.value;
     if (!name || name === 'auto' || name === 'none' || name === 'custom-add') {
-      dimsText.textContent = 'Select a BMS in section 5';
+      dimsText.textContent = t('sidebar.bms.selectBms');
       dimsText.className = 'text-[0.72rem] font-mono font-semibold text-slate-400';
       return;
     }
     const allBms = getAllBms();
     const bms = allBms.find((b) => b.name === name);
     if (!bms) {
-      dimsText.textContent = 'BMS not found';
+      dimsText.textContent = t('sidebar.bms.bmsNotFound');
       return;
     }
     const rot = parseInt(rotInput?.value ?? '0') || 0;
@@ -1988,11 +1989,11 @@ function updatePowerConnectorDisplay() {
     const packAh = cellAh * packP;
     summaryEl.innerHTML = `
       <div class="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[0.62rem]">
-        <span class="text-slate-500">Pack Voltage</span>
+        <span class="text-slate-500">${t('common.voltage')}</span>
         <span class="font-mono font-semibold text-slate-700">${packV.toFixed(1)}V (${packS}S)</span>
-        <span class="text-slate-500">Pack Capacity</span>
+        <span class="text-slate-500">${t('common.capacity')}</span>
         <span class="font-mono font-semibold text-slate-700">${packAh.toFixed(1)}Ah</span>
-        <span class="text-slate-500">Max Current</span>
+        <span class="text-slate-500">${t('connector.maxCurrent')}</span>
         <span class="font-mono font-semibold text-slate-700">${effectiveIMax.toFixed(1)}A</span>
         <span class="text-slate-500">BMS</span>
         <span class="font-mono font-semibold text-slate-700">${selectedBms ? selectedBms.name : 'None'}</span>
@@ -2901,47 +2902,47 @@ const VALIDATION_RULES: InputRule[] = [
   {
     id: 'c-diam',
     validate: (v) => v <= 0 ? 'invalid' : v < 5 ? 'warning' : 'valid',
-    hint: (v) => v <= 0 ? 'Diameter is required' : v < 5 ? 'Unusually small diameter' : '',
+    hint: (v) => v <= 0 ? t('validation.diameterRequired') : v < 5 ? t('validation.diameterSmall') : '',
   },
   {
     id: 'c-height',
     validate: (v) => v <= 0 ? 'invalid' : 'valid',
-    hint: (v) => v <= 0 ? 'Height is required' : '',
+    hint: (v) => v <= 0 ? t('validation.heightRequired') : '',
   },
   {
     id: 'c-mah',
     validate: (v) => v <= 0 ? 'invalid' : v > 15000 ? 'warning' : 'valid',
-    hint: (v) => v <= 0 ? 'Capacity is required' : v > 15000 ? 'Unusually high — verify datasheet' : '',
+    hint: (v) => v <= 0 ? t('validation.capacityRequired') : v > 15000 ? t('validation.capacityHigh') : '',
   },
   {
     id: 'c-volts',
     validate: (v) => v <= 0 ? 'invalid' : v < 1.5 || v > 5 ? 'warning' : 'valid',
-    hint: (v) => v <= 0 ? 'Nominal voltage is required' : v < 1.5 || v > 5 ? 'Outside typical Li-ion range (1.5–5V)' : '',
+    hint: (v) => v <= 0 ? t('validation.voltageRequired') : v < 1.5 || v > 5 ? t('validation.voltageRange') : '',
   },
   {
     id: 'c-ir',
     validate: (v) => v <= 0 ? 'invalid' : v > 100 ? 'warning' : 'valid',
-    hint: (v) => v <= 0 ? 'Internal resistance is required' : v > 100 ? 'Very high IR — check units (mΩ)' : '',
+    hint: (v) => v <= 0 ? t('validation.irRequired') : v > 100 ? t('validation.irHigh') : '',
   },
   {
     id: 's-count',
     validate: (v) => v < 1 ? 'invalid' : v > 30 ? 'warning' : 'valid',
-    hint: (v) => v < 1 ? 'At least 1S required' : v > 30 ? 'High S-count — verify BMS supports this' : '',
+    hint: (v) => v < 1 ? t('validation.sCountMin') : v > 30 ? t('validation.sCountHigh') : '',
   },
   {
     id: 'p-count',
     validate: (v) => v < 1 ? 'invalid' : 'valid',
-    hint: (v) => v < 1 ? 'At least 1P required' : '',
+    hint: (v) => v < 1 ? t('validation.pCountMin') : '',
   },
   {
     id: 'c-rate',
     validate: (v) => v <= 0 ? 'invalid' : v > 10 ? 'warning' : 'valid',
-    hint: (v) => v <= 0 ? 'C-rate is required' : v > 10 ? 'Extreme C-rate — verify cell capability' : '',
+    hint: (v) => v <= 0 ? t('validation.crateRequired') : v > 10 ? t('validation.crateExtreme') : '',
   },
   {
     id: 'c-spacing',
     validate: (v) => v < 0 ? 'invalid' : v < 0.2 ? 'warning' : 'valid',
-    hint: (v) => v < 0 ? 'Spacing cannot be negative' : v < 0.2 ? 'Very tight spacing — thermal risk' : '',
+    hint: (v) => v < 0 ? t('validation.spacingNegative') : v < 0.2 ? t('validation.spacingTight') : '',
   },
 ];
 

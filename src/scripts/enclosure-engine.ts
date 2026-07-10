@@ -4,6 +4,7 @@
    ───────────────────────────────────────────── */
 
 import type { SafetyLevel } from './safety-indicators';
+import { t } from '../i18n';
 
 /* ── Types ── */
 
@@ -25,44 +26,44 @@ interface MaterialProperties {
 
 const MATERIAL_DB: Record<EnclosureMaterial, MaterialProperties> = {
   aluminum: {
-    label: 'Aluminum (6061-T6)',
+    label: t('enclosure.aluminum'),
     density: 2700,
     thermalConductivity: 167,
     costPerKg: 4.5,
     emiShielding: true,
     maxIpRating: 'ip67',
     maxIpLabel: 'IP67',
-    description: 'Lightweight, good heat dissipation, EMI shielding',
+    description: t('enclosure.aluminumDesc'),
   },
   steel: {
-    label: 'Steel (Powder Coated)',
+    label: t('enclosure.steel'),
     density: 7850,
     thermalConductivity: 50,
     costPerKg: 2.0,
     emiShielding: true,
     maxIpRating: 'ip65',
     maxIpLabel: 'IP65',
-    description: 'Durable, cost-effective, good for stationary',
+    description: t('enclosure.steelDesc'),
   },
   plastic: {
-    label: 'Plastic (ABS/PC)',
+    label: t('enclosure.plastic'),
     density: 1100,
     thermalConductivity: 0.2,
     costPerKg: 3.0,
     emiShielding: false,
     maxIpRating: 'ip54',
     maxIpLabel: 'IP54',
-    description: 'Electrical insulation, lightweight, consumer electronics',
+    description: t('enclosure.plasticDesc'),
   },
   fiberglass: {
-    label: 'FR4/Fiberglass',
+    label: t('enclosure.fiberglass'),
     density: 1800,
     thermalConductivity: 0.3,
     costPerKg: 8.0,
     emiShielding: false,
     maxIpRating: 'ip65',
     maxIpLabel: 'IP65',
-    description: 'Excellent electrical insulation, high-voltage applications',
+    description: t('enclosure.fiberglassDesc'),
   },
 };
 
@@ -76,33 +77,33 @@ interface IpRatingProperties {
 const IP_DB: Record<IpRating, IpRatingProperties> = {
   ip20: {
     label: 'IP20',
-    ingressProtection: 'Protected against solid objects >12mm',
-    requirements: ['No specific sealing required', 'Ventilation openings allowed'],
-    typicalUse: ['Indoor stationary (powerwall, server room)'],
+    ingressProtection: t('enclosure.ip20Desc'),
+    requirements: [t('enclosure.ip20Req1'), t('enclosure.ip20Req2')],
+    typicalUse: [t('enclosure.ip20Use')],
   },
   ip54: {
     label: 'IP54',
-    ingressProtection: 'Dust protected, splash-proof',
-    requirements: ['Sealed enclosure with gaskets', 'Connector panel with IP-rated connectors', 'Drain holes optional'],
-    typicalUse: ['E-bike, general EV, outdoor sheltered'],
+    ingressProtection: t('enclosure.ip54Desc'),
+    requirements: [t('enclosure.ip54Req1'), t('enclosure.ip54Req2'), t('enclosure.ip54Req3')],
+    typicalUse: [t('enclosure.ip54Use')],
   },
   ip65: {
     label: 'IP65',
-    ingressProtection: 'Dust-tight, water jet resistant',
-    requirements: ['Full gasket sealing', 'IP-rated cable glands', 'No unsealed openings', 'Tested with 6.3mm nozzle'],
-    typicalUse: ['Marine, outdoor, industrial'],
+    ingressProtection: t('enclosure.ip65Desc'),
+    requirements: [t('enclosure.ip65Req1'), t('enclosure.ip65Req2'), t('enclosure.ip65Req3'), t('enclosure.ip65Req4')],
+    typicalUse: [t('enclosure.ip65Use')],
   },
   ip67: {
     label: 'IP67',
-    ingressProtection: 'Dust-tight, temporary immersion',
-    requirements: ['Full gasket sealing', 'IP68-rated connectors', 'Pressure equalization valve', 'Tested at 1m depth for 30min'],
-    typicalUse: ['Underwater, extreme environments, military'],
+    ingressProtection: t('enclosure.ip67Desc'),
+    requirements: [t('enclosure.ip67Req1'), t('enclosure.ip67Req2'), t('enclosure.ip67Req3'), t('enclosure.ip67Req4')],
+    typicalUse: [t('enclosure.ip67Use')],
   },
   ip68: {
     label: 'IP68',
-    ingressProtection: 'Dust-tight, permanent submersion',
-    requirements: ['Full potting or hermetic sealing', 'Submarine-rated connectors', 'Pressure tested', 'Continuous submersion rated'],
-    typicalUse: ['Permanent underwater, subsea applications'],
+    ingressProtection: t('enclosure.ip68Desc'),
+    requirements: [t('enclosure.ip68Req1'), t('enclosure.ip68Req2'), t('enclosure.ip68Req3'), t('enclosure.ip68Req4')],
+    typicalUse: [t('enclosure.ip68Use')],
   },
 };
 
@@ -167,21 +168,21 @@ export function analyzeEnclosure(config: EnclosureConfig): EnclosureResult {
   const maxMatIpIdx = ipOrder.indexOf(mat.maxIpRating);
 
   if (requestedIpIdx > maxMatIpIdx) {
-    warnings.push(`${mat.label} max IP rating is ${mat.maxIpLabel} — cannot achieve ${ip.label}`);
+    warnings.push(`${mat.label} ${t('enclosure.maxIpIs')} ${mat.maxIpLabel} — ${t('enclosure.cannotAchieve')} ${ip.label}`);
   }
 
   // ── 2. Check wall thickness ──
   let wallThicknessMm = config.wallThicknessMm;
   if (config.material === 'aluminum' && wallThicknessMm < 1.5) {
-    recommendations.push('Minimum 1.5mm wall thickness for aluminum enclosures for structural integrity');
+    recommendations.push(t('enclosure.aluminumWallRec'));
     wallThicknessMm = 1.5;
   }
   if (config.material === 'steel' && wallThicknessMm < 1.0) {
-    recommendations.push('Minimum 1.0mm wall thickness for steel enclosures');
+    recommendations.push(t('enclosure.steelWallRec'));
     wallThicknessMm = 1.0;
   }
   if (config.material === 'plastic' && wallThicknessMm < 2.0) {
-    recommendations.push('Minimum 2.0mm wall thickness for plastic enclosures');
+    recommendations.push(t('enclosure.plasticWallRec'));
     wallThicknessMm = 2.0;
   }
 
@@ -217,19 +218,19 @@ export function analyzeEnclosure(config: EnclosureConfig): EnclosureResult {
 
   // ── 7. Recommendations ──
   if (config.packVoltage > 60 && config.material === 'plastic') {
-    recommendations.push('For high voltage (>60V), consider aluminum or steel for EMI shielding and structural integrity');
+    recommendations.push(t('enclosure.highVoltageRec'));
   }
 
   if (config.packCurrentA > 100 && config.material === 'plastic') {
-    recommendations.push('For high current (>100A), consider metal enclosure for heat dissipation');
+    recommendations.push(t('enclosure.highCurrentRec'));
   }
 
   if (config.ventType === 'none' && config.ipRating !== 'ip20') {
-    recommendations.push('Consider adding filtered vents for pressure equalization');
+    recommendations.push(t('enclosure.ventRec'));
   }
 
   if (config.mountingType === 'custom') {
-    recommendations.push('Custom mounting requires CAD files — verify bolt patterns and clearances');
+    recommendations.push(t('enclosure.customMountRec'));
   }
 
   // ── 8. Safety level ──
@@ -240,11 +241,11 @@ export function analyzeEnclosure(config: EnclosureConfig): EnclosureResult {
   // ── 9. Status text ──
   let statusText: string;
   if (level === 'red') {
-    statusText = `INCOMPATIBLE — ${mat.label} cannot achieve ${ip.label}`;
+    statusText = `${t('enclosure.incompatible')} — ${mat.label} ${t('enclosure.cannotAchieve')} ${ip.label}`;
   } else if (level === 'yellow') {
-    statusText = `CAUTION — ${ip.label} with ${mat.label}, verify requirements`;
+    statusText = `${t('enclosure.caution')} — ${ip.label} ${t('enclosure.with')} ${mat.label}, ${t('enclosure.verifyReqs')}`;
   } else {
-    statusText = `OK — ${widthMm.toFixed(0)}×${depthMm.toFixed(0)}×${heightMm.toFixed(0)}mm, ${enclosureWeightKg.toFixed(1)}kg`;
+    statusText = `${t('enclosure.ok')} — ${widthMm.toFixed(0)}×${depthMm.toFixed(0)}×${heightMm.toFixed(0)}mm, ${enclosureWeightKg.toFixed(1)}kg`;
   }
 
   return {
@@ -274,7 +275,7 @@ export function renderEnclosureCard(result: EnclosureResult, config: EnclosureCo
 
   const warningsHtml = result.warnings.length > 0 ? `
     <div class="bg-red-50 border border-red-200 rounded-md p-2 mt-2">
-      <div class="text-[0.68rem] font-extrabold text-red-600 uppercase mb-1">Warnings</div>
+      <div class="text-[0.68rem] font-extrabold text-red-600 uppercase mb-1">${t('enclosure.warnings')}</div>
       ${result.warnings.map(w => `
         <div class="flex items-start gap-1 text-[0.58rem] leading-tight mt-0.5">
           <span class="text-red-500 font-bold shrink-0">→</span>
@@ -284,7 +285,7 @@ export function renderEnclosureCard(result: EnclosureResult, config: EnclosureCo
 
   const recsHtml = result.recommendations.length > 0 ? `
     <div class="bg-blue-50 border border-blue-200 rounded-md p-2 mt-2">
-      <div class="text-[0.68rem] font-extrabold text-blue-600 uppercase mb-1">Recommendations</div>
+      <div class="text-[0.68rem] font-extrabold text-blue-600 uppercase mb-1">${t('enclosure.recommendations')}</div>
       ${result.recommendations.map(r => `
         <div class="flex items-start gap-1 text-[0.58rem] leading-tight mt-0.5">
           <span class="text-blue-500 font-bold shrink-0">→</span>
@@ -295,40 +296,40 @@ export function renderEnclosureCard(result: EnclosureResult, config: EnclosureCo
   return `
     <div class="bg-slate-50 border border-slate-200 rounded-md p-2 mt-2">
       <div class="flex justify-between items-center mb-1">
-        <span class="text-[0.68rem] font-extrabold text-slate-400 uppercase">Enclosure Design</span>
+        <span class="text-[0.68rem] font-extrabold text-slate-400 uppercase">${t('enclosure.enclosureDesign')}</span>
         <span class="text-[0.55rem] font-bold px-1.5 py-0.5 rounded" style="background: ${levelColor}20; color: ${levelColor};">
-          ${result.level === 'green' ? 'OK' : result.level === 'yellow' ? 'CAUTION' : 'INCOMPATIBLE'}
+          ${result.level === 'green' ? t('enclosure.ok') : result.level === 'yellow' ? t('enclosure.caution') : t('enclosure.incompatible')}
         </span>
       </div>
       <div class="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[0.62rem]">
-        <span class="text-slate-500">Dimensions (W×D×H)</span>
+        <span class="text-slate-500">${t('enclosure.dimensions')}</span>
         <span class="font-mono font-semibold text-slate-700">${result.widthMm.toFixed(0)}×${result.depthMm.toFixed(0)}×${result.heightMm.toFixed(0)}mm</span>
-        <span class="text-slate-500">Material</span>
+        <span class="text-slate-500">${t('enclosure.material')}</span>
         <span class="font-mono font-semibold text-slate-700">${result.materialLabel}</span>
-        <span class="text-slate-500">IP Rating</span>
+        <span class="text-slate-500">${t('enclosure.ipRating')}</span>
         <span class="font-mono font-semibold text-slate-700">${result.ipLabel}</span>
-        <span class="text-slate-500">Wall Thickness</span>
+        <span class="text-slate-500">${t('enclosure.wallThickness')}</span>
         <span class="font-mono font-semibold text-slate-700">${config.wallThicknessMm}mm</span>
-        <span class="text-slate-500">Enclosure Weight</span>
+        <span class="text-slate-500">${t('enclosure.enclosureWeight')}</span>
         <span class="font-mono font-semibold text-slate-700">${result.enclosureWeightKg.toFixed(1)}kg</span>
-        <span class="text-slate-500">Total Weight</span>
+        <span class="text-slate-500">${t('enclosure.totalWeight')}</span>
         <span class="font-mono font-semibold text-slate-700">${result.totalWeightKg.toFixed(1)}kg</span>
-        <span class="text-slate-500">Estimated Cost</span>
+        <span class="text-slate-500">${t('enclosure.estimatedCost')}</span>
         <span class="font-mono font-semibold text-slate-700">€${result.estimatedCostEur.toFixed(0)}</span>
-        <span class="text-slate-500">Thermal Resistance</span>
+        <span class="text-slate-500">${t('enclosure.thermalResistance')}</span>
         <span class="font-mono font-semibold text-slate-700">${result.thermalResistance.toFixed(2)}°C/W</span>
       </div>
-      ${result.material.emiShielding ? '<div class="mt-1 text-[0.6rem] font-bold text-green-600">✓ EMI shielding</div>' : ''}
+      ${result.material.emiShielding ? `<div class="mt-1 text-[0.6rem] font-bold text-green-600">✓ ${t('enclosure.emiShielding')}</div>` : ''}
     </div>
 
     <div class="bg-slate-50 border border-slate-200 rounded-md p-2 mt-2">
-      <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-1">IP Rating Details</div>
+      <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-1">${t('enclosure.ipRatingDetails')}</div>
       <div class="text-[0.62rem] text-slate-600 mb-1">${result.ipRating.ingressProtection}</div>
       <div class="text-[0.58rem] text-slate-500">
         ${result.ipRating.requirements.join(' · ')}
       </div>
       <div class="text-[0.58rem] text-slate-400 mt-1">
-        Typical: ${result.ipRating.typicalUse.join(', ')}
+        ${t('enclosure.typical')}: ${result.ipRating.typicalUse.join(', ')}
       </div>
     </div>
 

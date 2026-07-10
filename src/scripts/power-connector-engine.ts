@@ -5,6 +5,7 @@
    ───────────────────────────────────────────── */
 
 import type { BmsEntry } from './bms-database';
+import { t } from '../i18n';
 
 /* ── Connector Database ── */
 
@@ -98,11 +99,11 @@ interface AppProfile {
 }
 
 const APP_PROFILES: Record<Application, AppProfile> = {
-  ebike:       { label: 'E-Bike',           preferType: 'any',     preferLightweight: false, preferFieldServiceable: true,  maxVoltageDropPct: 3 },
-  powerwall:   { label: 'Powerwall',        preferType: 'anderson',preferLightweight: false, preferFieldServiceable: true,  maxVoltageDropPct: 2 },
-  ev:          { label: 'Electric Vehicle', preferType: 'any',     preferLightweight: false, preferFieldServiceable: false, maxVoltageDropPct: 2 },
-  drone:       { label: 'Drone/UAV',        preferType: 'bullet',  preferLightweight: true,  preferFieldServiceable: false, maxVoltageDropPct: 5 },
-  general:     { label: 'General',          preferType: 'any',     preferLightweight: false, preferFieldServiceable: false, maxVoltageDropPct: 3 },
+  ebike:       { label: t('connector.ebike'),           preferType: 'any',     preferLightweight: false, preferFieldServiceable: true,  maxVoltageDropPct: 3 },
+  powerwall:   { label: t('connector.powerwall'),        preferType: 'anderson',preferLightweight: false, preferFieldServiceable: true,  maxVoltageDropPct: 2 },
+  ev:          { label: t('connector.electricVehicle'), preferType: 'any',     preferLightweight: false, preferFieldServiceable: false, maxVoltageDropPct: 2 },
+  drone:       { label: t('connector.droneUav'),        preferType: 'bullet',  preferLightweight: true,  preferFieldServiceable: false, maxVoltageDropPct: 5 },
+  general:     { label: t('connector.general'),          preferType: 'any',     preferLightweight: false, preferFieldServiceable: false, maxVoltageDropPct: 3 },
 };
 
 /* ── Result Types ── */
@@ -413,45 +414,45 @@ export function renderConnectorCard(rec: ConnectorRecommendation): string {
 
   return `
     <div class="bg-slate-50 border border-slate-200 rounded-md p-2 mt-2">
-      <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-1 border-b border-slate-200 pb-1">Recommended Connector</div>
+      <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-1 border-b border-slate-200 pb-1">${t('connector.recommendedConnector')}</div>
       <div class="flex justify-between items-center mb-1">
         <span class="text-[0.78rem] font-extrabold text-slate-700">${rec.connector.name}</span>
         <span class="text-[0.55rem] font-bold px-1.5 py-0.5 rounded ${rec.connector.antiSpark ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-600'}">${rec.connector.continuousA}A</span>
       </div>
       <div class="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[0.62rem]">
-        <span class="text-slate-500">Type</span>
+        <span class="text-slate-500">${t('connector.type')}</span>
         <span class="font-mono font-semibold text-slate-700">${rec.connector.type}</span>
-        <span class="text-slate-500">Continuous</span>
-        <span class="font-mono font-semibold text-slate-700">${rec.connector.continuousA}A / ${rec.connector.burstA}A burst</span>
-        <span class="text-slate-500">Resistance</span>
+        <span class="text-slate-500">${t('connector.continuous')}</span>
+        <span class="font-mono font-semibold text-slate-700">${rec.connector.continuousA}A / ${rec.connector.burstA}A ${t('connector.burst')}</span>
+        <span class="text-slate-500">${t('connector.resistance')}</span>
         <span class="font-mono font-semibold text-slate-700">${rec.connector.contactResistance} mΩ</span>
-        <span class="text-slate-500">Max Voltage</span>
+        <span class="text-slate-500">${t('connector.maxVoltage')}</span>
         <span class="font-mono font-semibold text-slate-700">${rec.connector.voltageMax}V</span>
-        <span class="text-slate-500">Wire Range</span>
+        <span class="text-slate-500">${t('connector.wireRange')}</span>
         <span class="font-mono font-semibold text-slate-700">${rec.connector.wireRange[1]}–${rec.connector.wireRange[0]} AWG</span>
-        <span class="text-slate-500">Weight</span>
+        <span class="text-slate-500">${t('connector.weight')}</span>
         <span class="font-mono font-semibold text-slate-700">${rec.connector.weightG}g</span>
       </div>
-      ${rec.connector.antiSpark ? '<div class="mt-1 text-[0.6rem] font-bold text-amber-600">⚡ Anti-Spark built-in</div>' : ''}
+      ${rec.connector.antiSpark ? `<div class="mt-1 text-[0.6rem] font-bold text-amber-600">⚡ ${t('connector.antiSparkBuiltIn')}</div>` : ''}
     </div>
 
     <div class="bg-slate-50 border border-slate-200 rounded-md p-2 mt-2">
-      <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-1 border-b border-slate-200 pb-1">Cable & Fuse</div>
+      <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-1 border-b border-slate-200 pb-1">${t('connector.cableAndFuse')}</div>
       <div class="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[0.62rem]">
-        <span class="text-slate-500">Cable Gauge</span>
+        <span class="text-slate-500">${t('connector.cableGauge')}</span>
         <span class="font-mono font-semibold text-slate-700">${rec.wireGauge.label} (${rec.wireGauge.areaMm2}mm²)</span>
-        <span class="text-slate-500">Ampacity</span>
+        <span class="text-slate-500">${t('connector.ampacity')}</span>
         <span class="font-mono font-semibold text-slate-700">${rec.wireGauge.ampacity75C}A (75°C)</span>
-        <span class="text-slate-500">Voltage Drop</span>
+        <span class="text-slate-500">${t('connector.voltageDrop')}</span>
         <span class="font-mono font-semibold ${rec.voltageDropPct > 3 ? 'text-red-600' : 'text-slate-700'}">${rec.voltageDrop.toFixed(2)}V (${rec.voltageDropPct.toFixed(1)}%)</span>
-        <span class="text-slate-500">Fuse</span>
+        <span class="text-slate-500">${t('connector.fuse')}</span>
         <span class="font-mono font-semibold text-slate-700">${rec.fuseRating}A ${rec.fuseType}</span>
       </div>
     </div>
 
     ${notes ? `
     <div class="bg-amber-50 border border-amber-200 rounded-md p-2 mt-2">
-      <div class="text-[0.68rem] font-extrabold text-amber-600 uppercase mb-1">Safety Notes</div>
+      <div class="text-[0.68rem] font-extrabold text-amber-600 uppercase mb-1">${t('connector.safetyNotes')}</div>
       ${notes}
     </div>` : ''}
   `;
@@ -460,17 +461,17 @@ export function renderConnectorCard(rec: ConnectorRecommendation): string {
 export function renderBmsWiringInfo(wiring: BmsWiringData): string {
   return `
     <div class="bg-slate-50 border border-slate-200 rounded-md p-2 mt-2">
-      <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-1 border-b border-slate-200 pb-1">BMS Wiring</div>
+      <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-1 border-b border-slate-200 pb-1">${t('connector.bmsWiring')}</div>
       <div class="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[0.62rem]">
-        <span class="text-slate-500">Balance Wires</span>
+        <span class="text-slate-500">${t('connector.balanceWires')}</span>
         <span class="font-mono font-semibold text-slate-700">${wiring.balanceWires.wireCount}× ${wiring.balanceWires.label}</span>
-        <span class="text-slate-500">Main B- Cable</span>
+        <span class="text-slate-500">${t('connector.mainBCable')}</span>
         <span class="font-mono font-semibold text-slate-700">${wiring.mainNegWire}</span>
-        <span class="text-slate-500">Main P+ Cable</span>
+        <span class="text-slate-500">${t('connector.mainPCable')}</span>
         <span class="font-mono font-semibold text-slate-700">${wiring.mainPosWire}</span>
       </div>
       <div class="mt-1.5 text-[0.58rem] text-slate-400 leading-tight">
-        ${wiring.seriesCount} series taps → BMS balance inputs (B-, B1, B2, ... B${wiring.seriesCount})
+        ${t('connector.seriesTaps', { count: wiring.seriesCount, last: wiring.seriesCount })}
       </div>
     </div>
   `;

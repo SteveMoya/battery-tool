@@ -1,5 +1,6 @@
 import type { SafetyLevel } from './safety-indicators';
 import type { ThermalResult } from './thermal-engine';
+import { t } from '../i18n';
 
 /* ─────────────────────────────────────────────
    F16 — Diagnostic Monitor
@@ -69,12 +70,12 @@ export function renderJouleHeatIndicator(r: JouleHeatResult) {
   if (emojiSpan) emojiSpan.textContent = JOULE_EMOJI[r.level];
   if (textSpan) {
     if (r.level === 'neutral') {
-      textSpan.textContent = 'N/A';
+      textSpan.textContent = t('common.na');
     } else {
       const heatStr = r.heatTotal >= 100 ? `${Math.round(r.heatTotal)}W`
         : r.heatTotal >= 10 ? `${r.heatTotal.toFixed(1)}W`
         : `${r.heatTotal.toFixed(2)}W`;
-      textSpan.textContent = `${heatStr} → ${r.tCell.toFixed(1)}°C (cell)`;
+      textSpan.textContent = `${heatStr} → ${r.tCell.toFixed(1)}°C (${t('diagnostic.cell')})`;
     }
   }
   (el as HTMLElement).style.color = JOULE_COLOR[r.level];
@@ -161,14 +162,14 @@ export function computeDiagnostic(joule: JouleHeatResult): DiagnosticReport {
     compliance: complianceLevel,
     thermal: thermalResult,
     metrics: [
-      { id: 'diag-voltage-sag', level: sagLevel, label: 'Voltage Sag', pct: readPct(sagEl) },
-      { id: 'diag-joule-heat', level: joule.level, label: 'Joule Heat', pct: joule.pct },
-      { id: 'diag-ampacity', level: ampLevel, label: 'Ampacity', pct: readPct(ampEl) },
-      { id: 'diag-micah', level: micahLevel, label: 'Strip Safety', pct: readPct(micahEl) },
-      { id: 'diag-strip-thermal', level: stripLevel, label: 'Strip Thermal', pct: readPct(stripEl) },
-      { id: 'diag-packing', level: packLevel, label: 'Packing Eff.', pct: readPct(packEl) },
-      { id: 'diag-compliance', level: complianceLevel, label: 'Compliance', pct: complianceLevel === 'green' ? 100 : complianceLevel === 'yellow' ? 50 : complianceLevel === 'red' ? 0 : -1 },
-      { id: 'diag-thermal', level: thermalLevel, label: 'Thermal', pct: thermalResult ? (thermalResult.level === 'green' ? 100 : thermalResult.level === 'yellow' ? 50 : 0) : -1 },
+      { id: 'diag-voltage-sag', level: sagLevel, label: t('diagnostic.voltageSag'), pct: readPct(sagEl) },
+      { id: 'diag-joule-heat', level: joule.level, label: t('diagnostic.jouleHeat'), pct: joule.pct },
+      { id: 'diag-ampacity', level: ampLevel, label: t('diagnostic.ampacity'), pct: readPct(ampEl) },
+      { id: 'diag-micah', level: micahLevel, label: t('diagnostic.stripSafety'), pct: readPct(micahEl) },
+      { id: 'diag-strip-thermal', level: stripLevel, label: t('diagnostic.stripThermal'), pct: readPct(stripEl) },
+      { id: 'diag-packing', level: packLevel, label: t('diagnostic.packingEff'), pct: readPct(packEl) },
+      { id: 'diag-compliance', level: complianceLevel, label: t('diagnostic.compliance'), pct: complianceLevel === 'green' ? 100 : complianceLevel === 'yellow' ? 50 : complianceLevel === 'red' ? 0 : -1 },
+      { id: 'diag-thermal', level: thermalLevel, label: t('diagnostic.thermal'), pct: thermalResult ? (thermalResult.level === 'green' ? 100 : thermalResult.level === 'yellow' ? 50 : 0) : -1 },
     ],
   };
 }
@@ -203,10 +204,10 @@ export function renderDiagnosticGlobal(report: DiagnosticReport) {
   }
   if (labelEl) {
     const labels: Record<SafetyLevel, string> = {
-      green: 'ALL OK',
-      yellow: 'CAUTION',
-      red: 'WARNING',
-      neutral: 'NO DATA',
+      green: t('diagnostic.allOk'),
+      yellow: t('common.caution'),
+      red: t('diagnostic.warning'),
+      neutral: t('diagnostic.noData'),
     };
     labelEl.textContent = labels[report.global];
     labelEl.style.color = GLOBAL_COLOR[report.global];

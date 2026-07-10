@@ -4,8 +4,8 @@ import HelpIcon from '../HelpIcon.astro';
 
 <section class="group-box">
   <div class="flex justify-between items-center mb-1.5">
-    <h2 class="section-title m-0">12. Enclosure Design</h2>
-    <HelpIcon tip="Pack enclosure sizing, IP rating, material selection, and weight estimation" />
+    <h2 class="section-title m-0" data-i18n="sidebar.enclosure.title">12. Enclosure Design</h2>
+    <HelpIcon tip="Pack enclosure sizing, IP rating, material selection, and weight estimation" data-i18n-tip="sidebar.enclosure.helpTip" />
   </div>
 
   <div class="mb-2">
@@ -14,7 +14,7 @@ import HelpIcon from '../HelpIcon.astro';
         id="enclosure-run-btn"
         class="btn-primary text-[0.65rem] py-1 px-2.5"
       >
-        Design Enclosure
+        <span data-i18n="sidebar.enclosure.designEnclosure">Design Enclosure</span>
       </button>
       <span id="enclosure-status-badge" class="text-[0.6rem] font-bold px-1.5 py-0.5 rounded hidden"></span>
     </div>
@@ -23,49 +23,49 @@ import HelpIcon from '../HelpIcon.astro';
     <div id="enclosure-inputs" class="rounded-md p-2 mb-2" style="background: var(--bg-tertiary); border-color: var(--border-primary); border-width: 1px; border-style: solid;">
       <div class="grid grid-cols-2 gap-2">
         <div class="flex flex-col">
-          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Material</label>
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);" data-i18n="sidebar.enclosure.material">Material</label>
           <select id="enclosure-material" class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);">
-            <option value="aluminum">Aluminum (6061-T6)</option>
-            <option value="steel">Steel (Powder Coated)</option>
-            <option value="plastic">Plastic (ABS/PC)</option>
-            <option value="fiberglass">FR4/Fiberglass</option>
+            <option value="aluminum" data-i18n="sidebar.enclosure.optionAluminum">Aluminum (6061-T6)</option>
+            <option value="steel" data-i18n="sidebar.enclosure.optionSteel">Steel (Powder Coated)</option>
+            <option value="plastic" data-i18n="sidebar.enclosure.optionPlastic">Plastic (ABS/PC)</option>
+            <option value="fiberglass" data-i18n="sidebar.enclosure.optionFiberglass">FR4/Fiberglass</option>
           </select>
         </div>
         <div class="flex flex-col">
-          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">IP Rating</label>
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);" data-i18n="sidebar.enclosure.ipRating">IP Rating</label>
           <select id="enclosure-ip" class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);">
-            <option value="ip20">IP20 (Indoor)</option>
-            <option value="ip54">IP54 (Splash-proof)</option>
-            <option value="ip65" selected>IP65 (Water jet)</option>
-            <option value="ip67">IP67 (Immersion)</option>
-            <option value="ip68">IP68 (Submersion)</option>
+            <option value="ip20" data-i18n="sidebar.enclosure.optionIP20">IP20 (Indoor)</option>
+            <option value="ip54" data-i18n="sidebar.enclosure.optionIP54">IP54 (Splash-proof)</option>
+            <option value="ip65" selected data-i18n="sidebar.enclosure.optionIP65">IP65 (Water jet)</option>
+            <option value="ip67" data-i18n="sidebar.enclosure.optionIP67">IP67 (Immersion)</option>
+            <option value="ip68" data-i18n="sidebar.enclosure.optionIP68">IP68 (Submersion)</option>
           </select>
         </div>
         <div class="flex flex-col">
-          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Wall Thickness (mm)</label>
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);" data-i18n="sidebar.enclosure.wallThickness">Wall Thickness (mm)</label>
           <input id="enclosure-wall" type="number" value="2" min="0.5" max="10" step="0.5"
             class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);" />
         </div>
         <div class="flex flex-col">
-          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Clearance (mm)</label>
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);" data-i18n="sidebar.enclosure.clearance">Clearance (mm)</label>
           <input id="enclosure-clearance" type="number" value="5" min="0" max="20" step="1"
             class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);" />
         </div>
         <div class="flex flex-col">
-          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Mounting</label>
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);" data-i18n="sidebar.enclosure.mounting">Mounting</label>
           <select id="enclosure-mounting" class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);">
-            <option value="brackets">Brackets</option>
-            <option value="rails">Rails</option>
-            <option value="custom">Custom</option>
+            <option value="brackets" data-i18n="sidebar.enclosure.optionBrackets">Brackets</option>
+            <option value="rails" data-i18n="sidebar.enclosure.optionRails">Rails</option>
+            <option value="custom" data-i18n="sidebar.enclosure.optionCustom">Custom</option>
           </select>
         </div>
         <div class="flex flex-col">
-          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Ventilation</label>
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);" data-i18n="sidebar.enclosure.ventilation">Ventilation</label>
           <select id="enclosure-vent" class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);">
-            <option value="none">None (Sealed)</option>
-            <option value="filtered">Filtered Vents</option>
-            <option value="sealed">Pressure Equalized</option>
-            <option value="conformal">Conformal Coating</option>
+            <option value="none" data-i18n="sidebar.enclosure.optionNoneSealed">None (Sealed)</option>
+            <option value="filtered" data-i18n="sidebar.enclosure.optionFiltered">Filtered Vents</option>
+            <option value="sealed" data-i18n="sidebar.enclosure.optionPressureEq">Pressure Equalized</option>
+            <option value="conformal" data-i18n="sidebar.enclosure.optionConformal">Conformal Coating</option>
           </select>
         </div>
       </div>

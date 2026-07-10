@@ -5,6 +5,8 @@
    UL 2580, ISO 12405, SAE J2464.
    ───────────────────────────────────────────── */
 
+import { t } from '../i18n';
+
 export type ComplianceStatus = 'pass' | 'warn' | 'fail' | 'info';
 export type StandardId = 'IEC_62619' | 'UN_38.3' | 'UL_2580' | 'ISO_12405' | 'SAE_J2464';
 
@@ -72,7 +74,7 @@ const REQUIREMENTS: ComplianceRequirement[] = [
     id: 'un38.3-voltage-limit',
     standard: 'UN_38.3',
     clause: '38.3.2',
-    description: 'Pack voltage ≤100V DC for transport classification',
+    description: t('standards.un383VoltageLimit'),
     category: 'transport',
     mandatory: true,
   },
@@ -80,7 +82,7 @@ const REQUIREMENTS: ComplianceRequirement[] = [
     id: 'un38.3-hazmat-label',
     standard: 'UN_38.3',
     clause: '38.3.4',
-    description: 'Class 9 hazardous material labeling for lithium batteries',
+    description: t('standards.un383HazmatLabel'),
     category: 'transport',
     mandatory: true,
   },
@@ -88,7 +90,7 @@ const REQUIREMENTS: ComplianceRequirement[] = [
     id: 'un38.3-power-limit',
     standard: 'UN_38.3',
     clause: '38.3.5',
-    description: 'Watt-hour rating ≤100Wh per cell or ≤300Wh per pack for simplified shipping',
+    description: t('standards.un383PowerLimit'),
     category: 'transport',
     mandatory: false,
   },
@@ -98,7 +100,7 @@ const REQUIREMENTS: ComplianceRequirement[] = [
     id: 'iec62619-overcharge',
     standard: 'IEC_62619',
     clause: '8.3.2',
-    description: 'BMS overcharge protection required',
+    description: t('standards.iec62619Overcharge'),
     category: 'safety',
     mandatory: true,
   },
@@ -106,7 +108,7 @@ const REQUIREMENTS: ComplianceRequirement[] = [
     id: 'iec62619-overdischarge',
     standard: 'IEC_62619',
     clause: '8.3.3',
-    description: 'BMS overdischarge protection required',
+    description: t('standards.iec62619Overdischarge'),
     category: 'safety',
     mandatory: true,
   },
@@ -114,7 +116,7 @@ const REQUIREMENTS: ComplianceRequirement[] = [
     id: 'iec62619-short-circuit',
     standard: 'IEC_62619',
     clause: '8.3.4',
-    description: 'Short circuit protection required',
+    description: t('standards.iec62619ShortCircuit'),
     category: 'safety',
     mandatory: true,
   },
@@ -122,7 +124,7 @@ const REQUIREMENTS: ComplianceRequirement[] = [
     id: 'iec62619-overcurrent',
     standard: 'IEC_62619',
     clause: '8.3.5',
-    description: 'Overcurrent protection required',
+    description: t('standards.iec62619Overcurrent'),
     category: 'safety',
     mandatory: true,
   },
@@ -130,7 +132,7 @@ const REQUIREMENTS: ComplianceRequirement[] = [
     id: 'iec62619-temperature',
     standard: 'IEC_62619',
     clause: '8.4.1',
-    description: 'Cell temperature monitoring required for packs >50Wh',
+    description: t('standards.iec62619Temperature'),
     category: 'safety',
     mandatory: false,
   },
@@ -138,7 +140,7 @@ const REQUIREMENTS: ComplianceRequirement[] = [
     id: 'iec62619-fuse',
     standard: 'IEC_62619',
     clause: '8.5.1',
-    description: 'External fuse or current-limiting device required',
+    description: t('standards.iec62619Fuse'),
     category: 'safety',
     mandatory: true,
   },
@@ -148,7 +150,7 @@ const REQUIREMENTS: ComplianceRequirement[] = [
     id: 'ul2580-contactor',
     standard: 'UL_2580',
     clause: '4.4',
-    description: 'Main contactor or disconnect for packs >48V',
+    description: t('standards.ul2580Contactor'),
     category: 'safety',
     mandatory: true,
   },
@@ -156,7 +158,7 @@ const REQUIREMENTS: ComplianceRequirement[] = [
     id: 'ul2580-hrc-fuse',
     standard: 'UL_2580',
     clause: '4.5',
-    description: 'HRC fuse recommended for packs >48V or >20Ah',
+    description: t('standards.ul2580HrcFuse'),
     category: 'safety',
     mandatory: false,
   },
@@ -164,7 +166,7 @@ const REQUIREMENTS: ComplianceRequirement[] = [
     id: 'ul2580-bms-current',
     standard: 'UL_2580',
     clause: '5.2',
-    description: 'BMS max current ≥1.25× pack max current',
+    description: t('standards.ul2580BmsCurrent'),
     category: 'performance',
     mandatory: false,
   },
@@ -172,7 +174,7 @@ const REQUIREMENTS: ComplianceRequirement[] = [
     id: 'ul2580-marking',
     standard: 'UL_2580',
     clause: '7.1',
-    description: 'Pack must have voltage, capacity, and polarity markings',
+    description: t('standards.ul2580Marking'),
     category: 'safety',
     mandatory: true,
   },
@@ -182,7 +184,7 @@ const REQUIREMENTS: ComplianceRequirement[] = [
     id: 'iso12405-bms-sizing',
     standard: 'ISO_12405',
     clause: '5.3',
-    description: 'BMS current rating ≥1.25× pack max continuous current',
+    description: t('standards.iso12405BmsSizing'),
     category: 'performance',
     mandatory: true,
   },
@@ -190,7 +192,7 @@ const REQUIREMENTS: ComplianceRequirement[] = [
     id: 'iso12405-voltage-range',
     standard: 'ISO_12405',
     clause: '6.1',
-    description: 'Pack operating voltage within BMS supported S-range',
+    description: t('standards.iso12405VoltageRange'),
     category: 'performance',
     mandatory: true,
   },
@@ -198,7 +200,7 @@ const REQUIREMENTS: ComplianceRequirement[] = [
     id: 'iso12405-chemistry-voltage',
     standard: 'ISO_12405',
     clause: '6.2',
-    description: 'Cell voltage range consistent with chemistry specification',
+    description: t('standards.iso12405ChemistryVoltage'),
     category: 'performance',
     mandatory: true,
   },
@@ -208,7 +210,7 @@ const REQUIREMENTS: ComplianceRequirement[] = [
     id: 'saej2464-overvoltage',
     standard: 'SAE_J2464',
     clause: '4.1',
-    description: 'Overvoltage protection must prevent cell voltage exceeding max rating',
+    description: t('standards.saej2464Overvoltage'),
     category: 'fire',
     mandatory: true,
   },
@@ -216,7 +218,7 @@ const REQUIREMENTS: ComplianceRequirement[] = [
     id: 'saej2464-overdischarge',
     standard: 'SAE_J2464',
     clause: '4.2',
-    description: 'Undervoltage protection must prevent cell voltage below min rating',
+    description: t('standards.saej2464Overdischarge'),
     category: 'fire',
     mandatory: true,
   },
@@ -224,7 +226,7 @@ const REQUIREMENTS: ComplianceRequirement[] = [
     id: 'saej2464-overcurrent',
     standard: 'SAE_J2464',
     clause: '4.3',
-    description: 'Overcurrent protection must limit current to safe levels',
+    description: t('standards.saej2464Overcurrent'),
     category: 'fire',
     mandatory: true,
   },
@@ -232,7 +234,7 @@ const REQUIREMENTS: ComplianceRequirement[] = [
     id: 'saej2464-short-circuit',
     standard: 'SAE_J2464',
     clause: '4.4',
-    description: 'Short-circuit protection must disconnect within 1ms',
+    description: t('standards.saej2464ShortCircuit'),
     category: 'fire',
     mandatory: true,
   },
@@ -240,7 +242,7 @@ const REQUIREMENTS: ComplianceRequirement[] = [
     id: 'saej2464-temperature',
     standard: 'SAE_J2464',
     clause: '5.1',
-    description: 'Temperature monitoring to prevent thermal runaway',
+    description: t('standards.saej2464Temperature'),
     category: 'fire',
     mandatory: false,
   },
@@ -350,8 +352,8 @@ function checkVoltageLimit(packV: number): ComplianceCheckResult {
     status,
     actual: `${packV.toFixed(1)}V`,
     detail: status === 'pass'
-      ? 'Pack voltage within transport limit (≤100V).'
-      : `Pack voltage ${packV.toFixed(1)}V exceeds 100V. Class 9 hazardous material procedures required for transport.`,
+      ? t('standards.voltageLimitPass')
+      : t('standards.voltageLimitFail', { voltage: packV.toFixed(1) }),
   };
 }
 
@@ -361,7 +363,7 @@ function checkHazmatLabel(packV: number): ComplianceCheckResult {
     requirement: req('un38.3-hazmat-label'),
     status,
     actual: packV > 100 ? 'Class 9 required' : 'Class 9 recommended',
-    detail: 'Lithium battery packs require Class 9 hazard labeling for commercial transport regardless of voltage.',
+    detail: t('standards.hazmatLabelInfo'),
   };
 }
 
@@ -371,13 +373,13 @@ function checkPowerLimit(packWh: number): ComplianceCheckResult {
 
   if (packWh <= 100) {
     status = 'pass';
-    detail = `Pack energy ${packWh.toFixed(0)}Wh ≤ 100Wh per cell/battery — simplified shipping applies.`;
+    detail = t('standards.powerLimitPass', { wh: packWh.toFixed(0) });
   } else if (packWh <= 300) {
     status = 'warn';
-    detail = `Pack energy ${packWh.toFixed(0)}Wh exceeds 100Wh. Section II packaging required for transport.`;
+    detail = t('standards.powerLimitWarn', { wh: packWh.toFixed(0) });
   } else {
     status = 'fail';
-    detail = `Pack energy ${packWh.toFixed(0)}Wh exceeds 300Wh. Full DG shipping documentation and approvals required.`;
+    detail = t('standards.powerLimitFail', { wh: packWh.toFixed(0) });
   }
 
   return {
@@ -393,10 +395,10 @@ function checkOverchargeProtection(c: PackConfig): ComplianceCheckResult {
   return {
     requirement: req('iec62619-overcharge'),
     status,
-    actual: c.hasBms ? (c.bmsHasOverchargeProtection ? 'Yes' : 'No') : 'No BMS',
+    actual: c.hasBms ? (c.bmsHasOverchargeProtection ? t('common.yes') : t('common.no')) : 'No BMS',
     detail: status === 'pass'
-      ? 'BMS provides overcharge protection per IEC 62619 §8.3.2.'
-      : 'CRITICAL: Pack requires BMS with overcharge protection. Charging without it risks thermal runaway.',
+      ? t('standards.overchargePass')
+      : t('standards.overchargeFail'),
   };
 }
 
@@ -405,10 +407,10 @@ function checkOverdischargeProtection(c: PackConfig): ComplianceCheckResult {
   return {
     requirement: req('iec62619-overdischarge'),
     status,
-    actual: c.hasBms ? (c.bmsHasOverdischargeProtection ? 'Yes' : 'No') : 'No BMS',
+    actual: c.hasBms ? (c.bmsHasOverdischargeProtection ? t('common.yes') : t('common.no')) : 'No BMS',
     detail: status === 'pass'
-      ? 'BMS provides overdischarge protection per IEC 62619 §8.3.3.'
-      : 'CRITICAL: Pack requires BMS with overdischarge protection to prevent cell damage.',
+      ? t('standards.overdischargePass')
+      : t('standards.overdischargeFail'),
   };
 }
 
@@ -417,10 +419,10 @@ function checkShortCircuitProtection(c: PackConfig): ComplianceCheckResult {
   return {
     requirement: req('iec62619-short-circuit'),
     status,
-    actual: c.hasBms ? (c.bmsHasShortCircuitProtection ? 'Yes' : 'No') : 'No BMS',
+    actual: c.hasBms ? (c.bmsHasShortCircuitProtection ? t('common.yes') : t('common.no')) : 'No BMS',
     detail: status === 'pass'
-      ? 'BMS provides short circuit protection per IEC 62619 §8.3.4.'
-      : 'CRITICAL: Pack requires short circuit protection to prevent fire risk.',
+      ? t('standards.shortCircuitPass')
+      : t('standards.shortCircuitFail'),
   };
 }
 
@@ -429,10 +431,10 @@ function checkOvercurrentProtection(c: PackConfig): ComplianceCheckResult {
   return {
     requirement: req('iec62619-overcurrent'),
     status,
-    actual: c.hasBms ? (c.bmsHasOvercurrentProtection ? 'Yes' : 'No') : 'No BMS',
+    actual: c.hasBms ? (c.bmsHasOvercurrentProtection ? t('common.yes') : t('common.no')) : 'No BMS',
     detail: status === 'pass'
-      ? 'BMS provides overcurrent protection per IEC 62619 §8.3.5.'
-      : 'CRITICAL: Pack requires overcurrent protection for safety.',
+      ? t('standards.overcurrentPass')
+      : t('standards.overcurrentFail'),
   };
 }
 
@@ -442,7 +444,7 @@ function checkTemperatureMonitoring(c: PackConfig, packWh: number): ComplianceCh
       requirement: req('iec62619-temperature'),
       status: 'info',
       actual: `${packWh.toFixed(0)}Wh — exempt`,
-      detail: 'Temperature monitoring recommended but not mandatory for packs ≤50Wh.',
+      detail: t('standards.temperatureInfo'),
     };
   }
   // Any BMS implies temperature monitoring capability
@@ -452,8 +454,8 @@ function checkTemperatureMonitoring(c: PackConfig, packWh: number): ComplianceCh
     status,
     actual: c.hasBms ? 'Via BMS' : 'Not monitored',
     detail: status === 'pass'
-      ? 'Temperature monitoring available through BMS per IEC 62619 §8.4.1.'
-      : 'WARNING: Packs >50Wh should have temperature monitoring to prevent thermal abuse.',
+      ? t('standards.temperaturePass')
+      : t('standards.temperatureWarn'),
   };
 }
 
@@ -464,8 +466,8 @@ function checkFuseRequired(c: PackConfig): ComplianceCheckResult {
     status,
     actual: c.hasFuse ? `${c.fuseRatingA}A fuse` : 'No fuse',
     detail: status === 'pass'
-      ? `Fuse rated at ${c.fuseRatingA}A provides overcurrent protection.`
-      : 'CRITICAL: External fuse or current-limiting device required per IEC 62619 §8.5.1.',
+      ? t('standards.fusePass', { rating: c.fuseRatingA })
+      : t('standards.fuseFail'),
   };
 }
 
@@ -476,7 +478,7 @@ function checkContactorRequired(c: PackConfig): ComplianceCheckResult {
       requirement: req('ul2580-contactor'),
       status: 'info',
       actual: `${c.packVoltage.toFixed(0)}V / ${c.packCapacityAh.toFixed(0)}Ah — not required`,
-      detail: 'Main contactor not required for packs ≤48V and ≤20Ah.',
+      detail: t('standards.contactorInfo'),
     };
   }
   const status: ComplianceStatus = c.hasContactor ? 'pass' : 'warn';
@@ -485,8 +487,8 @@ function checkContactorRequired(c: PackConfig): ComplianceCheckResult {
     status,
     actual: c.hasContactor ? 'Yes' : 'Not specified',
     detail: status === 'pass'
-      ? 'Contactor installed for safe pack disconnection per UL 2580 §4.4.'
-      : 'RECOMMENDED: Packs >48V or >20Ah should have a main contactor for safe isolation.',
+      ? t('standards.contactorPass')
+      : t('standards.contactorWarn'),
   };
 }
 
@@ -497,7 +499,7 @@ function checkHrcFuse(c: PackConfig): ComplianceCheckResult {
       requirement: req('ul2580-hrc-fuse'),
       status: 'info',
       actual: `${c.packVoltage.toFixed(0)}V / ${c.packCapacityAh.toFixed(0)}Ah — not required`,
-      detail: 'HRC fuse not required for packs ≤48V and ≤20Ah.',
+      detail: t('standards.hrcFuseInfo'),
     };
   }
   const status: ComplianceStatus = c.hasFuse ? 'pass' : 'warn';
@@ -506,8 +508,8 @@ function checkHrcFuse(c: PackConfig): ComplianceCheckResult {
     status,
     actual: c.hasFuse ? 'Fuse present' : 'No fuse',
     detail: status === 'pass'
-      ? 'Fuse present. Verify it is HRC-rated for high fault current interruption.'
-      : 'RECOMMENDED: HRC fuse for high-voltage/high-capacity packs per UL 2580 §4.5.',
+      ? t('standards.hrcFusePass')
+      : t('standards.hrcFuseWarn'),
   };
 }
 
@@ -517,7 +519,7 @@ function checkBmsCurrentSizing(c: PackConfig): ComplianceCheckResult {
       requirement: req('ul2580-bms-current'),
       status: 'warn',
       actual: 'No BMS or BMS current not specified',
-      detail: 'BMS current rating cannot be verified.',
+      detail: t('standards.bmsCurrentInfo'),
     };
   }
   const ratio = c.bmsMaxA / c.packIMax;
@@ -527,8 +529,8 @@ function checkBmsCurrentSizing(c: PackConfig): ComplianceCheckResult {
     status,
     actual: `BMS: ${c.bmsMaxA}A / Pack: ${c.packIMax.toFixed(0)}A (${ratio.toFixed(2)}×)`,
     detail: status === 'pass'
-      ? `BMS rated at ${ratio.toFixed(2)}× pack max current — adequate headroom.`
-      : `BMS at ${ratio.toFixed(2)}× pack max current. UL 2580 recommends ≥1.25×.`,
+      ? t('standards.bmsCurrentPass', { ratio: ratio.toFixed(2) })
+      : t('standards.bmsCurrentWarn', { ratio: ratio.toFixed(2) }),
   };
 }
 
@@ -538,7 +540,7 @@ function checkPackMarking(): ComplianceCheckResult {
     requirement: req('ul2580-marking'),
     status: 'pass',
     actual: 'Datasheet generated',
-    detail: 'Pack markings (voltage, capacity, polarity) provided via technical datasheet.',
+    detail: t('standards.packMarkingPass'),
   };
 }
 
@@ -548,7 +550,7 @@ function checkIsoBmsSizing(c: PackConfig): ComplianceCheckResult {
       requirement: req('iso12405-bms-sizing'),
       status: 'fail',
       actual: 'No BMS specified',
-      detail: 'CRITICAL: ISO 12405 requires BMS current rating ≥1.25× pack max continuous current.',
+      detail: t('standards.isoBmsSizingFail'),
     };
   }
   const ratio = c.bmsMaxA / c.packIMax;
@@ -558,8 +560,8 @@ function checkIsoBmsSizing(c: PackConfig): ComplianceCheckResult {
     status,
     actual: `Ratio: ${ratio.toFixed(2)}×`,
     detail: status === 'pass'
-      ? `BMS current rating meets ISO 12405 requirement (${ratio.toFixed(2)}× ≥ 1.25×).`
-      : `BMS current rating (${c.bmsMaxA}A) insufficient per ISO 12405 §5.3 — need ≥${(c.packIMax * 1.25).toFixed(0)}A.`,
+      ? t('standards.isoBmsSizingPass', { ratio: ratio.toFixed(2) })
+      : t('standards.isoBmsSizingWarn', { current: c.bmsMaxA, needed: (c.packIMax * 1.25).toFixed(0) }),
   };
 }
 
@@ -572,8 +574,8 @@ function checkIsoVoltageRange(c: PackConfig): ComplianceCheckResult {
     status,
     actual: `${c.s}S (${c.packVoltage.toFixed(0)}V)`,
     detail: status === 'pass'
-      ? `${c.s}S configuration is within standard BMS supported range.`
-      : `${c.s}S exceeds typical BMS range. Verify BMS supports this series count.`,
+      ? t('standards.isoVoltageRangePass', { sCount: c.s })
+      : t('standards.isoVoltageRangeWarn', { sCount: c.s }),
   };
 }
 
@@ -600,10 +602,10 @@ function checkIsoChemistryVoltage(c: PackConfig): ComplianceCheckResult {
     status,
     actual: `${c.cellNomV}V (nom) / ${c.cellMinV}–${c.cellMaxV}V range`,
     detail: status === 'pass'
-      ? `Cell voltage range matches ${c.chemistry} specification (ref: ${chemRange.minV}–${chemRange.maxV}V).`
+      ? t('standards.isoChemistryVoltagePass', { chemistry: c.chemistry, minV: chemRange.minV, maxV: chemRange.maxV })
       : status === 'warn'
-        ? `Cell voltages are close but not exactly matching typical ${c.chemistry} range (${chemRange.minV}–${chemRange.maxV}V).`
-        : `Cell voltage (${c.cellNomV}V) does not match ${c.chemistry} chemistry (expected ~${chemRange.nomV}V).`,
+        ? t('standards.isoChemistryVoltageWarn', { chemistry: c.chemistry, minV: chemRange.minV, maxV: chemRange.maxV })
+        : t('standards.isoChemistryVoltageFail', { nomV: c.cellNomV, chemistry: c.chemistry, expected: chemRange.nomV }),
   };
 }
 
@@ -615,8 +617,8 @@ function checkSaeOvervoltage(c: PackConfig): ComplianceCheckResult {
     status,
     actual: hasProtection ? 'Protected' : 'Not protected',
     detail: status === 'pass'
-      ? 'Overvoltage protection prevents cell from exceeding max voltage rating per SAE J2464 §4.1.'
-      : 'CRITICAL: Without overvoltage protection, cells may vent or enter thermal runaway.',
+      ? t('standards.saeOvervoltagePass')
+      : t('standards.saeOvervoltageFail'),
   };
 }
 
@@ -628,8 +630,8 @@ function checkSaeOverdischarge(c: PackConfig): ComplianceCheckResult {
     status,
     actual: hasProtection ? 'Protected' : 'Not protected',
     detail: status === 'pass'
-      ? 'Undervoltage protection prevents deep discharge damage per SAE J2464 §4.2.'
-      : 'CRITICAL: Deep discharge can cause copper dissolution and internal short circuits.',
+      ? t('standards.saeOverdischargePass')
+      : t('standards.saeOverdischargeFail'),
   };
 }
 
@@ -641,8 +643,8 @@ function checkSaeOvercurrent(c: PackConfig): ComplianceCheckResult {
     status,
     actual: hasProtection ? 'Protected' : 'Not protected',
     detail: status === 'pass'
-      ? 'Overcurrent protection limits current to safe operating area per SAE J2464 §4.3.'
-      : 'CRITICAL: Overcurrent can cause excessive heating and cell degradation.',
+      ? t('standards.saeOvercurrentPass')
+      : t('standards.saeOvercurrentFail'),
   };
 }
 
@@ -654,8 +656,8 @@ function checkSaeShortCircuit(c: PackConfig): ComplianceCheckResult {
     status,
     actual: hasProtection ? 'Protected' : 'Not protected',
     detail: status === 'pass'
-      ? 'Short circuit protection provides fast disconnection per SAE J2464 §4.4.'
-      : 'CRITICAL: Short circuit currents can exceed 1000A — immediate fire risk without protection.',
+      ? t('standards.saeShortCircuitPass')
+      : t('standards.saeShortCircuitFail'),
   };
 }
 
@@ -666,8 +668,8 @@ function checkSaeTemperatureMonitoring(c: PackConfig): ComplianceCheckResult {
     status,
     actual: c.hasBms ? 'Via BMS' : 'Not monitored',
     detail: status === 'pass'
-      ? 'Temperature monitoring via BMS enables thermal abuse detection per SAE J2464 §5.1.'
-      : 'WARNING: Temperature monitoring recommended for thermal runaway prevention.',
+      ? t('standards.saeTemperaturePass')
+      : t('standards.saeTemperatureWarn'),
   };
 }
 
@@ -747,7 +749,7 @@ export function renderComplianceCard(report: ComplianceReport): string {
     <div class="bg-slate-50 border border-slate-200 rounded-md p-2 mt-2">
       <div class="flex items-center justify-between mb-1.5">
         <div class="flex items-center gap-1.5">
-          <span class="text-[0.68rem] font-extrabold text-slate-400 uppercase border-b border-slate-200 pb-1">Compliance Status</span>
+          <span class="text-[0.68rem] font-extrabold text-slate-400 uppercase border-b border-slate-200 pb-1">${t('standards.complianceStatus')}</span>
         </div>
         <span class="text-[0.6rem] font-bold px-1.5 py-0.5 rounded" style="background: ${overallColor}20; color: ${overallColor}">
           ${overallEmoji} ${report.summary.pass}/${report.summary.total}

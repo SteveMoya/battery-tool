@@ -7,6 +7,7 @@ import { inputs, $ } from './dom';
 import { getOpenCircuitVoltage, rescaleLoadSlider, updateSimulation, renderCurrentStats } from './simulation';
 import { checkPacking, renderPackingIndicator } from './safety-indicators';
 import { getAllBms, recommendBms, type CellType as BmsCellType } from './bms-database';
+import { t } from '../i18n';
 
 let userSizePresets: SizePreset[] = JSON.parse(localStorage.getItem('batt_vis_presets_size_v40') || '[]');
 let userChemPresets: ChemPreset[] = JSON.parse(localStorage.getItem('batt_vis_presets_chem_v40') || '[]');
@@ -188,7 +189,7 @@ export function getBomData(): BomData {
     nickelMetersTotal,
     cellCount: s.cells ?? 0,
     configLabel: `${s.s ?? 0}S ${s.p ?? 1}P${(s.l ?? 0) > 1 ? ` ${s.l}L` : ''}`,
-    packName: s.name ?? 'Pack',
+    packName: s.name ?? t('pack3d.pack'),
   };
 }
 
@@ -355,7 +356,7 @@ export function calculateStats(w: number, dep: number, h: number, S_Total: numbe
   const nickelMeters = currentNickelLen / 1000;
 
   const outNickel = $('out-nickel'); if (outNickel) outNickel.textContent = `${nickelMeters.toFixed(2)} m`;
-  const totalCellsText = `<span class="cell-count-wrap">(${totalCells} cells)</span>`;
+  const totalCellsText = `<span class="cell-count-wrap">(${totalCells} ${t('pack3d.cells')})</span>`;
   let configStr = `${S_Total}S&nbsp;${P}P`;
   if (L > 1) configStr += `&nbsp;${L}L`;
   configStr += ` ${totalCellsText}`;
@@ -917,8 +918,8 @@ export function updatePack() {
   // Theoretical max densities for current mode
   const theoMax = isHex ? THEO_HEX : THEO_SQUARE;
   const theoAlt = isHex ? THEO_SQUARE : THEO_HEX;
-  const theoLabel = isHex ? 'Hex' : 'Square';
-  const theoAltLabel = isHex ? 'Square' : 'Hex';
+  const theoLabel = isHex ? t('pack3d.hex') : t('pack3d.square');
+  const theoAltLabel = isHex ? t('pack3d.square') : t('pack3d.hex');
 
   // Auto-rotation check: would rotating 90° improve packing?
   let rotationSuggestion: string | null = null;
@@ -929,7 +930,7 @@ export function updatePack() {
     const rotArea = rotW * rotD;
     const rotFill = rotArea > 0 ? cellAreaTotal / rotArea : 0;
     if (rotFill > fillRatio * 1.02) {
-      rotationSuggestion = `${(rotFill * 100).toFixed(1)}% vs ${(fillRatio * 100).toFixed(1)}% — rotate 90° for better density`;
+      rotationSuggestion = `${(rotFill * 100).toFixed(1)}% ${t('pack3d.vs')} ${(fillRatio * 100).toFixed(1)}% — ${t('pack3d.rotateForDensity')}`;
     }
   }
 
@@ -1145,11 +1146,11 @@ function updateBmsBoxInterferenceUI(result: BmsBoxResult) {
   if (result.hasInterference) {
     el.className = 'rounded-md p-2 mt-1 border bg-red-50 border-red-300 text-red-700';
     if (emoji) emoji.textContent = '🔴';
-    if (text) text.textContent = 'Interference detected — BMS box overlaps pack';
+    if (text) text.textContent = t('pack3d.interferenceDetected');
   } else {
     el.className = 'rounded-md p-2 mt-1 border bg-green-50 border-green-300 text-green-700';
     if (emoji) emoji.textContent = '🟢';
-    if (text) text.textContent = 'No interference';
+    if (text) text.textContent = t('pack3d.noInterference');
   }
 }
 
@@ -1454,15 +1455,15 @@ export function setupHoverDetection(container: HTMLElement) {
           const d = parseFloat(inputs['c-diam']?.value ?? '18') || 18;
           const l = parseFloat(inputs['c-len']?.value ?? '65') || 65;
           const v = parseFloat(inputs['c-volts']?.value ?? '3.6') || 3.6;
-          info = `<b>${name === 'cells' ? 'Cell Body' : 'Cell Cap'}</b><br>` +
-            `Type: ${cellType}<br>Dimensions: ${d.toFixed(1)} × ${l.toFixed(1)} mm<br>` +
-            `Voltage: ${v.toFixed(2)}V<br>Cells: ${s.cells ?? 0}`;
+          info = `<b>${name === 'cells' ? t('pack3d.cellBody') : t('pack3d.cellCap')}</b><br>` +
+            `${t('pack3d.type')} ${cellType}<br>${t('pack3d.dimensions')} ${d.toFixed(1)} × ${l.toFixed(1)} mm<br>` +
+            `${t('pack3d.voltage')} ${v.toFixed(2)}V<br>${t('pack3d.cellsLabel')} ${s.cells ?? 0}`;
         } else if (name === 'busbars') {
           const mat = (inputs['sim-strip-mat'] as HTMLSelectElement | null)?.value ?? '7';
-          const matName = parseFloat(mat) <= 1.8 ? 'Copper' : parseFloat(mat) <= 2.5 ? 'Nickel-Plated' : parseFloat(mat) >= 13 ? 'Steel' : 'Nickel';
-          info = `<b>Busbars</b><br>Material: ${matName}<br>Config: ${s.s ?? 0}S × ${s.p ?? 1}P`;
+          const matName = parseFloat(mat) <= 1.8 ? t('pack3d.copper') : parseFloat(mat) <= 2.5 ? t('pack3d.nickelPlated') : parseFloat(mat) >= 13 ? t('pack3d.steel') : t('pack3d.nickel');
+          info = `<b>${t('pack3d.busbars')}</b><br>${t('pack3d.material')} ${matName}<br>${t('pack3d.config')} ${s.s ?? 0}S × ${s.p ?? 1}P`;
         } else if (name === 'spacers') {
-          info = `<b>Spacers</b><br>Insulating垫片<br>Pack: ${s.s ?? 0}S × ${s.p ?? 1}P`;
+          info = `<b>${t('pack3d.spacers')}</b><br>${t('pack3d.insulating')}<br>${t('pack3d.pack')}: ${s.s ?? 0}S × ${s.p ?? 1}P`;
         } else {
           info = `<b>${name}</b>`;
         }

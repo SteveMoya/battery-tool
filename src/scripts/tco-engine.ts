@@ -3,6 +3,8 @@
  * Lifecycle cost analysis: CAPEX + OPEX + replacement + disposal
  */
 
+import { t } from '../i18n';
+
 export interface TcoConfig {
   packCapacityKwh: number;
   packCostEur: number;
@@ -130,10 +132,10 @@ export function renderTcoCard(result: TcoResult, cfg: TcoConfig): string {
       <div class="flex justify-between items-start mb-2">
         <div>
           <div class="text-[0.65rem] font-bold" style="color: var(--text-primary);">
-            ${cfg.analysisYears}-Year TCO Analysis
+            ${cfg.analysisYears}-${t('tco.yearTcoAnalysis')}
           </div>
           <div class="text-[0.6rem] mt-0.5" style="color: ${result.levelColor}; font-weight: 700;">
-            €${result.costPerKwhCycle.toFixed(4)}/kWh/cycle — ${result.level.toUpperCase()}
+            €${result.costPerKwhCycle.toFixed(4)}${t('tco.perKwhCycle')} — ${result.level.toUpperCase()}
           </div>
         </div>
         <div class="text-[0.58rem] font-bold px-1.5 py-0.5 rounded" style="background: ${result.levelColor}20; color: ${result.levelColor};">
@@ -143,40 +145,40 @@ export function renderTcoCard(result: TcoResult, cfg: TcoConfig): string {
 
       <div class="grid grid-cols-2 gap-x-3 gap-y-1 mb-2">
         <div>
-          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">CAPEX</span>
+          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">${t('tco.capex')}</span>
           <div class="text-[0.6rem]" style="color: var(--text-primary);">€${result.capexEur.toLocaleString()}</div>
         </div>
         <div>
-          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">OPEX (energy+maint)</span>
+          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">${t('tco.opex')} (energy+maint)</span>
           <div class="text-[0.6rem]" style="color: var(--text-primary);">€${result.opexEur.toLocaleString()}</div>
         </div>
         <div>
-          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">Replacement</span>
+          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">${t('tco.replacement')}</span>
           <div class="text-[0.6rem]" style="color: var(--text-primary);">€${result.replacementEur.toLocaleString()}</div>
         </div>
         <div>
-          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">Disposal</span>
+          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">${t('tco.disposal')}</span>
           <div class="text-[0.6rem]" style="color: var(--text-primary);">€${result.disposalEur.toLocaleString()}</div>
         </div>
       </div>
 
       <div class="grid grid-cols-3 gap-2 mb-2 pt-1.5" style="border-top: 1px solid var(--border-primary);">
         <div>
-          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">NPV</span>
+          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">${t('tco.npv')}</span>
           <div class="text-[0.65rem] font-bold" style="color: var(--text-primary);">€${result.npvEur.toLocaleString()}</div>
         </div>
         <div>
-          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">LCOE</span>
+          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">${t('tco.lcoe')}</span>
           <div class="text-[0.65rem]" style="color: var(--text-primary);">€${result.lcoePerKwh.toFixed(4)}/kWh</div>
         </div>
         <div>
-          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">Payback</span>
-          <div class="text-[0.65rem]" style="color: var(--text-primary);">${result.paybackYears}yr</div>
+          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">${t('tco.payback')}</span>
+          <div class="text-[0.65rem]" style="color: var(--text-primary);">${result.paybackYears}${t('tco.yr')}</div>
         </div>
       </div>
 
       <div class="text-[0.56rem]" style="color: var(--text-muted);">
-        Cost/yr: €${result.costPerYear.toLocaleString()} | Throughput: ${(cfg.packCapacityKwh * cfg.dodAvg * cfg.cyclesPerYear / cfg.efficiencyRoundtrip).toFixed(0)} kWh/yr
+        ${t('tco.costYr')} €${result.costPerYear.toLocaleString()} | ${t('tco.throughput')} ${(cfg.packCapacityKwh * cfg.dodAvg * cfg.cyclesPerYear / cfg.efficiencyRoundtrip).toFixed(0)} kWh/yr
       </div>
     </div>
   `;

@@ -4,26 +4,26 @@ import HelpIcon from '../HelpIcon.astro';
 
 <section class="group-box">
   <div class="flex justify-between items-center mb-1.5">
-    <h2 class="section-title m-0">7. Power Connectors</h2>
-    <HelpIcon tip="Connector &amp; cable guide — recommends connectors, wire gauge, fuse, and BMS wiring based on your pack config" />
+    <h2 class="section-title m-0" data-i18n="sidebar.powerConnector.title">7. Power Connectors</h2>
+    <HelpIcon tip="Connector &amp; cable guide — recommends connectors, wire gauge, fuse, and BMS wiring based on your pack config" data-i18n-tip="sidebar.powerConnector.helpTip" />
   </div>
 
   <div class="grid grid-cols-2 gap-2 mb-2">
     <div class="flex flex-col">
-      <label class="control-label" for="conn-cable-length">Cable Length</label>
+      <label class="control-label" for="conn-cable-length" data-i18n="sidebar.powerConnector.cableLength">Cable Length</label>
       <div class="smart-input-wrap">
         <input id="conn-cable-length" type="number" value="30" min="5" max="500" step="5" class="control-input" />
         <span class="unit">cm</span>
       </div>
     </div>
     <div class="flex flex-col">
-      <label class="control-label" for="conn-application">Application</label>
+      <label class="control-label" for="conn-application" data-i18n="sidebar.powerConnector.application">Application</label>
       <select id="conn-application" class="control-input">
-        <option value="general">General</option>
-        <option value="ebike">E-Bike</option>
-        <option value="powerwall">Powerwall</option>
-        <option value="ev">Electric Vehicle</option>
-        <option value="drone">Drone / UAV</option>
+        <option value="general" data-i18n="sidebar.powerConnector.optionGeneral">General</option>
+        <option value="ebike" data-i18n="sidebar.powerConnector.optionEBike">E-Bike</option>
+        <option value="powerwall" data-i18n="sidebar.powerConnector.optionPowerwall">Powerwall</option>
+        <option value="ev" data-i18n="sidebar.powerConnector.optionEV">Electric Vehicle</option>
+        <option value="drone" data-i18n="sidebar.powerConnector.optionDrone">Drone / UAV</option>
       </select>
     </div>
   </div>
@@ -31,7 +31,7 @@ import HelpIcon from '../HelpIcon.astro';
   <!-- Input summary -->
   <div id="conn-input-summary" class="rounded-md p-2 mb-2" style="background: var(--bg-tertiary); border-color: var(--border-primary); border-width: 1px; border-style: solid;">
     <div class="text-[0.62rem] font-semibold" style="color: var(--text-muted);">
-      Configure pack &amp; load in sections 1–4 to see recommendations.
+      <span data-i18n="sidebar.powerConnector.configureFirst">Configure pack &amp; load in sections 1–4 to see recommendations.</span>
     </div>
   </div>
 
@@ -43,16 +43,16 @@ import HelpIcon from '../HelpIcon.astro';
 
   <!-- Connector Reference Table (always visible) -->
   <details class="mt-2">
-    <summary class="text-[0.65rem] font-bold cursor-pointer" style="color: var(--text-muted);">📋 Connector Reference Table</summary>
+    <summary class="text-[0.65rem] font-bold cursor-pointer" style="color: var(--text-muted);" data-i18n="sidebar.powerConnector.connectorRefTable">📋 Connector Reference Table</summary>
     <div class="mt-1 overflow-x-auto">
       <table class="w-full text-[0.58rem] border-collapse">
         <thead>
           <tr class="border-b" style="border-color: var(--border-primary);">
-            <th class="text-left py-0.5 px-1 font-semibold" style="color: var(--text-tertiary);">Type</th>
-            <th class="text-right py-0.5 px-1 font-semibold" style="color: var(--text-tertiary);">Cont.</th>
-            <th class="text-right py-0.5 px-1 font-semibold" style="color: var(--text-tertiary);">Burst</th>
-            <th class="text-right py-0.5 px-1 font-semibold" style="color: var(--text-tertiary);">mΩ</th>
-            <th class="text-right py-0.5 px-1 font-semibold" style="color: var(--text-tertiary);">AWG</th>
+            <th class="text-left py-0.5 px-1 font-semibold" style="color: var(--text-tertiary);" data-i18n="sidebar.powerConnector.colType">Type</th>
+            <th class="text-right py-0.5 px-1 font-semibold" style="color: var(--text-tertiary);" data-i18n="sidebar.powerConnector.colCont">Cont.</th>
+            <th class="text-right py-0.5 px-1 font-semibold" style="color: var(--text-tertiary);" data-i18n="sidebar.powerConnector.colBurst">Burst</th>
+            <th class="text-right py-0.5 px-1 font-semibold" style="color: var(--text-tertiary);" data-i18n="sidebar.powerConnector.colMilliohm">mΩ</th>
+            <th class="text-right py-0.5 px-1 font-semibold" style="color: var(--text-tertiary);" data-i18n="sidebar.powerConnector.colAWG">AWG</th>
           </tr>
         </thead>
         <tbody id="conn-ref-table-body">

@@ -8,26 +8,26 @@
     style="background: var(--bg-secondary);"
   >
     <div class="flex justify-between items-center mb-4">
-      <h3 class="m-0" style="color: var(--text-primary);">Export CAD Model (STEP)</h3>
+      <h3 class="m-0" style="color: var(--text-primary);" data-i18n="modals.exportSTEP.title">Export CAD Model (STEP)</h3>
       <button id="btn-close-step-export" class="border-none bg-none text-[1.5rem] cursor-pointer leading-none">&times;</button>
     </div>
     <p class="text-[0.8rem] mt-0 mb-3" style="color: var(--text-muted);">
-      Export spacer geometry as STEP AP214 for Fusion 360 / SolidWorks.
+      <span data-i18n="modals.exportSTEP.description">Export spacer geometry as STEP AP214 for Fusion 360 / SolidWorks.</span>
     </p>
     <div class="flex flex-col gap-2.5 mb-5">
       <label class="flex items-center gap-2.5 cursor-pointer">
         <input id="step-spacers" type="checkbox" checked />
-        <span class="text-[0.9rem] font-semibold">Spacers (Holders)</span>
+        <span class="text-[0.9rem] font-semibold" data-i18n="modals.exportSTEP.spacers">Spacers (Holders)</span>
       </label>
     </div>
     <p class="text-[0.7rem] mt-0 mb-4" style="color: var(--text-muted);">
-      Only spacers are exported as STEP. Cells and busbars are available via STL export.
+      <span data-i18n="modals.exportSTEP.onlySpacers">Only spacers are exported as STEP. Cells and busbars are available via STL export.</span>
     </p>
     <button
       id="btn-do-step-export"
       class="w-full bg-app-blue text-white border-none py-2.5 rounded-md font-bold cursor-pointer"
     >
-      Download .STEP File
+      <span data-i18n="modals.exportSTEP.downloadSTEP">Download .STEP File</span>
     </button>
   </div>
 </div>

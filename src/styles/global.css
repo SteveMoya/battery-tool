@@ -184,6 +184,20 @@
     background: var(--bg-hover);
   }
 
+  .btn-lang-toggle {
+    @apply bg-transparent text-[0.7rem] font-bold w-8 h-7 p-0 rounded cursor-pointer flex items-center justify-center transition-all;
+    border-color: var(--border-primary);
+    color: var(--text-tertiary);
+    border-width: 1px;
+    border-style: solid;
+    letter-spacing: 0.5px;
+  }
+  .btn-lang-toggle:hover {
+    color: var(--accent-primary);
+    border-color: var(--accent-primary);
+    background: var(--bg-hover);
+  }
+
   .btn-donate {
     @apply bg-app-donate border border-app-yellow text-black font-bold text-[0.7rem] py-[3px] px-2 rounded cursor-pointer flex items-center gap-1 whitespace-nowrap;
   }

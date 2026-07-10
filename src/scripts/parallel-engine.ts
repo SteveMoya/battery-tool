@@ -3,6 +3,8 @@
  * Analyzes current distribution between parallel strings
  */
 
+import { t } from '../i18n';
+
 export interface ParallelConfig {
   seriesGroups: number;
   parallelCount: number;
@@ -77,22 +79,22 @@ export function analyzeParallel(cfg: ParallelConfig): ParallelResult {
   let levelColor: string;
 
   if (maxImbalance > 15) {
-    recommendation = 'Critical Imbalance';
+    recommendation = t('parallel.criticalImbalance');
     recommendationColor = '#ef4444';
     level = 'critical';
     levelColor = '#ef4444';
   } else if (maxImbalance > 10) {
-    recommendation = 'Imbalance Warning';
+    recommendation = t('parallel.imbalanceWarning');
     recommendationColor = '#f59e0b';
     level = 'warning';
     levelColor = '#f59e0b';
   } else if (maxImbalance > 5) {
-    recommendation = 'Monitor Current Sharing';
+    recommendation = t('parallel.monitorCurrentSharing');
     recommendationColor = '#3b82f6';
     level = 'warning';
     levelColor = '#3b82f6';
   } else {
-    recommendation = 'Well Balanced';
+    recommendation = t('parallel.wellBalanced');
     recommendationColor = '#22c55e';
     level = 'good';
     levelColor = '#22c55e';
@@ -118,7 +120,7 @@ export function renderParallelCard(result: ParallelResult, cfg: ParallelConfig):
       <div class="flex justify-between items-start mb-2">
         <div>
           <div class="text-[0.65rem] font-bold" style="color: var(--text-primary);">
-            ${cfg.parallelCount} Parallel Strings × ${cfg.seriesGroups}S
+            ${cfg.parallelCount} ${t('parallel.parallelStrings')} × ${cfg.seriesGroups}S
           </div>
           <div class="text-[0.6rem] mt-0.5" style="color: ${result.recommendationColor}; font-weight: 700;">
             ${result.recommendation}
@@ -131,15 +133,15 @@ export function renderParallelCard(result: ParallelResult, cfg: ParallelConfig):
 
       <div class="grid grid-cols-3 gap-2 mb-2">
         <div>
-          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">Imbalance</span>
+          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">${t('parallel.imbalance')}</span>
           <div class="text-[0.65rem] font-bold" style="color: ${result.levelColor};">${result.maxImbalancePct}%</div>
         </div>
         <div>
-          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">Max Current</span>
+          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">${t('parallel.maxCurrent')}</span>
           <div class="text-[0.65rem]" style="color: var(--text-primary);">${result.maxCurrentA}A</div>
         </div>
         <div>
-          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">Power Loss</span>
+          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">${t('parallel.powerLoss')}</span>
           <div class="text-[0.65rem]" style="color: var(--text-primary);">${result.totalPowerLossW}W</div>
         </div>
       </div>
@@ -158,7 +160,7 @@ export function renderParallelCard(result: ParallelResult, cfg: ParallelConfig):
 
       ${result.deratingRequired ? `
         <div class="mt-2 p-1.5 rounded text-[0.58rem] font-bold" style="background: #ef444420; color: #ef4444;">
-          ⚠ Derating required: reduce total current to ${Math.round(cfg.cellCapacityAh * cfg.parallelCount * 0.9)}A max
+          ⚠ ${t('parallel.deratingRequired')} ${Math.round(cfg.cellCapacityAh * cfg.parallelCount * 0.9)}A max
         </div>
       ` : ''}
     </div>

@@ -6,20 +6,20 @@
   class="flex-grow h-full relative overflow-hidden max-md:h-[25vh] max-md:w-full max-md:border-t max-md:border-b-0 max-md:order-2"
   style="background: var(--bg-tertiary); border-color: var(--border-primary);"
 >
-  <div id="watermark" class="overlay-text bottom-2.5 right-4 font-semibold opacity-60">Designed by Battery Tool</div>
+  <div id="watermark" class="overlay-text bottom-2.5 right-4 font-semibold opacity-60" data-i18n="renderArea.watermark">Designed by Battery Tool</div>
   <div id="controls-hint" class="overlay-text bottom-2.5 left-4 flex flex-col gap-0.5 max-md:!hidden">
-    <span>🖱️ Left: Rotate</span>
-    <span>🖱️ Right: Pan</span>
-    <span>🖱️ Scroll: Zoom</span>
+    <span data-i18n="renderArea.leftRotate">🖱️ Left: Rotate</span>
+    <span data-i18n="renderArea.rightPan">🖱️ Right: Pan</span>
+    <span data-i18n="renderArea.scrollZoom">🖱️ Scroll: Zoom</span>
   </div>
   <!-- F18: Camera presets toolbar -->
   <div id="camera-toolbar" class="absolute top-2 left-2 flex gap-1 z-40 max-md:hidden">
-    <button id="cam-front" class="text-[0.6rem] font-semibold px-2 py-1 rounded cursor-pointer transition-colors shadow-sm" style="background: color-mix(in srgb, var(--bg-secondary) 90%, transparent); border-color: var(--border-primary); color: var(--text-tertiary); border-width: 1px; border-style: solid;" title="Front View">Front</button>
-    <button id="cam-side" class="text-[0.6rem] font-semibold px-2 py-1 rounded cursor-pointer transition-colors shadow-sm" style="background: color-mix(in srgb, var(--bg-secondary) 90%, transparent); border-color: var(--border-primary); color: var(--text-tertiary); border-width: 1px; border-style: solid;" title="Side View">Side</button>
-    <button id="cam-top" class="text-[0.6rem] font-semibold px-2 py-1 rounded cursor-pointer transition-colors shadow-sm" style="background: color-mix(in srgb, var(--bg-secondary) 90%, transparent); border-color: var(--border-primary); color: var(--text-tertiary); border-width: 1px; border-style: solid;" title="Top View">Top</button>
-    <button id="cam-iso" class="text-[0.6rem] font-semibold px-2 py-1 rounded cursor-pointer transition-colors shadow-sm" style="background: color-mix(in srgb, var(--bg-secondary) 90%, transparent); border-color: var(--border-primary); color: var(--text-tertiary); border-width: 1px; border-style: solid;" title="Isometric View">Iso</button>
-    <button id="cam-free" class="text-[0.6rem] font-semibold px-2 py-1 rounded cursor-pointer transition-colors shadow-sm" style="background: color-mix(in srgb, var(--bg-secondary) 90%, transparent); border-color: var(--border-primary); color: var(--text-tertiary); border-width: 1px; border-style: solid;" title="Free Orbit">Free</button>
-    <button id="cam-fit" class="text-[0.6rem] font-semibold px-2 py-1 rounded cursor-pointer transition-colors shadow-sm" style="background: color-mix(in srgb, var(--bg-secondary) 90%, transparent); border-color: var(--border-primary); color: var(--text-tertiary); border-width: 1px; border-style: solid;" title="Zoom to Fit">Fit</button>
+    <button id="cam-front" class="text-[0.6rem] font-semibold px-2 py-1 rounded cursor-pointer transition-colors shadow-sm" style="background: color-mix(in srgb, var(--bg-secondary) 90%, transparent); border-color: var(--border-primary); color: var(--text-tertiary); border-width: 1px; border-style: solid;" title="Front View" data-i18n="renderArea.front" data-i18n-title="renderArea.frontView">Front</button>
+    <button id="cam-side" class="text-[0.6rem] font-semibold px-2 py-1 rounded cursor-pointer transition-colors shadow-sm" style="background: color-mix(in srgb, var(--bg-secondary) 90%, transparent); border-color: var(--border-primary); color: var(--text-tertiary); border-width: 1px; border-style: solid;" title="Side View" data-i18n="renderArea.side" data-i18n-title="renderArea.sideView">Side</button>
+    <button id="cam-top" class="text-[0.6rem] font-semibold px-2 py-1 rounded cursor-pointer transition-colors shadow-sm" style="background: color-mix(in srgb, var(--bg-secondary) 90%, transparent); border-color: var(--border-primary); color: var(--text-tertiary); border-width: 1px; border-style: solid;" title="Top View" data-i18n="renderArea.top" data-i18n-title="renderArea.topView">Top</button>
+    <button id="cam-iso" class="text-[0.6rem] font-semibold px-2 py-1 rounded cursor-pointer transition-colors shadow-sm" style="background: color-mix(in srgb, var(--bg-secondary) 90%, transparent); border-color: var(--border-primary); color: var(--text-tertiary); border-width: 1px; border-style: solid;" title="Isometric View" data-i18n="renderArea.iso" data-i18n-title="renderArea.isoView">Iso</button>
+    <button id="cam-free" class="text-[0.6rem] font-semibold px-2 py-1 rounded cursor-pointer transition-colors shadow-sm" style="background: color-mix(in srgb, var(--bg-secondary) 90%, transparent); border-color: var(--border-primary); color: var(--text-tertiary); border-width: 1px; border-style: solid;" title="Free Orbit" data-i18n="renderArea.free" data-i18n-title="renderArea.freeOrbit">Free</button>
+    <button id="cam-fit" class="text-[0.6rem] font-semibold px-2 py-1 rounded cursor-pointer transition-colors shadow-sm" style="background: color-mix(in srgb, var(--bg-secondary) 90%, transparent); border-color: var(--border-primary); color: var(--text-tertiary); border-width: 1px; border-style: solid;" title="Zoom to Fit" data-i18n="renderArea.fit" data-i18n-title="renderArea.zoomToFit">Fit</button>
   </div>
   <!-- F18: Hover tooltip -->
   <div id="f18-tooltip" class="absolute hidden text-white text-[0.65rem] px-2 py-1.5 rounded pointer-events-none z-50 max-w-[220px] leading-tight shadow-lg" style="background: var(--tooltip-bg);"></div>

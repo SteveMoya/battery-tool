@@ -4,8 +4,8 @@ import HelpIcon from '../HelpIcon.astro';
 
 <section class="group-box">
   <div class="flex justify-between items-center mb-1.5">
-    <h2 class="section-title m-0">14. Parallel Strings</h2>
-    <HelpIcon tip="Current sharing analysis between parallel cell strings — detects imbalance and derating needs" />
+    <h2 class="section-title m-0" data-i18n="sidebar.parallel.title">14. Parallel Strings</h2>
+    <HelpIcon tip="Current sharing analysis between parallel cell strings — detects imbalance and derating needs" data-i18n-tip="sidebar.parallel.helpTip" />
   </div>
 
   <div class="mb-2">
@@ -14,7 +14,7 @@ import HelpIcon from '../HelpIcon.astro';
         id="parallel-run-btn"
         class="btn-primary text-[0.65rem] py-1 px-2.5"
       >
-        Analyze Sharing
+        <span data-i18n="sidebar.parallel.analyzeSharing">Analyze Sharing</span>
       </button>
       <span id="parallel-status-badge" class="text-[0.6rem] font-bold px-1.5 py-0.5 rounded hidden"></span>
     </div>
@@ -23,22 +23,22 @@ import HelpIcon from '../HelpIcon.astro';
     <div id="parallel-inputs" class="rounded-md p-2 mb-2" style="background: var(--bg-tertiary); border-color: var(--border-primary); border-width: 1px; border-style: solid;">
       <div class="grid grid-cols-2 gap-2">
         <div class="flex flex-col">
-          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Cell IR (mΩ)</label>
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);" data-i18n="sidebar.parallel.cellIR">Cell IR (mΩ)</label>
           <input id="parallel-cell-ir" type="number" value="20" min="1" max="500" step="1"
             class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);" />
         </div>
         <div class="flex flex-col">
-          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Interconnect IR (mΩ)</label>
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);" data-i18n="sidebar.parallel.interconnectIR">Interconnect IR (mΩ)</label>
           <input id="parallel-interconnect-ir" type="number" value="5" min="0" max="100" step="0.5"
             class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);" />
         </div>
         <div class="flex flex-col">
-          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Total Current (A)</label>
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);" data-i18n="sidebar.parallel.totalCurrent">Total Current (A)</label>
           <input id="parallel-total-current" type="number" value="50" min="0" max="1000" step="5"
             class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);" />
         </div>
         <div class="flex flex-col">
-          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Ambient Temp (°C)</label>
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);" data-i18n="sidebar.parallel.ambientTemp">Ambient Temp (°C)</label>
           <input id="parallel-temp-ambient" type="number" value="25" min="-20" max="60" step="1"
             class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);" />
         </div>

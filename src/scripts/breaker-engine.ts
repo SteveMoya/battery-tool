@@ -4,6 +4,7 @@
    ───────────────────────────────────────────── */
 
 import type { BmsEntry } from './bms-database';
+import { t } from '../i18n';
 import {
   findContactor,
   findBreaker,
@@ -82,7 +83,7 @@ export function recommendProtection(config: ProtectionConfig): ProtectionReport 
 
     if (contactor) {
       recs.push({
-        component: 'Main Contactor',
+        component: t('breaker.mainContactor'),
         partNumber: contactor.name,
         ratingA: contactor.continuousA,
         voltageMax: contactor.voltageMax,
@@ -121,7 +122,7 @@ export function recommendProtection(config: ProtectionConfig): ProtectionReport 
 
     if (breaker) {
       recs.push({
-        component: 'Circuit Breaker',
+        component: t('breaker.circuitBreaker'),
         partNumber: breaker.name,
         ratingA: breaker.ratingA,
         voltageMax: breaker.voltageMax,
@@ -158,7 +159,7 @@ export function recommendProtection(config: ProtectionConfig): ProtectionReport 
 
     if (disconnect) {
       recs.push({
-        component: 'Disconnect Switch',
+        component: t('breaker.disconnectSwitch'),
         partNumber: disconnect.name,
         ratingA: disconnect.ratingA,
         voltageMax: disconnect.voltageMax,
@@ -205,7 +206,7 @@ export function recommendProtection(config: ProtectionConfig): ProtectionReport 
     if (resistor) {
       const prechargeTimeMs = -resistor.resistanceOhm * capacitanceF * Math.log(0.05) * 1000;
       recs.push({
-        component: 'Precharge Resistor',
+        component: t('breaker.prechargeResistor'),
         partNumber: resistor.name,
         ratingA: Math.round(Math.sqrt(resistor.wattage / resistor.resistanceOhm) * 10) / 10,
         voltageMax: packVoltage,
@@ -240,7 +241,7 @@ export function recommendProtection(config: ProtectionConfig): ProtectionReport 
     needsFuse = true;
     const fuseMinA = Math.ceil(packCurrentA * 1.25);
     recs.push({
-      component: 'Main Fuse',
+      component: t('breaker.mainFuse'),
       partNumber: 'Refer to F17 Power Connector section',
       ratingA: fuseMinA,
       voltageMax: packVoltage,
@@ -264,11 +265,11 @@ export function recommendProtection(config: ProtectionConfig): ProtectionReport 
   // ── 6. Safety warnings ──
 
   if (packVoltage > 60) {
-    warnings.push(`HIGH VOLTAGE: ${packVoltage.toFixed(0)}V exceeds 60V — use insulated components, follow IEC 60364/NEC requirements`);
+    warnings.push(`${t('breaker.highVoltage')} ${packVoltage.toFixed(0)}V exceeds 60V — use insulated components, follow IEC 60364/NEC requirements`);
   }
 
   if (packCurrentA > 200) {
-    warnings.push(`HIGH CURRENT: ${packCurrentA.toFixed(0)}A — ensure all connections are properly torqued and use appropriate cable glands`);
+    warnings.push(`${t('breaker.highCurrent')} ${packCurrentA.toFixed(0)}A — ensure all connections are properly torqued and use appropriate cable glands`);
   }
 
   if (packVoltage > 100) {
@@ -348,7 +349,7 @@ export function renderProtectionCard(report: ProtectionReport): string {
         </div>
         ${notesHtml ? `
         <div class="pt-1 border-t border-slate-100">
-          <div class="text-[0.58rem] font-bold text-slate-400 mb-0.5">Notes</div>
+          <div class="text-[0.58rem] font-bold text-slate-400 mb-0.5">${t('breaker.notes')}</div>
           ${notesHtml}
         </div>` : ''}
       </div>`;
@@ -356,7 +357,7 @@ export function renderProtectionCard(report: ProtectionReport): string {
 
   const warningsHtml = report.warnings.length > 0 ? `
     <div class="bg-red-50 border border-red-200 rounded-md p-2 mt-2">
-      <div class="text-[0.68rem] font-extrabold text-red-600 uppercase mb-1">Safety Warnings</div>
+      <div class="text-[0.68rem] font-extrabold text-red-600 uppercase mb-1">${t('breaker.safetyWarnings')}</div>
       ${report.warnings.map(w => `
         <div class="flex items-start gap-1 text-[0.58rem] leading-tight mt-0.5">
           <span class="text-red-500 font-bold shrink-0">→</span>
@@ -366,7 +367,7 @@ export function renderProtectionCard(report: ProtectionReport): string {
 
   return `
     <div class="mb-2 text-[0.6rem] text-slate-500">
-      <span class="font-bold">Status:</span>
+      <span class="font-bold">${t('breaker.statusPrefix')}</span>
       <span class="font-bold ml-1" style="color: ${report.summary.overallStatus === 'safe' ? '#22c55e' : report.summary.overallStatus === 'caution' ? '#eab308' : '#ef4444'}">
         ${report.summary.overallStatus.toUpperCase()}
       </span>

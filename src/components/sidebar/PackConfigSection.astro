@@ -3,21 +3,21 @@ import HelpIcon from '../HelpIcon.astro';
 ---
 
 <section class="group-box">
-  <h2 class="section-title">3. Pack Configuration</h2>
+  <h2 class="section-title" data-i18n="sidebar.packConfig.title">3. Pack Configuration</h2>
 
   <div class="grid grid-cols-3 gap-1.5 mb-2 items-end">
     <div class="flex flex-col">
-      <label class="control-label" for="s-count">Total Series</label>
+      <label class="control-label" for="s-count" data-i18n="sidebar.packConfig.totalSeries">Total Series</label>
       <input id="s-count" type="number" value="10" min="1" class="control-input" />
     </div>
     <div class="flex flex-col">
-      <label class="control-label" for="p-count">Parallel (P)</label>
+      <label class="control-label" for="p-count" data-i18n="sidebar.packConfig.parallel">Parallel (P)</label>
       <input id="p-count" type="number" value="4" min="1" class="control-input" />
     </div>
     <div class="flex flex-col">
-      <label class="control-label">
+      <label class="control-label" data-i18n="sidebar.packConfig.spacing">
         Spacing (mm)
-        <HelpIcon>
+        <HelpIcon data-i18n-html="sidebar.packConfig.distanceHelp">
           <svg width="100" height="40" class="mb-1">
             <circle cx="20" cy="20" r="10" stroke="#fff" fill="none" />
             <circle cx="80" cy="20" r="10" stroke="#fff" fill="none" />
@@ -25,7 +25,7 @@ import HelpIcon from '../HelpIcon.astro';
             <text x="50" y="15" text-anchor="middle" fill="#94a3b8" font-size="9">Gap</text>
           </svg>
           <div>Distance between cells.</div>
-          <div class="text-slate-400 mt-1 text-[0.6rem]">This thickness is also applied to outer edges, increasing total dimensions.</div>
+          <div class="text-slate-400 mt-1 text-[0.6rem]" data-i18n="sidebar.packConfig.thicknessHelp">This thickness is also applied to outer edges, increasing total dimensions.</div>
         </HelpIcon>
       </label>
       <input id="c-spacing" type="number" value="1.0" min="0" step="0.5" class="control-input" />
@@ -34,14 +34,14 @@ import HelpIcon from '../HelpIcon.astro';
 
   <div class="grid grid-cols-2 gap-2 mb-2 items-end">
     <div class="flex flex-col">
-      <label class="control-label">
+      <label class="control-label" data-i18n="sidebar.packConfig.layers">
         Layers
         <HelpIcon variant="warn" width="250px" align="left">
-          <div class="mb-2 font-medium text-white">Total series count is divided across this many layers.</div>
+          <div class="mb-2 font-medium text-white" data-i18n="sidebar.packConfig.layersHelp">Total series count is divided across this many layers.</div>
           <div class="bg-black/25 border-l-[3px] border-red-300 p-2 rounded text-[0.65rem] leading-snug">
-            <strong class="text-red-300 block mb-1 uppercase">⚠️ Experimental</strong>
-            Multi-layer busbar logic is complex. The visualization will output incorrect strip positions for certain configurations.
-            <div class="mt-1 text-white font-semibold">Always verify connections manually.</div>
+            <strong class="text-red-300 block mb-1 uppercase" data-i18n="sidebar.packConfig.experimental">⚠️ Experimental</strong>
+            <span data-i18n="sidebar.packConfig.multiLayerWarning">Multi-layer busbar logic is complex. The visualization will output incorrect strip positions for certain configurations.</span>
+            <div class="mt-1 text-white font-semibold" data-i18n="sidebar.packConfig.verifyConnections">Always verify connections manually.</div>
           </div>
         </HelpIcon>
       </label>
@@ -49,57 +49,57 @@ import HelpIcon from '../HelpIcon.astro';
         <div class="layer-input-group"><input id="pack-layers" type="number" value="1" min="1" /></div>
         <div id="row-exploded" class="layer-check-group">
           <input id="exploded-view" type="checkbox" disabled />
-          <label for="exploded-view" id="lbl-exploded" class="layer-check-label">Exploded<br />View</label>
+          <label for="exploded-view" id="lbl-exploded" class="layer-check-label" data-i18n="sidebar.packConfig.explodedView">Exploded<br />View</label>
         </div>
       </div>
     </div>
     <div class="flex flex-col">
-      <label class="control-label" for="layer-spacing">Layer Spacing (mm)</label>
+      <label class="control-label" for="layer-spacing" data-i18n="sidebar.packConfig.layerSpacing">Layer Spacing (mm)</label>
       <input id="layer-spacing" type="number" value="3.0" step="0.5" min="0" class="control-input" />
     </div>
   </div>
 
   <div class="toggle-row">
-    <label for="barley-paper" class="cursor-pointer">
+    <label for="barley-paper" class="cursor-pointer" data-i18n="sidebar.packConfig.barleyPaper">
       Barley Paper
-      <HelpIcon width="180px" align="left">
+      <HelpIcon width="180px" align="left" data-i18n-html="sidebar.packConfig.barleyPaperInterlayer">
         <strong>Barley Paper Interlayer</strong><br />
         Adds insulating paper between layers. Increases total pack height by the paper thickness per layer boundary.<br /><br />
-        <span class="text-yellow-300">⚠ Reduces axial clearance.</span>
+        <span class="text-yellow-300" data-i18n="sidebar.packConfig.reducesClearance">⚠ Reduces axial clearance.</span>
       </HelpIcon>
     </label>
     <input id="barley-paper" type="checkbox" />
   </div>
 
   <div id="barley-thickness-row" class="flex flex-col mb-2 hidden">
-    <label class="control-label" for="barley-thickness">Barley Paper Thickness (mm)</label>
+    <label class="control-label" for="barley-thickness" data-i18n="sidebar.packConfig.barleyPaperThickness">Barley Paper Thickness (mm)</label>
     <input id="barley-thickness" type="number" value="0.2" step="0.05" min="0" class="control-input" />
   </div>
 
   <div class="flex flex-col mb-2">
-    <label class="control-label" for="bom-waste-pct">Waste Factor (%)</label>
+    <label class="control-label" for="bom-waste-pct" data-i18n="sidebar.packConfig.wasteFactor">Waste Factor (%)</label>
     <input id="bom-waste-pct" type="number" value="15" min="0" max="100" step="1" class="control-input" />
   </div>
 
   <div class="control-item full-width mb-2">
-    <label class="control-label">Busbar Visualization</label>
+    <label class="control-label" data-i18n="sidebar.packConfig.busbarVisualization">Busbar Visualization</label>
     <select id="bus-mode" class="control-input">
-      <option value="none">None</option>
-      <option value="geo">Strips Only</option>
-      <option value="bn">Strips + B-Numbers</option>
-      <option value="both" selected>Strips + Numbers + Voltages</option>
+      <option value="none" data-i18n="sidebar.packConfig.none">None</option>
+      <option value="geo" data-i18n="sidebar.packConfig.stripsOnly">Strips Only</option>
+      <option value="bn" data-i18n="sidebar.packConfig.stripsNumbers">Strips + B-Numbers</option>
+      <option value="both" selected data-i18n="sidebar.packConfig.stripsNumbersVoltages">Strips + Numbers + Voltages</option>
     </select>
   </div>
 
   <div class="toggle-row">
-    <label for="hex-mode" class="cursor-pointer">Hexagonal Nesting</label>
+    <label for="hex-mode" class="cursor-pointer" data-i18n="sidebar.packConfig.hexNesting">Hexagonal Nesting</label>
     <input id="hex-mode" type="checkbox" checked />
   </div>
 
   <div class="toggle-row">
-    <label for="calc-ladder" class="cursor-pointer">
+    <label for="calc-ladder" class="cursor-pointer" data-i18n="sidebar.packConfig.ladderWideStrip">
       Ladder / Wide Strip
-      <HelpIcon width="160px" align="left">
+      <HelpIcon width="160px" align="left" data-i18n-html="sidebar.packConfig.rollLengthCalc">
         <strong>Roll Length Calculation</strong><br />
         Assumes one wide sheet of nickel connects the parallel group, dividing the required linear roll length by P.
       </HelpIcon>
@@ -109,19 +109,19 @@ import HelpIcon from '../HelpIcon.astro';
 
   <div class="border-t mt-2 pt-2" style="border-color: var(--border-primary);">
     <div class="flex items-center justify-between mb-1">
-      <span class="control-label !mb-0">Target Mode (bidirectional)</span>
-      <HelpIcon width="220px" align="left">
+      <span class="control-label !mb-0" data-i18n="sidebar.packConfig.targetMode">Target Mode (bidirectional)</span>
+      <HelpIcon width="220px" align="left" data-i18n-html="sidebar.packConfig.bidirectionalEngine">
         <strong>Bidirectional Engine</strong><br />
         Editing <em>S</em> recomputes <em>Target V</em>; editing <em>Target V</em> snaps <em>S = ceil(V / cellNom)</em>. Same for <em>P</em> ↔ <em>Target Ah</em>. Cell changes trigger a re-sync of the side not currently in focus.
       </HelpIcon>
     </div>
     <div class="grid grid-cols-2 gap-1.5 items-end">
       <div class="flex flex-col">
-        <label class="control-label" for="target-v">Target V</label>
+        <label class="control-label" for="target-v" data-i18n="sidebar.packConfig.targetV">Target V</label>
         <input id="target-v" type="number" value="36" min="1" step="0.1" class="control-input" />
       </div>
       <div class="flex flex-col">
-        <label class="control-label" for="target-ah">Target Ah</label>
+        <label class="control-label" for="target-ah" data-i18n="sidebar.packConfig.targetAh">Target Ah</label>
         <input id="target-ah" type="number" value="10" min="0.1" step="0.1" class="control-input" />
       </div>
     </div>
@@ -129,8 +129,8 @@ import HelpIcon from '../HelpIcon.astro';
 
   <div class="border-t mt-2 pt-2" style="border-color: var(--border-primary);">
     <div class="flex items-center justify-between mb-1">
-      <span class="control-label !mb-0">Generative Mode</span>
-      <HelpIcon width="260px" align="left">
+      <span class="control-label !mb-0" data-i18n="sidebar.packConfig.generativeMode">Generative Mode</span>
+      <HelpIcon width="260px" align="left" data-i18n-html="sidebar.packConfig.autoGenerate">
         <strong>Auto-generate S × P</strong><br />
         Enter a target voltage and capacity. The algorithm calculates the minimum series (S) and parallel (P) count from the current cell's nominal voltage and capacity.<br /><br />
         <code>S = ⌈targetV / cellNomV⌉</code><br />
@@ -140,15 +140,15 @@ import HelpIcon from '../HelpIcon.astro';
     </div>
     <div class="grid grid-cols-2 gap-1.5 items-end mb-1.5">
       <div class="flex flex-col">
-        <label class="control-label" for="gen-target-v">Target Voltage (V)</label>
+        <label class="control-label" for="gen-target-v" data-i18n="sidebar.packConfig.targetVoltage">Target Voltage (V)</label>
         <input id="gen-target-v" type="number" value="36" min="1" step="0.1" class="control-input" />
       </div>
       <div class="flex flex-col">
-        <label class="control-label" for="gen-target-ah">Target Capacity (Ah)</label>
+        <label class="control-label" for="gen-target-ah" data-i18n="sidebar.packConfig.targetCapacity">Target Capacity (Ah)</label>
         <input id="gen-target-ah" type="number" value="10" min="0.1" step="0.1" class="control-input" />
       </div>
     </div>
-    <button id="gen-pack-btn" type="button" class="w-full py-1.5 px-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded transition-colors cursor-pointer">
+    <button id="gen-pack-btn" type="button" class="w-full py-1.5 px-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded transition-colors cursor-pointer" data-i18n="sidebar.packConfig.generateConfig">
       Generate Configuration
     </button>
     <div id="gen-pack-feedback" class="text-[0.65rem] mt-1 hidden" style="color: var(--text-muted);"></div>

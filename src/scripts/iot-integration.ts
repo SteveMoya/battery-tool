@@ -3,6 +3,8 @@
  * Generates monitoring configurations for MQTT, Modbus, CAN
  */
 
+import { t } from '../i18n';
+
 export interface IoTConfig {
   protocol: 'mqtt' | 'modbus' | 'can';
   sampleRateSeconds: number;
@@ -145,7 +147,7 @@ function generateCanConfig(dataPoints: IoTDataPoint[]): string {
 function generateGrafanaConfig(dataPoints: IoTDataPoint[]): string {
   return JSON.stringify({
     dashboard: {
-      title: 'Battery Pack Monitoring',
+      title: t('iot.batteryPackMonitoring'),
       panels: dataPoints.filter(dp => dp.category !== 'status').map((dp, i) => ({
         id: i + 1,
         title: dp.name,
@@ -233,16 +235,16 @@ export function analyzeIoT(
 
   const recommendations: string[] = [];
   if (sampleRateSeconds < 1) {
-    recommendations.push('Very high sample rate — ensure sufficient network bandwidth');
+    recommendations.push(t('iot.highSampleRate'));
   }
   if (seriesCells > 16) {
-    recommendations.push('Consider CAN bus for large series counts — faster data throughput');
+    recommendations.push(t('iot.canBusRecommendation'));
   }
   if (protocol === 'modbus' && sampleRateSeconds < 5) {
-    recommendations.push('Modbus may bottleneck at <5s sample rates — consider MQTT');
+    recommendations.push(t('iot.modbusBottleneck'));
   }
   if (tempSensors > 8) {
-    recommendations.push('Many temperature sensors — consider multiplexed ADC');
+    recommendations.push(t('iot.manyTempSensors'));
   }
 
   return {
@@ -266,10 +268,10 @@ export function renderIoTCard(result: IoTResult): string {
       <div class="flex justify-between items-start mb-2">
         <div>
           <div class="text-[0.65rem] font-bold" style="color: var(--text-primary);">
-            ${result.protocol.toUpperCase()} — ${result.totalDataPoints} Data Points
+            ${result.protocol.toUpperCase()} — ${result.totalDataPoints} ${t('iot.dataPoints')}
           </div>
           <div class="text-[0.6rem] mt-0.5" style="color: var(--text-muted);">
-            Sample: ${result.samplingRateMs}ms | BW: ${result.estimatedBandwidth}
+            ${t('iot.sample')} ${result.samplingRateMs}ms | ${t('iot.bw')} ${result.estimatedBandwidth}
           </div>
         </div>
         <div class="text-[0.58rem] font-bold px-1.5 py-0.5 rounded" style="background: ${result.levelColor}20; color: ${result.levelColor};">
@@ -280,16 +282,16 @@ export function renderIoTCard(result: IoTResult): string {
       <div class="space-y-1 mb-2">
         <div class="flex items-center gap-2">
           <button class="iot-export-btn text-[0.58rem] px-1.5 py-0.5 rounded font-bold" style="background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-primary);" data-format="mqtt">
-            MQTT Config
+            ${t('iot.mqttConfig')}
           </button>
           <button class="iot-export-btn text-[0.58rem] px-1.5 py-0.5 rounded font-bold" style="background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-primary);" data-format="grafana">
-            Grafana
+            ${t('iot.grafana')}
           </button>
           <button class="iot-export-btn text-[0.58rem] px-1.5 py-0.5 rounded font-bold" style="background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-primary);" data-format="ha">
-            Home Assistant
+            ${t('iot.homeAssistant')}
           </button>
           <button class="iot-export-btn text-[0.58rem] px-1.5 py-0.5 rounded font-bold" style="background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-primary);" data-format="csv">
-            CSV
+            ${t('iot.csv')}
           </button>
         </div>
       </div>
@@ -301,7 +303,7 @@ export function renderIoTCard(result: IoTResult): string {
           `).join('')}
         </div>
       ` : `
-        <div class="text-[0.56rem]" style="color: var(--text-muted);">No special requirements</div>
+        <div class="text-[0.56rem]" style="color: var(--text-muted);">${t('iot.noSpecialRequirements')}</div>
       `}
     </div>
   `;

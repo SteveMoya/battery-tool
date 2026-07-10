@@ -1,5 +1,6 @@
 import { inputs } from './dom';
 import { getOpenCircuitVoltage } from './simulation';
+import { t } from '../i18n';
 
 /* ─────────────────────────────────────────────
    F10a — Empirical Ampacity Table
@@ -125,10 +126,10 @@ export interface StripThermalResult {
 }
 
 function getMaterialLabel(rhoRaw: number): string {
-  if (rhoRaw <= 1.8) return 'Copper';
-  if (rhoRaw <= 2.5) return 'Au-plated Cu';
-  if (rhoRaw <= 8.0) return 'Nickel';
-  return 'Steel';
+  if (rhoRaw <= 1.8) return t('safety.copper');
+  if (rhoRaw <= 2.5) return t('safety.auPlatedCu');
+  if (rhoRaw <= 8.0) return t('safety.nickel');
+  return t('safety.steel');
 }
 
 export function checkStripThermal(packCurrentA: number, P: number): StripThermalResult {
@@ -174,12 +175,12 @@ export function checkStripThermal(packCurrentA: number, P: number): StripThermal
 export function renderStripThermalIndicator(r: StripThermalResult) {
   let text: string;
   if (r.level === 'red') {
-    text = `THERMAL RISK — ${r.tStrip.toFixed(1)}°C ≥ ${r.tMax}°C limit`;
+    text = `${t('safety.thermalRisk')} — ${r.tStrip.toFixed(1)}°C ≥ ${r.tMax}°C ${t('safety.limit')}`;
   } else if (r.level === 'yellow') {
-    text = `WARM — ${r.tStrip.toFixed(1)}°C (${r.matLabel}, ${r.pct.toFixed(0)}% of limit)`;
+    text = `${t('safety.warm')} — ${r.tStrip.toFixed(1)}°C (${r.matLabel}, ${r.pct.toFixed(0)}% ${t('safety.ofSafeLimit')})`;
   } else {
     const heatStr = r.heatPerSeg >= 0.01 ? `${r.heatPerSeg.toFixed(2)}W` : `${(r.heatPerSeg * 1000).toFixed(1)}mW`;
-    text = `OK — ${r.tStrip.toFixed(1)}°C (${heatStr})`;
+    text = `${t('safety.ok')} — ${r.tStrip.toFixed(1)}°C (${heatStr})`;
   }
   setSafetyEl('safety-strip-thermal', EMOJI[r.level], text, COLOR[r.level], r.level);
 }
@@ -293,16 +294,16 @@ export function renderVoltageSagIndicator(r: VoltageSagResult) {
 
   if (r.level === 'green' && r.timeToCutoff === '--') {
     // Idle / charging — no load, no sag
-    text = `0% — No load`;
+    text = t('safety.noLoad');
     barPct = 0;
   } else if (r.level === 'red') {
-    text = `HIT LVC — ${r.vNet.toFixed(1)}V < ${r.cutoffPack.toFixed(1)}V`;
+    text = `${t('safety.hitLvc')} — ${r.vNet.toFixed(1)}V < ${r.cutoffPack.toFixed(1)}V`;
     barPct = 100;
   } else if (r.level === 'yellow') {
-    text = `LVC Cercano — ${r.headroomPct.toFixed(1)}% headroom`;
+    text = `${t('safety.lvcCercano')} — ${r.headroomPct.toFixed(1)}% ${t('safety.headroom')}`;
     barPct = Math.max(0, Math.min(100, 100 - r.headroomPct));
   } else {
-    text = `OK — ${r.headroomPct.toFixed(1)}% above LVC`;
+    text = `${t('safety.ok')} — ${r.headroomPct.toFixed(1)}% ${t('safety.aboveLvc')}`;
     barPct = Math.max(0, Math.min(100, 100 - r.headroomPct));
   }
 
@@ -330,11 +331,11 @@ export function renderVoltageSagIndicator(r: VoltageSagResult) {
 export function renderAmpacityIndicator(r: AmpacityResult) {
   let text: string;
   if (r.level === 'red') {
-    text = `EXCEED — ${r.currentPerSegment.toFixed(1)}A > ${r.poorA}A limit`;
+    text = `${t('safety.exceed')} — ${r.currentPerSegment.toFixed(1)}A > ${r.poorA}A ${t('safety.limit')}`;
   } else if (r.level === 'yellow') {
-    text = `MARGINAL — ${r.currentPerSegment.toFixed(1)}A > ${r.optimalA}A optimal`;
+    text = `${t('safety.marginal')} — ${r.currentPerSegment.toFixed(1)}A > ${r.optimalA}A ${t('safety.optimal')}`;
   } else {
-    text = `OK — ${r.currentPerSegment.toFixed(1)}A ≤ ${r.optimalA}A`;
+    text = `${t('safety.ok')} — ${r.currentPerSegment.toFixed(1)}A ≤ ${r.optimalA}A`;
   }
   setSafetyEl('safety-ampacity', EMOJI[r.level], text, COLOR[r.level], r.level);
 
@@ -373,8 +374,8 @@ export function getStripRecommendations(
   if (singleCandidates.length > 0) {
     const best = singleCandidates[0];
     recs.push({
-      label: `Upgrade to ${best.t}×${best.w}mm`,
-      detail: `${best.maxA}A max (single layer)`,
+      label: `${t('safety.upgradeTo')} ${best.t}×${best.w}mm`,
+      detail: `${best.maxA}A ${t('safety.maxSingleLayer')}`,
       t: best.t,
       w: best.w,
       layers: 1,
@@ -389,8 +390,8 @@ export function getStripRecommendations(
   if (doubleCandidates.length > 0) {
     const best = doubleCandidates[0];
     recs.push({
-      label: `Double layer: 2× ${best.t}×${best.w}mm`,
-      detail: `${(best.maxA * 2).toFixed(0)}A combined`,
+      label: `${t('safety.doubleLayer')} 2× ${best.t}×${best.w}mm`,
+      detail: `${(best.maxA * 2).toFixed(0)}A ${t('safety.combined')}`,
       t: best.t,
       w: best.w,
       layers: 2,
@@ -434,11 +435,11 @@ function renderStripRecommendations(r: AmpacityResult) {
 export function renderMicahTollIndicator(r: MicahTollResult) {
   let text: string;
   if (r.level === 'red') {
-    text = `EXCEED — ${r.currentPerSegment.toFixed(1)}A > ${r.safeA.toFixed(1)}A safe`;
+    text = `${t('safety.exceed')} — ${r.currentPerSegment.toFixed(1)}A > ${r.safeA.toFixed(1)}A ${t('safety.safe')}`;
   } else if (r.level === 'yellow') {
-    text = `MARGINAL — ${Math.round(r.ratio * 100)}% of safe limit`;
+    text = `${t('safety.marginal')} — ${Math.round(r.ratio * 100)}% ${t('safety.ofSafeLimit')}`;
   } else {
-    text = `OK — ${r.currentPerSegment.toFixed(1)}A ≤ ${r.safeA.toFixed(1)}A`;
+    text = `${t('safety.ok')} — ${r.currentPerSegment.toFixed(1)}A ≤ ${r.safeA.toFixed(1)}A`;
   }
   setSafetyEl('safety-micah', EMOJI[r.level], text, COLOR[r.level], r.level);
 }
@@ -469,11 +470,11 @@ export function checkPacking(fillRatio: number, theoMax: number): PackingResult 
 export function renderPackingIndicator(r: PackingResult) {
   let text: string;
   if (r.level === 'red') {
-    text = `LOW — ${(r.efficiency * 100).toFixed(0)}% of theoretical max (${(r.theoMax * 100).toFixed(1)}%)`;
+    text = `${t('safety.low')} — ${(r.efficiency * 100).toFixed(0)}% ${t('safety.ofTheoreticalMax')} (${(r.theoMax * 100).toFixed(1)}%)`;
   } else if (r.level === 'yellow') {
-    text = `FAIR — ${(r.efficiency * 100).toFixed(0)}% of theoretical max`;
+    text = `${t('safety.fair')} — ${(r.efficiency * 100).toFixed(0)}% ${t('safety.ofTheoreticalMax')}`;
   } else {
-    text = `GOOD — ${(r.efficiency * 100).toFixed(0)}% of theoretical max (${(r.theoMax * 100).toFixed(1)}%)`;
+    text = `${t('safety.good')} — ${(r.efficiency * 100).toFixed(0)}% ${t('safety.ofTheoreticalMax')} (${(r.theoMax * 100).toFixed(1)}%)`;
   }
   setSafetyEl('safety-packing', EMOJI[r.level], text, COLOR[r.level], r.level);
 }

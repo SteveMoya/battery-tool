@@ -3,6 +3,8 @@
  * Active vs passive balancing comparison
  */
 
+import { t } from '../i18n';
+
 export interface BalancingConfig {
   seriesGroups: number;
   parallelCount: number;
@@ -42,7 +44,7 @@ function analyzePassive(cfg: BalancingConfig, totalCells: number): BalancingMode
   const bmsCostEur = totalCells * cfg.channelCostEur;
 
   return {
-    mode: 'Passive',
+    mode: t('balancing.passive'),
     balancingTimeHours: Math.round(balancingTimeHours * 10) / 10,
     energyLossWh: Math.round(energyLossWh * 100) / 100,
     heatPerChannelMw: Math.round(heatPerChannelMw * 10) / 10,
@@ -61,7 +63,7 @@ function analyzeActive(cfg: BalancingConfig, totalCells: number): BalancingModeR
   const bmsCostEur = totalCells * cfg.channelCostEur * 3; // active ~3x cost per channel
 
   return {
-    mode: 'Active',
+    mode: t('balancing.active'),
     balancingTimeHours: Math.round(balancingTimeHours * 10) / 10,
     energyLossWh: Math.round(energyLossWh * 100) / 100,
     heatPerChannelMw: Math.round(heatPerChannelMw * 10) / 10,
@@ -90,15 +92,15 @@ export function analyzeBalancing(cfg: BalancingConfig): BalancingResult {
   let bestMode: 'passive' | 'active';
 
   if (highSpread || manyCells || highLoss) {
-    recommendation = 'Active Recommended';
+    recommendation = t('balancing.activeRecommended');
     recommendationColor = '#3b82f6';
     bestMode = 'active';
   } else if (cfg.socSpread > 0.05 || cfg.seriesGroups > 16) {
-    recommendation = 'Active Preferred';
+    recommendation = t('balancing.activePreferred');
     recommendationColor = '#f59e0b';
     bestMode = 'active';
   } else {
-    recommendation = 'Passive Sufficient';
+    recommendation = t('balancing.passiveSufficient');
     recommendationColor = '#22c55e';
     bestMode = 'passive';
   }
@@ -121,7 +123,7 @@ export function renderBalancingCard(result: BalancingResult, cfg: BalancingConfi
       <div class="flex justify-between items-start mb-2">
         <div>
           <div class="text-[0.65rem] font-bold" style="color: var(--text-primary);">
-            ${result.totalChannels} Channels (${cfg.seriesGroups}S × ${cfg.parallelCount}P)
+            ${result.totalChannels} ${t('balancing.channels')} (${cfg.seriesGroups}S × ${cfg.parallelCount}P)
           </div>
           <div class="text-[0.6rem] mt-0.5" style="color: ${result.recommendationColor}; font-weight: 700;">
             ${result.recommendation}
@@ -134,21 +136,21 @@ export function renderBalancingCard(result: BalancingResult, cfg: BalancingConfi
 
       <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-2">
         <div>
-          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">Passive</span>
+          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">${t('balancing.passive')}</span>
           <div class="text-[0.6rem]" style="color: var(--text-primary);">
-            ${result.passive.balancingTimeHours}h | ${result.passive.energyLossWh}Wh loss | €${result.passive.bmsCostEur.toFixed(0)}
+            ${result.passive.balancingTimeHours}h | ${result.passive.energyLossWh}Wh ${t('balancing.loss')} | €${result.passive.bmsCostEur.toFixed(0)}
           </div>
         </div>
         <div>
-          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">Active</span>
+          <span class="text-[0.58rem] font-bold" style="color: var(--text-muted);">${t('balancing.active')}</span>
           <div class="text-[0.6rem]" style="color: var(--text-primary);">
-            ${result.active.balancingTimeHours}h | ${result.active.energyLossWh}Wh loss | €${result.active.bmsCostEur.toFixed(0)}
+            ${result.active.balancingTimeHours}h | ${result.active.energyLossWh}Wh ${t('balancing.loss')} | €${result.active.bmsCostEur.toFixed(0)}
           </div>
         </div>
       </div>
 
       <div class="text-[0.56rem]" style="color: var(--text-muted);">
-        Heat per channel: ${best.heatPerChannelMw}mW | Max spread: ${best.maxSoCSpreadPct}% | Transfer eff: ${best.efficiency}%
+        ${t('balancing.heatPerChannel')} ${best.heatPerChannelMw}mW | ${t('balancing.maxSpread')} ${best.maxSoCSpreadPct}% | ${t('balancing.transferEff')} ${best.efficiency}%
       </div>
     </div>
   `;

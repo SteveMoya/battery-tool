@@ -8,29 +8,29 @@
     style="background: var(--bg-secondary);"
   >
     <div class="flex justify-between items-center mb-4">
-      <h3 class="m-0" style="color: var(--text-primary);">Export 3D Model (STL)</h3>
+      <h3 class="m-0" style="color: var(--text-primary);" data-i18n="modals.exportSTL.title">Export 3D Model (STL)</h3>
       <button id="btn-close-export" class="border-none bg-none text-[1.5rem] cursor-pointer leading-none" style="color: var(--text-muted);">×</button>
     </div>
-    <p class="text-[0.8rem] mt-0" style="color: var(--text-tertiary);">Select parts to include in the STL file:</p>
+    <p class="text-[0.8rem] mt-0" style="color: var(--text-tertiary);" data-i18n="modals.exportSTL.selectParts">Select parts to include in the STL file:</p>
     <div class="flex flex-col gap-2.5 mb-5">
       <label class="flex items-center gap-2.5 cursor-pointer">
         <input id="ex-cells" type="checkbox" checked />
-        <span class="text-[0.9rem] font-semibold" style="color: var(--text-primary);">Cells &amp; Caps</span>
+        <span class="text-[0.9rem] font-semibold" style="color: var(--text-primary);" data-i18n="modals.exportSTL.cellsCaps">Cells &amp; Caps</span>
       </label>
       <label class="flex items-center gap-2.5 cursor-pointer">
         <input id="ex-spacers" type="checkbox" checked />
-        <span class="text-[0.9rem] font-semibold" style="color: var(--text-primary);">Spacers (Holders)</span>
+        <span class="text-[0.9rem] font-semibold" style="color: var(--text-primary);" data-i18n="modals.exportSTL.spacers">Spacers (Holders)</span>
       </label>
       <label class="flex items-center gap-2.5 cursor-pointer">
         <input id="ex-bus" type="checkbox" checked />
-        <span class="text-[0.9rem] font-semibold" style="color: var(--text-primary);">Busbars &amp; Wires</span>
+        <span class="text-[0.9rem] font-semibold" style="color: var(--text-primary);" data-i18n="modals.exportSTL.busbarsWires">Busbars &amp; Wires</span>
       </label>
     </div>
     <button
       id="btn-do-export"
       class="w-full bg-app-blue text-white border-none py-2.5 rounded-md font-bold cursor-pointer"
     >
-      Download .STL File
+      <span data-i18n="modals.exportSTL.downloadSTL">Download .STL File</span>
     </button>
   </div>
 </div>

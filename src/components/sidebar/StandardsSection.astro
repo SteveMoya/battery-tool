@@ -4,8 +4,8 @@ import HelpIcon from '../HelpIcon.astro';
 
 <section class="group-box">
   <div class="flex justify-between items-center mb-1.5">
-    <h2 class="section-title m-0">8. Standards Compliance</h2>
-    <HelpIcon tip="Validates pack configuration against IEC 62619, UN 38.3, UL 2580, ISO 12405, SAE J2464 standards" />
+    <h2 class="section-title m-0" data-i18n="sidebar.standards.title">8. Standards Compliance</h2>
+    <HelpIcon tip="Validates pack configuration against IEC 62619, UN 38.3, UL 2580, ISO 12405, SAE J2464 standards" data-i18n-tip="sidebar.standards.helpTip" />
   </div>
 
   <div class="mb-2">
@@ -14,7 +14,7 @@ import HelpIcon from '../HelpIcon.astro';
         id="compliance-run-btn"
         class="btn-primary text-[0.65rem] py-1 px-2.5"
       >
-        Run Compliance Check
+        <span data-i18n="sidebar.standards.runCheck">Run Compliance Check</span>
       </button>
       <span id="compliance-status-badge" class="text-[0.6rem] font-bold px-1.5 py-0.5 rounded hidden"></span>
     </div>
@@ -28,13 +28,13 @@ import HelpIcon from '../HelpIcon.astro';
           checked
           class="w-3.5 h-3.5 rounded border-slate-300 text-app-blue focus:ring-app-blue cursor-pointer"
         />
-        <span class="text-[0.62rem] font-semibold" style="color: var(--text-tertiary);">Include in datasheet PDF</span>
+        <span class="text-[0.62rem] font-semibold" style="color: var(--text-tertiary);" data-i18n="sidebar.standards.includeInDatasheet">Include in datasheet PDF</span>
       </label>
       <button
         id="compliance-export-btn"
         class="text-[0.6rem] font-bold px-2 py-0.5 rounded bg-app-blue text-white hover:bg-app-blue-dark transition-colors cursor-pointer border-none"
       >
-        Export Compliance Report
+        <span data-i18n="sidebar.standards.exportReport">Export Compliance Report</span>
       </button>
     </div>
 
@@ -51,27 +51,27 @@ import HelpIcon from '../HelpIcon.astro';
 
   <!-- Standards reference -->
   <details class="mt-2">
-    <summary class="text-[0.65rem] font-bold cursor-pointer" style="color: var(--text-muted);">Standards Reference</summary>
+    <summary class="text-[0.65rem] font-bold cursor-pointer" style="color: var(--text-muted);" data-i18n="sidebar.standards.refTitle">Standards Reference</summary>
     <div class="mt-1 space-y-1">
       <div class="flex items-start gap-1.5 text-[0.55rem]">
-        <span class="font-extrabold" style="color: #3b82f6;">IEC 62619</span>
-        <span class="text-slate-500">— Secondary lithium cells for industrial applications</span>
+        <span class="font-extrabold" style="color: #3b82f6;" data-i18n="sidebar.standards.iec62619Name">IEC 62619</span>
+        <span class="text-slate-500" data-i18n="sidebar.standards.iec62619Desc">— Secondary lithium cells for industrial applications</span>
       </div>
       <div class="flex items-start gap-1.5 text-[0.55rem]">
-        <span class="font-extrabold" style="color: #ef4444;">UN 38.3</span>
-        <span class="text-slate-500">— Transport of dangerous goods — lithium battery testing</span>
+        <span class="font-extrabold" style="color: #ef4444;" data-i18n="sidebar.standards.un383Name">UN 38.3</span>
+        <span class="text-slate-500" data-i18n="sidebar.standards.un383Desc">— Transport of dangerous goods — lithium battery testing</span>
       </div>
       <div class="flex items-start gap-1.5 text-[0.55rem]">
-        <span class="font-extrabold" style="color: #f59e0b;">UL 2580</span>
-        <span class="text-slate-500">— Batteries for use in electric vehicles</span>
+        <span class="font-extrabold" style="color: #f59e0b;" data-i18n="sidebar.standards.ul2580Name">UL 2580</span>
+        <span class="text-slate-500" data-i18n="sidebar.standards.ul2580Desc">— Batteries for use in electric vehicles</span>
       </div>
       <div class="flex items-start gap-1.5 text-[0.55rem]">
-        <span class="font-extrabold" style="color: #8b5cf6;">ISO 12405</span>
-        <span class="text-slate-500">— EV battery pack performance testing</span>
+        <span class="font-extrabold" style="color: #8b5cf6;" data-i18n="sidebar.standards.iso12405Name">ISO 12405</span>
+        <span class="text-slate-500" data-i18n="sidebar.standards.iso12405Desc">— EV battery pack performance testing</span>
       </div>
       <div class="flex items-start gap-1.5 text-[0.55rem]">
-        <span class="font-extrabold" style="color: #ec4899;">SAE J2464</span>
-        <span class="text-slate-500">— EV battery abuse testing</span>
+        <span class="font-extrabold" style="color: #ec4899;" data-i18n="sidebar.standards.saeJ2464Name">SAE J2464</span>
+        <span class="text-slate-500" data-i18n="sidebar.standards.saeJ2464Desc">— EV battery abuse testing</span>
       </div>
     </div>
   </details>

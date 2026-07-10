@@ -51,13 +51,14 @@ import CustomBmsModal from '../components/modals/CustomBmsModal.astro';
       <Header />
 
       <div class="px-[15px] pt-2.5">
-        <label class="control-label" for="pack-name">Configuration Name</label>
+        <label class="control-label" for="pack-name" data-i18n="index.configurationName">Configuration Name</label>
         <input
           id="pack-name"
           type="text"
           value="My Custom Pack"
           placeholder="e.g. Long Range V1"
           class="control-input"
+          data-i18n-placeholder="index.configurationPlaceholder"
         />
       </div>
 

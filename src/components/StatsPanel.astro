@@ -4,79 +4,79 @@ import HelpIcon from './HelpIcon.astro';
 
 <div id="stats-panel" class="flex-shrink-0 py-2.5 px-[15px] flex gap-5 z-20" style="background: var(--bg-secondary); border-color: var(--border-primary); border-width: 1px 0 0 0; border-style: solid;">
   <div class="stats-col flex flex-col gap-0.5 justify-center min-w-0 flex-[1.4]">
-    <div class="stat-header text-[0.68rem] font-extrabold uppercase mb-0.5 border-b pb-0.5" style="color: var(--text-muted); border-color: var(--border-primary);">Electrical</div>
+    <div class="stat-header text-[0.68rem] font-extrabold uppercase mb-0.5 border-b pb-0.5" style="color: var(--text-muted); border-color: var(--border-primary);" data-i18n="stats.electrical">Electrical</div>
     <div class="stat-row flex justify-between items-baseline text-[0.75rem] leading-snug font-semibold" style="color: var(--text-tertiary);">
-      <span>Config</span>
+      <span data-i18n="stats.config">Config</span>
       <span id="out-config" class="val font-bold text-right font-mono tracking-[-0.3px] ml-2 c-dark">--</span>
     </div>
     <div class="stat-row flex justify-between items-baseline text-[0.75rem] leading-snug font-semibold" style="color: var(--text-tertiary);">
       <span>
-        Strip Length
-        <HelpIcon position="right" align="left" width="200px">Excludes inter-layer series connections.</HelpIcon>
+        <span data-i18n="stats.stripLength">Strip Length</span>
+        <HelpIcon position="right" align="left" width="200px" data-i18n-html="stats.stripLengthHelp">Excludes inter-layer series connections.</HelpIcon>
         <span id="badge-ladder" class="hidden bg-app-blue text-white text-[8px] px-1 py-px rounded ml-1 font-bold align-middle">LADDER</span>
       </span>
       <span id="out-nickel" class="val font-bold text-right font-mono tracking-[-0.3px] ml-2 c-dark text-[0.75rem]">--</span>
     </div>
     <div class="stat-row flex justify-between items-baseline text-[0.75rem] leading-snug font-semibold" style="color: var(--text-tertiary);">
-      <span>Label Rating</span>
+      <span data-i18n="stats.labelRating">Label Rating</span>
       <span id="out-nom-label" class="val font-bold text-right font-mono tracking-[-0.3px] ml-2 c-blue">--</span>
     </div>
     <div class="stat-row flex justify-between items-baseline text-[0.75rem] leading-snug font-semibold" style="color: var(--text-tertiary);">
-      <span>V Range</span>
+      <span data-i18n="stats.vRange">V Range</span>
       <span id="out-v-range" class="val font-bold text-right font-mono tracking-[-0.3px] ml-2 c-gray text-[0.75rem]">--</span>
     </div>
     <div class="stat-row flex justify-between items-baseline text-[0.75rem] leading-snug font-semibold" style="color: var(--text-tertiary);">
-      <span>Max Output</span>
+      <span data-i18n="stats.maxOutput">Max Output</span>
       <span id="out-output" class="val font-bold text-right font-mono tracking-[-0.3px] ml-2 c-red">--</span>
     </div>
     <div class="stat-divider border-t border-dashed my-0.5" style="border-color: var(--border-primary);"></div>
     <div class="stat-row flex justify-between items-baseline text-[0.75rem] leading-snug font-semibold" style="color: var(--text-tertiary);">
       <span>
-        Pack Current
-        <HelpIcon position="right" align="left" width="180px">Total current through the series string (I). Equal at every series node S1, S2, … SN.</HelpIcon>
+        <span data-i18n="stats.packCurrent">Pack Current</span>
+        <HelpIcon position="right" align="left" width="180px" data-i18n-html="stats.packCurrentHelp">Total current through the series string (I). Equal at every series node S1, S2, … SN.</HelpIcon>
       </span>
       <span id="out-pack-current" class="val font-bold text-right font-mono tracking-[-0.3px] ml-2 c-blue">--</span>
     </div>
     <div class="stat-row flex justify-between items-baseline text-[0.75rem] leading-snug font-semibold" style="color: var(--text-tertiary);">
       <span>
-        Cell Current (I/P)
-        <HelpIcon position="right" align="left" width="180px">Current through a single cell — total pack current divided by parallel count. Used for cell thermal limits and ampacity.</HelpIcon>
+        <span data-i18n="stats.cellCurrent">Cell Current (I/P)</span>
+        <HelpIcon position="right" align="left" width="180px" data-i18n-html="stats.cellCurrentHelp">Current through a single cell — total pack current divided by parallel count. Used for cell thermal limits and ampacity.</HelpIcon>
       </span>
       <span id="out-cell-current" class="val font-bold text-right font-mono tracking-[-0.3px] ml-2 c-blue">--</span>
     </div>
     <div class="stat-row flex justify-between items-baseline text-[0.75rem] leading-snug font-semibold" style="color: var(--text-tertiary);">
-      <span>Total Energy</span>
+      <span data-i18n="stats.totalEnergy">Total Energy</span>
       <span id="out-wh" class="val font-bold text-right font-mono tracking-[-0.3px] ml-2 c-purp">--</span>
     </div>
   </div>
   <div class="stats-v-sep w-px my-1.5" style="background: var(--border-primary);"></div>
   <div class="stats-col flex flex-col gap-0.5 justify-center min-w-0 flex-[0.9]">
-    <div class="stat-header text-[0.68rem] font-extrabold uppercase mb-0.5 border-b pb-0.5" style="color: var(--text-muted); border-color: var(--border-primary);">Physical</div>
+    <div class="stat-header text-[0.68rem] font-extrabold uppercase mb-0.5 border-b pb-0.5" style="color: var(--text-muted); border-color: var(--border-primary);" data-i18n="stats.physical">Physical</div>
     <div class="stat-row flex justify-between items-baseline text-[0.75rem] leading-snug font-semibold" style="color: var(--text-tertiary);">
-      <span>Length</span>
+      <span data-i18n="stats.length">Length</span>
       <span id="dim-l" class="val font-bold text-right font-mono tracking-[-0.3px] ml-2 c-teal">--</span>
     </div>
     <div class="stat-row flex justify-between items-baseline text-[0.75rem] leading-snug font-semibold" style="color: var(--text-tertiary);">
-      <span>Width</span>
+      <span data-i18n="stats.width">Width</span>
       <span id="dim-w" class="val font-bold text-right font-mono tracking-[-0.3px] ml-2 c-teal">--</span>
     </div>
     <div class="stat-row flex justify-between items-baseline text-[0.75rem] leading-snug font-semibold" style="color: var(--text-tertiary);">
-      <span>Height</span>
+      <span data-i18n="stats.height">Height</span>
       <span id="dim-h" class="val font-bold text-right font-mono tracking-[-0.3px] ml-2 c-teal">--</span>
     </div>
     <div class="stat-row flex justify-between items-baseline text-[0.75rem] leading-snug font-semibold" style="color: var(--text-tertiary);">
-      <span>Volume</span>
+      <span data-i18n="stats.volume">Volume</span>
       <span id="out-vol" class="val font-bold text-right font-mono tracking-[-0.3px] ml-2 c-pink">--</span>
     </div>
     <div class="stat-row flex justify-between items-baseline text-[0.75rem] leading-snug font-semibold" style="color: var(--text-tertiary);">
-      <span>Weight</span>
+      <span data-i18n="stats.weight">Weight</span>
       <span id="out-weight" class="val font-bold text-right font-mono tracking-[-0.3px] ml-2 c-orange">--</span>
     </div>
     <div class="stat-divider border-t border-dashed my-0.5" style="border-color: var(--border-primary);"></div>
     <div class="stat-row flex justify-between items-baseline text-[0.75rem] leading-snug font-semibold" style="color: var(--text-tertiary);">
       <span>
-        Fill Ratio
-        <HelpIcon position="right" align="left" width="220px">
+        <span data-i18n="stats.fillRatio">Fill Ratio</span>
+        <HelpIcon position="right" align="left" width="220px" data-i18n-html="stats.fillRatioHelp">
           <strong>Actual cell area ÷ pack footprint area</strong><br />
           Compared to theoretical max: Square ≈ 78.5%, Hex ≈ 90.7%.<br />
           Closer to theoretical = tighter packing = smaller pack.
@@ -86,15 +86,15 @@ import HelpIcon from './HelpIcon.astro';
     </div>
     <div class="stat-row flex justify-between items-baseline text-[0.75rem] leading-snug font-semibold" style="color: var(--text-tertiary);">
       <span>
-        Rotation Hint
-        <HelpIcon position="right" align="left" width="200px">
+        <span data-i18n="stats.rotationHint">Rotation Hint</span>
+        <HelpIcon position="right" align="left" width="200px" data-i18n-html="stats.rotationHintHelp">
           If rotating the pack 90° would improve packing density, a suggestion is shown here.
         </HelpIcon>
       </span>
       <span id="out-rotation-hint" class="val font-bold text-right font-mono tracking-[-0.3px] ml-2 c-yellow text-[0.65rem] hidden"></span>
     </div>
     <div class="stat-row flex justify-between items-baseline text-[0.75rem] leading-snug font-semibold" style="color: var(--text-tertiary);">
-      <span>Cell Cost</span>
+      <span data-i18n="stats.cellCost">Cell Cost</span>
       <span id="out-cost" class="val font-bold text-right font-mono tracking-[-0.3px] ml-2 c-green">--</span>
     </div>
   </div>

@@ -3,12 +3,12 @@ import HelpIcon from '../HelpIcon.astro';
 ---
 
 <section class="group-box mt-[15px]">
-  <h2 class="section-title">1. Cell Specifications</h2>
+  <h2 class="section-title" data-i18n="sidebar.cellSpecs.title">1. Cell Specifications</h2>
 
   <div id="db-search-wrap" class="control-item full-width relative mb-2">
-    <label class="control-label">
+    <label class="control-label" data-i18n="sidebar.cellSpecs.searchDatabase">
       Search Cell Database (100+ Models)
-      <HelpIcon variant="warn" position="centered">
+      <HelpIcon variant="warn" position="centered" data-i18n-html="sidebar.cellSpecs.dataWarning">
         <strong>⚠️ Data Warning</strong><br />
         Database values are static snapshots and may be outdated.<br /><br />
         Always verify Capacity, Price, and especially Amps with official datasheets/vendors.
@@ -19,6 +19,7 @@ import HelpIcon from '../HelpIcon.astro';
       type="text"
       placeholder="Type to search (e.g. '26J', 'Molicel', '5000mAh')..."
       class="control-input border-app-blue"
+      data-i18n-placeholder="sidebar.cellSpecs.searchPlaceholder"
     />
     <div
       id="db-results"
@@ -28,26 +29,26 @@ import HelpIcon from '../HelpIcon.astro';
   </div>
 
   <div class="control-item full-width mb-2">
-    <label class="control-label">Or Use Generic Preset</label>
+    <label class="control-label" data-i18n="sidebar.cellSpecs.orUsePreset">Or Use Generic Preset</label>
     <div class="flex gap-1">
-      <select id="preset-selector" class="control-input flex-1"><option value="custom">Custom Cell</option></select>
+      <select id="preset-selector" class="control-input flex-1"><option value="custom" data-i18n="sidebar.cellSpecs.customCell">Custom Cell</option></select>
       <button id="btn-save-preset-size" class="btn-icon" title="Save">💾</button>
       <button id="btn-del-preset-size" class="btn-icon del" title="Delete" disabled>🗑️</button>
     </div>
   </div>
 
   <div class="control-item full-width mb-2">
-    <label class="control-label">Form Factor</label>
+    <label class="control-label" data-i18n="sidebar.cellSpecs.formFactor">Form Factor</label>
     <div id="toggle-cell-type" class="inline-toggle">
-      <span class="it-opt active" data-val="cylindrical">Cylindrical</span>
-      <span class="it-opt" data-val="prismatic">Prismatic</span>
+      <span class="it-opt active" data-val="cylindrical" data-i18n="sidebar.cellSpecs.cylindrical">Cylindrical</span>
+      <span class="it-opt" data-val="prismatic" data-i18n="sidebar.cellSpecs.prismatic">Prismatic</span>
     </div>
   </div>
 
   <div class="control-item full-width mb-2">
-    <label class="control-label">
+    <label class="control-label" data-i18n="sidebar.cellSpecs.cellOrigin">
       Cell Origin
-      <HelpIcon position="right" width="220px" align="left">
+      <HelpIcon position="right" width="220px" align="left" data-i18n-html="sidebar.cellSpecs.pitchTolerance">
         <strong>Pitch Tolerance</strong><br />
         Chinese generic 21700 cells can vary ±0.5mm from nominal diameter.<br /><br />
         <strong>Tier 1</strong>: Samsung, LG, Panasonic, Sony — ±0.2mm tolerance.<br />
@@ -55,8 +56,8 @@ import HelpIcon from '../HelpIcon.astro';
       </HelpIcon>
     </label>
     <select id="cell-origin" class="control-input">
-      <option value="tier1">Tier 1 (Samsung, LG, Panasonic...)</option>
-      <option value="generic-china">Generic China (±0.5mm tolerance)</option>
+      <option value="tier1" data-i18n="sidebar.cellSpecs.tier1">Tier 1 (Samsung, LG, Panasonic...)</option>
+      <option value="generic-china" data-i18n="sidebar.cellSpecs.genericChina">Generic China (±0.5mm tolerance)</option>
     </select>
   </div>
 
@@ -65,11 +66,11 @@ import HelpIcon from '../HelpIcon.astro';
   <!-- Cylindrical dimensions (default) -->
   <div id="cell-dims-cylindrical" class="grid grid-cols-2 gap-2 mb-2 items-end">
     <div class="flex flex-col">
-      <label class="control-label" for="c-diam">Diameter (mm)</label>
+      <label class="control-label" for="c-diam" data-i18n="sidebar.cellSpecs.diameter">Diameter (mm)</label>
       <input id="c-diam" type="number" value="18.4" class="control-input" />
     </div>
     <div class="flex flex-col">
-      <label class="control-label" for="c-len">Length (mm)</label>
+      <label class="control-label" for="c-len" data-i18n="sidebar.cellSpecs.length">Length (mm)</label>
       <input id="c-len" type="number" value="65" class="control-input" />
     </div>
   </div>
@@ -78,15 +79,15 @@ import HelpIcon from '../HelpIcon.astro';
   <div id="cell-dims-prismatic" class="hidden">
     <div class="grid grid-cols-3 gap-2 mb-2 items-end">
       <div class="flex flex-col">
-        <label class="control-label" for="c-prism-w">Width (mm)</label>
+        <label class="control-label" for="c-prism-w" data-i18n="sidebar.cellSpecs.prismWidth">Width (mm)</label>
         <input id="c-prism-w" type="number" value="148" class="control-input" />
       </div>
       <div class="flex flex-col">
-        <label class="control-label" for="c-prism-d">Depth (mm)</label>
+        <label class="control-label" for="c-prism-d" data-i18n="sidebar.cellSpecs.prismDepth">Depth (mm)</label>
         <input id="c-prism-d" type="number" value="27" class="control-input" />
       </div>
       <div class="flex flex-col">
-        <label class="control-label" for="c-len-p">Height (mm)</label>
+        <label class="control-label" for="c-len-p" data-i18n="sidebar.cellSpecs.prismHeight">Height (mm)</label>
         <input id="c-len-p" type="number" value="91" class="control-input" />
       </div>
     </div>
@@ -94,33 +95,33 @@ import HelpIcon from '../HelpIcon.astro';
 
   <div class="grid grid-cols-2 gap-2 mb-2 items-end">
     <div class="flex flex-col">
-      <label class="control-label" for="c-weight">Weight (g)</label>
+      <label class="control-label" for="c-weight" data-i18n="sidebar.cellSpecs.weight">Weight (g)</label>
       <input id="c-weight" type="number" value="45" class="control-input" />
     </div>
     <div class="flex flex-col">
-      <label class="control-label" for="c-cost">Cost (Unit)</label>
+      <label class="control-label" for="c-cost" data-i18n="sidebar.cellSpecs.cost">Cost (Unit)</label>
       <input id="c-cost" type="text" value="€4.50" class="control-input" />
     </div>
   </div>
   <div class="grid grid-cols-2 gap-2 items-end">
     <div class="flex flex-col">
-      <label class="control-label" for="c-mah">Capacity (mAh)</label>
+      <label class="control-label" for="c-mah" data-i18n="sidebar.cellSpecs.capacity">Capacity (mAh)</label>
       <input id="c-mah" type="number" value="2500" step="100" class="control-input" />
     </div>
     <div class="flex flex-col">
-      <label class="control-label" for="c-amp">Continuous (A)</label>
+      <label class="control-label" for="c-amp" data-i18n="sidebar.cellSpecs.continuous">Continuous (A)</label>
       <input id="c-amp" type="number" value="20" class="control-input" />
     </div>
     <div class="flex flex-col">
-      <label class="control-label" for="c-pulse-amp">Pulse (A)</label>
-      <input id="c-pulse-amp" type="number" value="" step="1" class="control-input" placeholder="Optional" />
+      <label class="control-label" for="c-pulse-amp" data-i18n="sidebar.cellSpecs.pulse">Pulse (A)</label>
+      <input id="c-pulse-amp" type="number" value="" step="1" class="control-input" placeholder="Optional" data-i18n-placeholder="sidebar.cellSpecs.optional" />
     </div>
     <div class="flex flex-col">
-      <label class="control-label" for="c-charge-amp">Charge (A)</label>
-      <input id="c-charge-amp" type="number" value="" step="1" class="control-input" placeholder="Optional" />
+      <label class="control-label" for="c-charge-amp" data-i18n="sidebar.cellSpecs.charge">Charge (A)</label>
+      <input id="c-charge-amp" type="number" value="" step="1" class="control-input" placeholder="Optional" data-i18n-placeholder="sidebar.cellSpecs.optional" />
     </div>
     <div class="flex flex-col col-span-2">
-      <label class="control-label" for="sim-cell-ir">Cell IR (mΩ)</label>
+      <label class="control-label" for="sim-cell-ir" data-i18n="sidebar.cellSpecs.cellIR">Cell IR (mΩ)</label>
       <input id="sim-cell-ir" type="number" value="25" class="control-input" />
     </div>
   </div>

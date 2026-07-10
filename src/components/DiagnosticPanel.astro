@@ -11,13 +11,14 @@
   <div class="diag-header flex items-center justify-between px-3 py-2 border-b" style="border-color: var(--border-primary); background: var(--bg-tertiary);">
     <div class="flex items-center gap-1.5">
       <span id="diag-global-status" class="text-lg leading-none">⚪</span>
-      <span class="text-[0.72rem] font-extrabold uppercase tracking-wide" style="color: var(--text-tertiary);">Diagnostic</span>
+      <span class="text-[0.72rem] font-extrabold uppercase tracking-wide" style="color: var(--text-tertiary);" data-i18n="diagnostic.title">Diagnostic</span>
     </div>
     <button
       id="diag-toggle-btn"
       class="diag-collapse-btn transition-colors"
       style="color: var(--text-muted);"
       title="Collapse panel"
+      data-i18n-title="diagnostic.collapsePanel"
     >
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="15 18 9 12 15 6"></polyline>
@@ -30,8 +31,8 @@
     <!-- Global Status -->
     <div class="diag-section mb-3">
       <div class="flex items-center justify-between mb-1">
-        <span class="text-[0.65rem] font-bold uppercase" style="color: var(--text-muted);">Global Status</span>
-        <span id="diag-global-label" class="text-[0.68rem] font-extrabold">NO DATA</span>
+        <span class="text-[0.65rem] font-bold uppercase" style="color: var(--text-muted);" data-i18n="diagnostic.globalStatus">Global Status</span>
+        <span id="diag-global-label" class="text-[0.68rem] font-extrabold" data-i18n="diagnostic.noData">NO DATA</span>
       </div>
       <div class="diag-bar-track">
         <div id="diag-global-bar" class="diag-bar-fill" style="width: 0%; background: #94a3b8;"></div>
@@ -45,7 +46,7 @@
       <div class="flex items-center justify-between mb-0.5">
         <div class="flex items-center gap-1">
           <span class="safety-emoji text-[0.7rem] leading-none">⚪</span>
-          <span class="text-[0.65rem] font-bold" style="color: var(--text-primary);">Voltage Sag</span>
+          <span class="text-[0.65rem] font-bold" style="color: var(--text-primary);" data-i18n="diagnostic.voltageSag">Voltage Sag</span>
         </div>
         <span class="diag-pct text-[0.65rem] font-mono font-bold">0%</span>
       </div>
@@ -54,7 +55,7 @@
         <div class="diag-bar-fill" style="width: 0%; background: #94a3b8;"></div>
       </div>
       <div class="flex justify-between mt-0.5">
-        <span class="text-[0.55rem]" style="color: var(--text-muted);">TTC:</span>
+        <span class="text-[0.55rem]" style="color: var(--text-muted);" data-i18n="diagnostic.ttc">TTC:</span>
         <span id="safety-time-to-cutoff" class="text-[0.55rem] font-mono" style="color: var(--text-muted);">--</span>
       </div>
     </div>
@@ -64,7 +65,7 @@
       <div class="flex items-center justify-between mb-0.5">
         <div class="flex items-center gap-1">
           <span class="safety-emoji text-[0.7rem] leading-none">⚪</span>
-          <span class="text-[0.65rem] font-bold" style="color: var(--text-primary);">Joule Heat</span>
+          <span class="text-[0.65rem] font-bold" style="color: var(--text-primary);" data-i18n="diagnostic.jouleHeat">Joule Heat</span>
         </div>
         <span class="diag-pct text-[0.65rem] font-mono font-bold">0%</span>
       </div>
@@ -79,7 +80,7 @@
       <div class="flex items-center justify-between mb-0.5">
         <div class="flex items-center gap-1">
           <span class="safety-emoji text-[0.7rem] leading-none">⚪</span>
-          <span class="text-[0.65rem] font-bold" style="color: var(--text-primary);">Ampacity</span>
+          <span class="text-[0.65rem] font-bold" style="color: var(--text-primary);" data-i18n="diagnostic.ampacity">Ampacity</span>
         </div>
         <span class="diag-pct text-[0.65rem] font-mono font-bold">0%</span>
       </div>
@@ -95,7 +96,7 @@
       <div class="flex items-center justify-between mb-0.5">
         <div class="flex items-center gap-1">
           <span class="safety-emoji text-[0.7rem] leading-none">⚪</span>
-          <span class="text-[0.65rem] font-bold" style="color: var(--text-primary);">Strip Safety</span>
+          <span class="text-[0.65rem] font-bold" style="color: var(--text-primary);" data-i18n="diagnostic.stripSafety">Strip Safety</span>
         </div>
         <span class="diag-pct text-[0.65rem] font-mono font-bold">0%</span>
       </div>
@@ -110,7 +111,7 @@
       <div class="flex items-center justify-between mb-0.5">
         <div class="flex items-center gap-1">
           <span class="safety-emoji text-[0.7rem] leading-none">⚪</span>
-          <span class="text-[0.65rem] font-bold" style="color: var(--text-primary);">Strip Thermal</span>
+          <span class="text-[0.65rem] font-bold" style="color: var(--text-primary);" data-i18n="diagnostic.stripThermal">Strip Thermal</span>
         </div>
         <span class="diag-pct text-[0.65rem] font-mono font-bold">N/A</span>
       </div>
@@ -122,7 +123,7 @@
       <div class="flex items-center justify-between mb-0.5">
         <div class="flex items-center gap-1">
           <span class="safety-emoji text-[0.7rem] leading-none">⚪</span>
-          <span class="text-[0.65rem] font-bold" style="color: var(--text-primary);">Packing Eff.</span>
+          <span class="text-[0.65rem] font-bold" style="color: var(--text-primary);" data-i18n="diagnostic.packingEff">Packing Eff.</span>
         </div>
         <span class="diag-pct text-[0.65rem] font-mono font-bold">0%</span>
       </div>
@@ -137,11 +138,11 @@
       <div class="flex items-center justify-between mb-0.5">
         <div class="flex items-center gap-1">
           <span class="safety-emoji text-[0.7rem] leading-none">⚪</span>
-          <span class="text-[0.65rem] font-bold" style="color: var(--text-primary);">Compliance</span>
+          <span class="text-[0.65rem] font-bold" style="color: var(--text-primary);" data-i18n="diagnostic.compliance">Compliance</span>
         </div>
         <span class="diag-pct text-[0.65rem] font-mono font-bold">N/A</span>
       </div>
-      <span class="safety-text text-[0.6rem] font-semibold leading-tight block">Run check to validate</span>
+      <span class="safety-text text-[0.6rem] font-semibold leading-tight block" data-i18n="diagnostic.runCheck">Run check to validate</span>
     </div>
   </div>
 </aside>

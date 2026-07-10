@@ -4,6 +4,7 @@
    ───────────────────────────────────────────── */
 
 import type { SafetyLevel } from './safety-indicators';
+import { t } from '../i18n';
 
 /* ── Types ── */
 
@@ -19,10 +20,10 @@ interface CoolantProperties {
 }
 
 const COOLANT_DB: Record<CoolantType, CoolantProperties> = {
-  water_glycol_50: { label: 'Water/Glycol 50/50', density: 1060, specificHeat: 3350, thermalConductivity: 0.4, maxTemp: 100 },
-  water_glycol_70: { label: 'Water/Glycol 70/30', density: 1100, specificHeat: 2980, thermalConductivity: 0.35, maxTemp: 105 },
-  silicone_oil: { label: 'Silicone Oil', density: 960, specificHeat: 1500, thermalConductivity: 0.15, maxTemp: 200 },
-  dielectric_fluid: { label: 'Dielectric Fluid', density: 850, specificHeat: 1800, thermalConductivity: 0.12, maxTemp: 150 },
+  water_glycol_50: { label: t('cooling.waterGlycol50'), density: 1060, specificHeat: 3350, thermalConductivity: 0.4, maxTemp: 100 },
+  water_glycol_70: { label: t('cooling.waterGlycol70'), density: 1100, specificHeat: 2980, thermalConductivity: 0.35, maxTemp: 105 },
+  silicone_oil: { label: t('cooling.siliconeOil'), density: 960, specificHeat: 1500, thermalConductivity: 0.15, maxTemp: 200 },
+  dielectric_fluid: { label: t('cooling.dielectricFluid'), density: 850, specificHeat: 1800, thermalConductivity: 0.12, maxTemp: 150 },
 };
 
 /* ── Interfaces ── */
@@ -149,19 +150,19 @@ export function analyzeCooling(config: CoolingConfig): CoolingResult {
 
   if (!coolingAdequate) {
     const deficit = Q - coolingCapacityW;
-    warnings.push(`Cooling capacity (${coolingCapacityW.toFixed(0)}W) insufficient for heat generation (${Q.toFixed(0)}W) — ${deficit.toFixed(0)}W deficit`);
+    warnings.push(`${t('cooling.insufficientCapacity', { capacity: coolingCapacityW.toFixed(0), load: Q.toFixed(0), deficit: deficit.toFixed(0) })}`);
   }
 
   if (tCellMax > 55) {
-    warnings.push(`Cell temperature ${tCellMax.toFixed(1)}°C exceeds 55°C — consider upgrading cooling system`);
+    warnings.push(`${t('cooling.cellTempExceeds', { temp: tCellMax.toFixed(1) })}`);
   }
 
   if (config.method === 'air' && fanCFM < 50) {
-    warnings.push(`Low airflow (${fanCFM.toFixed(0)} CFM) — consider adding more fans`);
+    warnings.push(`${t('cooling.lowAirflow', { cfm: fanCFM.toFixed(0) })}`);
   }
 
   if (config.method === 'liquid' && coolantFlowLPM < 2) {
-    warnings.push(`Low coolant flow (${coolantFlowLPM.toFixed(1)} LPM) — may cause hot spots`);
+    warnings.push(`${t('cooling.lowCoolantFlow', { flow: coolantFlowLPM.toFixed(1) })}`);
   }
 
   // ── 4. TIM recommendation ──
@@ -175,11 +176,11 @@ export function analyzeCooling(config: CoolingConfig): CoolingResult {
   // ── 6. Status text ──
   let statusText: string;
   if (level === 'red') {
-    statusText = `INSUFFICIENT — ${tCellMax.toFixed(1)}°C, ${coolingCapacityW.toFixed(0)}W capacity vs ${Q.toFixed(0)}W load`;
+    statusText = `${t('cooling.insufficient')} — ${tCellMax.toFixed(1)}°C, ${coolingCapacityW.toFixed(0)}W ${t('cooling.capacityVs')} ${Q.toFixed(0)}W ${t('cooling.load')}`;
   } else if (level === 'yellow') {
-    statusText = `MARGINAL — ${tCellMax.toFixed(1)}°C, ${(coolingCapacityW / Math.max(1, Q) * 100).toFixed(0)}% capacity`;
+    statusText = `${t('cooling.marginal')} — ${tCellMax.toFixed(1)}°C, ${(coolingCapacityW / Math.max(1, Q) * 100).toFixed(0)}% ${t('cooling.capacity')}`;
   } else {
-    statusText = `OK — ${tCellMax.toFixed(1)}°C, ${coolingCapacityW.toFixed(0)}W capacity`;
+    statusText = `${t('cooling.ok')} — ${tCellMax.toFixed(1)}°C, ${coolingCapacityW.toFixed(0)}W ${t('cooling.capacity')}`;
   }
 
   return {
@@ -215,15 +216,15 @@ function recommendTim(heatW: number, tMax: number): TimEntry {
 /* ── Render helpers ── */
 
 export function renderCoolingCard(result: CoolingResult, config: CoolingConfig): string {
-  const methodLabel = config.method === 'passive' ? 'Passive (Natural Convection)'
-    : config.method === 'air' ? 'Air Cooled (Forced)'
-    : 'Liquid Cooled';
+  const methodLabel = config.method === 'passive' ? t('cooling.passiveNatural')
+    : config.method === 'air' ? t('cooling.airCooledForced')
+    : t('cooling.liquidCooled');
 
   const levelColor = result.level === 'green' ? '#22c55e' : result.level === 'yellow' ? '#eab308' : '#ef4444';
 
   const warningsHtml = result.warnings.length > 0 ? `
     <div class="bg-amber-50 border border-amber-200 rounded-md p-2 mt-2">
-      <div class="text-[0.68rem] font-extrabold text-amber-600 uppercase mb-1">Warnings</div>
+      <div class="text-[0.68rem] font-extrabold text-amber-600 uppercase mb-1">${t('cooling.warnings')}</div>
       ${result.warnings.map(w => `
         <div class="flex items-start gap-1 text-[0.58rem] leading-tight mt-0.5">
           <span class="text-amber-500 font-bold shrink-0">→</span>
@@ -234,45 +235,45 @@ export function renderCoolingCard(result: CoolingResult, config: CoolingConfig):
   return `
     <div class="bg-slate-50 border border-slate-200 rounded-md p-2 mt-2">
       <div class="flex justify-between items-center mb-1">
-        <span class="text-[0.68rem] font-extrabold text-slate-400 uppercase">Cooling System</span>
+        <span class="text-[0.68rem] font-extrabold text-slate-400 uppercase">${t('cooling.coolingSystem')}</span>
         <span class="text-[0.55rem] font-bold px-1.5 py-0.5 rounded" style="background: ${levelColor}20; color: ${levelColor};">
-          ${result.level === 'green' ? 'OK' : result.level === 'yellow' ? 'MARGINAL' : 'INSUFFICIENT'}
+          ${result.level === 'green' ? t('cooling.ok') : result.level === 'yellow' ? t('cooling.marginal') : t('cooling.insufficient')}
         </span>
       </div>
       <div class="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[0.62rem]">
-        <span class="text-slate-500">Method</span>
+        <span class="text-slate-500">${t('cooling.method')}</span>
         <span class="font-mono font-semibold text-slate-700">${methodLabel}</span>
-        <span class="text-slate-500">Cell Temperature</span>
+        <span class="text-slate-500">${t('cooling.cellTemperature')}</span>
         <span class="font-mono font-semibold" style="color: ${levelColor}">${result.tCellMax.toFixed(1)}°C</span>
-        <span class="text-slate-500">Cooling Capacity</span>
+        <span class="text-slate-500">${t('cooling.coolingCapacity')}</span>
         <span class="font-mono font-semibold text-slate-700">${result.coolingCapacityW.toFixed(0)}W</span>
-        <span class="text-slate-500">Heat Load</span>
+        <span class="text-slate-500">${t('cooling.heatLoad')}</span>
         <span class="font-mono font-semibold text-slate-700">${config.heatGenerationW.toFixed(0)}W</span>
-        <span class="text-slate-500">Power Consumption</span>
+        <span class="text-slate-500">${t('cooling.powerConsumption')}</span>
         <span class="font-mono font-semibold text-slate-700">${result.powerConsumptionW.toFixed(1)}W</span>
-        <span class="text-slate-500">Thermal Gradient</span>
+        <span class="text-slate-500">${t('cooling.thermalGradient')}</span>
         <span class="font-mono font-semibold text-slate-700">${result.thermalGradient.toFixed(1)}°C</span>
         ${config.method === 'air' ? `
-        <span class="text-slate-500">Total Airflow</span>
+        <span class="text-slate-500">${t('cooling.totalAirflow')}</span>
         <span class="font-mono font-semibold text-slate-700">${result.fanCFM.toFixed(0)} CFM</span>
         ` : ''}
         ${config.method === 'liquid' ? `
-        <span class="text-slate-500">Coolant Flow</span>
+        <span class="text-slate-500">${t('cooling.coolantFlow')}</span>
         <span class="font-mono font-semibold text-slate-700">${result.coolantFlowLPM.toFixed(1)} LPM</span>
         ` : ''}
       </div>
     </div>
 
     <div class="bg-slate-50 border border-slate-200 rounded-md p-2 mt-2">
-      <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-1">Recommended TIM</div>
+      <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-1">${t('cooling.recommendedTim')}</div>
       <div class="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[0.62rem]">
-        <span class="text-slate-500">Material</span>
+        <span class="text-slate-500">${t('cooling.material')}</span>
         <span class="font-mono font-semibold text-slate-700">${result.recommendedTim.name}</span>
-        <span class="text-slate-500">Type</span>
+        <span class="text-slate-500">${t('cooling.type')}</span>
         <span class="font-mono font-semibold text-slate-700">${result.recommendedTim.type}</span>
-        <span class="text-slate-500">Conductivity</span>
+        <span class="text-slate-500">${t('cooling.conductivity')}</span>
         <span class="font-mono font-semibold text-slate-700">${result.recommendedTim.thermalConductivity} W/(m·K)</span>
-        <span class="text-slate-500">Thickness</span>
+        <span class="text-slate-500">${t('cooling.thickness')}</span>
         <span class="font-mono font-semibold text-slate-700">${result.recommendedTim.thickness}mm</span>
       </div>
     </div>

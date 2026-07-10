@@ -1,25 +1,25 @@
 ---
 const materials = [
-  { id: 'cell', label: 'Cell', color: '#f0a3ff', met: 0.15 },
-  { id: 'cap', label: 'Cap', color: '#ffffff', met: 0.20 },
-  { id: 'bus', label: 'Busbar', color: '#ff8f00', met: 0.3 },
-  { id: 'inter', label: 'Inter-Layer', color: '#b87333', met: 0.8, rowId: 'row-inter' },
-  { id: 'spacer', label: 'Spacer', color: '#111111', met: 0.0 },
-  { id: 'bg', label: 'Background', color: '#f4f6f9', met: null, hideMet: true },
+  { id: 'cell', label: 'Cell', color: '#f0a3ff', met: 0.15, i18nKey: 'cell' },
+  { id: 'cap', label: 'Cap', color: '#ffffff', met: 0.20, i18nKey: 'cap' },
+  { id: 'bus', label: 'Busbar', color: '#ff8f00', met: 0.3, i18nKey: 'busbar' },
+  { id: 'inter', label: 'Inter-Layer', color: '#b87333', met: 0.8, rowId: 'row-inter', i18nKey: 'interLayer' },
+  { id: 'spacer', label: 'Spacer', color: '#111111', met: 0.0, i18nKey: 'spacer' },
+  { id: 'bg', label: 'Background', color: '#f4f6f9', met: null, hideMet: true, i18nKey: 'background' },
 ];
 ---
 
 <details open>
-  <summary>Visual Settings</summary>
+  <summary data-i18n="sidebar.visualSettings.title">Visual Settings</summary>
   <div class="p-2.5">
     <div class="grid grid-cols-[60px_1fr_55px] gap-2 text-[0.65rem] text-slate-400 font-bold mb-1.5 uppercase items-center">
-      <div>Element</div>
-      <div>Color</div>
-      <div class="text-center tracking-[-0.5px]">Metallic</div>
+      <div data-i18n="sidebar.visualSettings.colElement">Element</div>
+      <div data-i18n="sidebar.visualSettings.colColor">Color</div>
+      <div class="text-center tracking-[-0.5px]" data-i18n="sidebar.visualSettings.colMetallic">Metallic</div>
     </div>
     {materials.map((m) => (
       <div id={m.rowId} class="grid grid-cols-[60px_1fr_55px] gap-2 items-center mb-1.5">
-        <div class="text-[0.75rem] font-semibold text-[#555]">{m.label}</div>
+        <div class="text-[0.75rem] font-semibold text-[#555]" data-i18n={`sidebar.visualSettings.material.${m.i18nKey}`}>{m.label}</div>
         <div class="flex items-center gap-1 w-full">
           <input
             id={`col-${m.id}`}
@@ -51,18 +51,18 @@ const materials = [
 
     <!-- F18: 3D View Controls -->
     <div class="mt-3 pt-3 border-t" style="border-color: var(--border-primary);">
-      <div class="text-[0.65rem] font-bold mb-2 uppercase" style="color: var(--text-muted);">3D View</div>
+      <div class="text-[0.65rem] font-bold mb-2 uppercase" style="color: var(--text-muted);" data-i18n="sidebar.visualSettings.view3d">3D View</div>
       <div class="flex flex-col gap-2">
         <label class="flex items-center gap-2 cursor-pointer text-[0.75rem] font-medium" style="color: var(--text-primary);">
           <input id="f18-wireframe" type="checkbox" class="w-3.5 h-3.5 accent-blue-500" />
-          Wireframe Mode
+          <span data-i18n="sidebar.visualSettings.wireframeMode">Wireframe Mode</span>
         </label>
         <button
           id="f18-screenshot"
           class="w-full text-[0.7rem] font-semibold py-1.5 px-3 rounded transition-colors cursor-pointer"
           style="background: var(--bg-secondary); border-color: var(--border-primary); color: var(--text-tertiary); border-width: 1px; border-style: solid;"
         >
-          📸 Screenshot (PNG)
+          <span data-i18n="sidebar.visualSettings.screenshot">📸 Screenshot (PNG)</span>
         </button>
       </div>
     </div>

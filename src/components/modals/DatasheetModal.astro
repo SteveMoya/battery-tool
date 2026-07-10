@@ -9,43 +9,43 @@
   >
     <!-- Header -->
     <div class="px-5 py-3 border-b flex justify-between items-center flex-shrink-0" style="border-color: var(--border-primary);">
-      <h3 class="m-0 text-[0.95rem]" style="color: var(--text-primary);">Technical Datasheet</h3>
+      <h3 class="m-0 text-[0.95rem]" style="color: var(--text-primary);" data-i18n="modals.datasheet.title">Technical Datasheet</h3>
       <button id="btn-close-datasheet" class="border-none bg-none text-[1.5rem] cursor-pointer leading-none" style="color: var(--text-muted);">×</button>
     </div>
 
     <!-- Body -->
     <div class="px-5 py-4 overflow-y-auto flex-1">
-      <p class="text-[0.78rem] mb-4 leading-relaxed" style="color: var(--text-tertiary);">
+      <p class="text-[0.78rem] mb-4 leading-relaxed" style="color: var(--text-tertiary);" data-i18n="modals.datasheet.description">
         Generate a professional A4 landscape PDF with all pack specifications, BMS selection, connector recommendations, safety status, simulation results, and BOM summary.
       </p>
 
       <!-- Info card -->
       <div class="border rounded-md p-3 mb-4" style="border-color: var(--border-primary); background: var(--bg-tertiary);">
-        <div class="text-[0.68rem] font-extrabold uppercase mb-2" style="color: var(--text-muted);">Contents</div>
+        <div class="text-[0.68rem] font-extrabold uppercase mb-2" style="color: var(--text-muted);" data-i18n="modals.datasheet.contents">Contents</div>
         <ul class="text-[0.72rem] list-none p-0 m-0 space-y-1" style="color: var(--text-tertiary);">
-          <li>• Electrical & Physical Specifications</li>
-          <li>• Configuration (S×P, layers, grid)</li>
-          <li>• BMS Recommendation</li>
-          <li>• Power Connectors & Wiring</li>
-          <li>• Safety Status (semaphore indicators)</li>
-          <li>• Standards Compliance (IEC 62619, UN 38.3, UL 2580, ISO 12405, SAE J2464)</li>
-          <li>• Protection & Disconnect (contactor, breaker, disconnect, precharge)</li>
-          <li>• Thermal Analysis (temperature, derating, cycle life)</li>
-          <li>• Cooling System (method, capacity, TIM)</li>
-          <li>• Enclosure Design (material, IP rating, dimensions)</li>
-          <li>• Degradation & Cycle Life (capacity fade, cost per cycle)</li>
-          <li>• Simulation Results & Runtime</li>
-          <li>• BOM Summary (nickel strip, cells)</li>
+          <li data-i18n="modals.datasheet.itemElectrical">• Electrical & Physical Specifications</li>
+          <li data-i18n="modals.datasheet.itemConfiguration">• Configuration (S×P, layers, grid)</li>
+          <li data-i18n="modals.datasheet.itemBms">• BMS Recommendation</li>
+          <li data-i18n="modals.datasheet.itemConnectors">• Power Connectors & Wiring</li>
+          <li data-i18n="modals.datasheet.itemSafety">• Safety Status (semaphore indicators)</li>
+          <li data-i18n="modals.datasheet.itemStandards">• Standards Compliance (IEC 62619, UN 38.3, UL 2580, ISO 12405, SAE J2464)</li>
+          <li data-i18n="modals.datasheet.itemProtection">• Protection & Disconnect (contactor, breaker, disconnect, precharge)</li>
+          <li data-i18n="modals.datasheet.itemThermal">• Thermal Analysis (temperature, derating, cycle life)</li>
+          <li data-i18n="modals.datasheet.itemCooling">• Cooling System (method, capacity, TIM)</li>
+          <li data-i18n="modals.datasheet.itemEnclosure">• Enclosure Design (material, IP rating, dimensions)</li>
+          <li data-i18n="modals.datasheet.itemDegradation">• Degradation & Cycle Life (capacity fade, cost per cycle)</li>
+          <li data-i18n="modals.datasheet.itemSimulation">• Simulation Results & Runtime</li>
+          <li data-i18n="modals.datasheet.itemBom">• BOM Summary (nickel strip, cells)</li>
         </ul>
       </div>
 
       <!-- Actions -->
       <div class="flex gap-2">
         <button id="btn-gen-datasheet" class="flex-1 bg-app-blue text-white border-none py-2.5 rounded-md font-bold text-[0.8rem] cursor-pointer hover:bg-app-blue-dark transition-colors">
-          Generate PDF
+          <span data-i18n="modals.datasheet.generatePdf">Generate PDF</span>
         </button>
         <button id="btn-cancel-datasheet" class="flex-1 text-[0.8rem] font-bold cursor-pointer transition-colors" style="background: var(--bg-quaternary); color: var(--text-tertiary); border: 1px solid var(--border-primary); border-radius: 0.375rem; padding: 0.625rem;">
-          Cancel
+          <span data-i18n="modals.datasheet.cancel">Cancel</span>
         </button>
       </div>
     </div>

@@ -5,6 +5,7 @@
    ───────────────────────────────────────────── */
 
 import type { SafetyLevel } from './safety-indicators';
+import { t } from '../i18n';
 
 /* ── Chemistry-specific thermal parameters ── */
 
@@ -25,7 +26,7 @@ interface ChemistryThermal {
 
 const CHEMISTRY_PARAMS: Record<Chemistry, ChemistryThermal> = {
   nmc: {
-    label: 'NMC (Nickel Manganese Cobalt)',
+    label: t('thermal.nmcFull'),
     ea: 24.6, nRef: 500, tRef: 25, crateRef: 1, dodRef: 0.8,
     deratingCurve: [
       { temp: 25, capacityPct: 100 },
@@ -36,7 +37,7 @@ const CHEMISTRY_PARAMS: Record<Chemistry, ChemistryThermal> = {
     tMax: 60, tRecommended: 45,
   },
   lfp: {
-    label: 'LFP (Lithium Iron Phosphate)',
+    label: t('thermal.lfpFull'),
     ea: 20.0, nRef: 2000, tRef: 25, crateRef: 1, dodRef: 0.8,
     deratingCurve: [
       { temp: 25, capacityPct: 100 },
@@ -47,7 +48,7 @@ const CHEMISTRY_PARAMS: Record<Chemistry, ChemistryThermal> = {
     tMax: 65, tRecommended: 50,
   },
   lto: {
-    label: 'LTO (Lithium Titanate)',
+    label: t('thermal.ltoFull'),
     ea: 15.0, nRef: 8000, tRef: 25, crateRef: 1, dodRef: 0.8,
     deratingCurve: [
       { temp: 25, capacityPct: 100 },
@@ -58,7 +59,7 @@ const CHEMISTRY_PARAMS: Record<Chemistry, ChemistryThermal> = {
     tMax: 70, tRecommended: 55,
   },
   'na-ion': {
-    label: 'Na-Ion (Sodium Ion)',
+    label: t('thermal.naIonFull'),
     ea: 22.0, nRef: 1000, tRef: 25, crateRef: 1, dodRef: 0.8,
     deratingCurve: [
       { temp: 25, capacityPct: 100 },
@@ -69,7 +70,7 @@ const CHEMISTRY_PARAMS: Record<Chemistry, ChemistryThermal> = {
     tMax: 55, tRecommended: 40,
   },
   nca: {
-    label: 'NCA (Nickel Cobalt Aluminum)',
+    label: t('thermal.ncaFull'),
     ea: 26.0, nRef: 400, tRef: 25, crateRef: 1, dodRef: 0.8,
     deratingCurve: [
       { temp: 25, capacityPct: 100 },
@@ -204,11 +205,11 @@ export function analyzeThermal(config: ThermalConfig): ThermalResult {
   // ── 8. Status text ──
   let statusText: string;
   if (level === 'red') {
-    statusText = `DANGER — ${tCellMax.toFixed(1)}°C exceeds ${chem.tMax}°C limit`;
+    statusText = `${t('thermal.danger')} — ${tCellMax.toFixed(1)}°C ${t('thermal.exceeds')} ${chem.tMax}°C ${t('thermal.limit')}`;
   } else if (level === 'yellow') {
-    statusText = `WARM — ${tCellMax.toFixed(1)}°C (derating ${((1 - deratingFactor) * 100).toFixed(0)}%)`;
+    statusText = `${t('thermal.warm')} — ${tCellMax.toFixed(1)}°C (${t('thermal.derating')} ${((1 - deratingFactor) * 100).toFixed(0)}%)`;
   } else {
-    statusText = `OK — ${tCell.toFixed(1)}°C (${estimatedCycles.toLocaleString()} cycles est.)`;
+    statusText = `${t('thermal.ok')} — ${tCell.toFixed(1)}°C (${estimatedCycles.toLocaleString()} ${t('thermal.cyclesEst')})`;
   }
 
   return {
@@ -263,42 +264,42 @@ export function renderThermalCard(result: ThermalResult, config: ThermalConfig):
   return `
     <div class="bg-slate-50 border border-slate-200 rounded-md p-2 mt-2">
       <div class="flex justify-between items-center mb-1">
-        <span class="text-[0.68rem] font-extrabold text-slate-400 uppercase">Thermal Analysis</span>
+        <span class="text-[0.68rem] font-extrabold text-slate-400 uppercase">${t('thermal.thermalAnalysis')}</span>
         <span class="text-[0.55rem] font-bold px-1.5 py-0.5 rounded" style="background: ${levelColor}20; color: ${levelColor};">
-          ${result.level === 'green' ? 'OK' : result.level === 'yellow' ? 'WARM' : 'HOT'}
+          ${result.level === 'green' ? t('thermal.ok') : result.level === 'yellow' ? t('thermal.warm') : t('thermal.hot')}
         </span>
       </div>
       <div class="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[0.62rem]">
-        <span class="text-slate-500">Cell Temperature</span>
+        <span class="text-slate-500">${t('thermal.cellTemperature')}</span>
         <span class="font-mono font-semibold text-slate-700">${result.tCell.toFixed(1)}°C</span>
-        <span class="text-slate-500">Hottest Cell</span>
+        <span class="text-slate-500">${t('thermal.hottestCell')}</span>
         <span class="font-mono font-semibold" style="color: ${levelColor}">${result.tCellMax.toFixed(1)}°C</span>
-        <span class="text-slate-500">Thermal Gradient</span>
+        <span class="text-slate-500">${t('thermal.thermalGradient')}</span>
         <span class="font-mono font-semibold text-slate-700">${result.thermalGradient.toFixed(1)}°C</span>
-        <span class="text-slate-500">Derating</span>
+        <span class="text-slate-500">${t('thermal.derating')}</span>
         <span class="font-mono font-semibold ${result.deratingFactor < 0.95 ? 'text-amber-600' : 'text-slate-700'}">${(result.deratingFactor * 100).toFixed(0)}%</span>
-        <span class="text-slate-500">Heat Generation</span>
+        <span class="text-slate-500">${t('thermal.heatGeneration')}</span>
         <span class="font-mono font-semibold text-slate-700">${result.heatGenerationW >= 100 ? Math.round(result.heatGenerationW) : result.heatGenerationW.toFixed(1)}W</span>
-        <span class="text-slate-500">Cooling Power</span>
+        <span class="text-slate-500">${t('thermal.coolingPower')}</span>
         <span class="font-mono font-semibold text-slate-700">${result.coolingPowerW.toFixed(1)}W</span>
       </div>
     </div>
 
     <div class="bg-slate-50 border border-slate-200 rounded-md p-2 mt-2">
-      <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-1">Cycle Life Estimate</div>
+      <div class="text-[0.68rem] font-extrabold text-slate-400 uppercase mb-1">${t('thermal.cycleLifeEstimate')}</div>
       <div class="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[0.62rem]">
-        <span class="text-slate-500">Estimated Cycles (80% SoH)</span>
+        <span class="text-slate-500">${t('thermal.estimatedCyclesLabel')}</span>
         <span class="font-mono font-semibold text-slate-700">${result.estimatedCycles.toLocaleString()}</span>
-        <span class="text-slate-500">Annual Degradation</span>
+        <span class="text-slate-500">${t('thermal.annualDegradation')}</span>
         <span class="font-mono font-semibold ${result.annualDegradation > 15 ? 'text-amber-600' : 'text-slate-700'}">${result.annualDegradation.toFixed(1)}%/year</span>
-        <span class="text-slate-500">Chemistry</span>
+        <span class="text-slate-500">${t('thermal.chemistry')}</span>
         <span class="font-mono font-semibold text-slate-700">${chem.label.split('(')[0].trim()}</span>
-        <span class="text-slate-500">Avg C-rate / DoD</span>
+        <span class="text-slate-500">${t('thermal.avgCrateDod')}</span>
         <span class="font-mono font-semibold text-slate-700">${config.crateAvg.toFixed(1)}C / ${(config.dodAvg * 100).toFixed(0)}%</span>
       </div>
       ${result.estimatedCycles < 500 ? `
       <div class="mt-1 text-[0.58rem] font-bold text-red-600">
-        ⚠ Low cycle life — consider LFP chemistry for longer life
+        ⚠ ${t('thermal.lowCycleLifeWarning')}
       </div>` : ''}
     </div>
   `;

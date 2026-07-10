@@ -4,8 +4,8 @@ import HelpIcon from '../HelpIcon.astro';
 
 <section class="group-box">
   <div class="flex justify-between items-center mb-1.5">
-    <h2 class="section-title m-0">15. Total Cost of Ownership</h2>
-    <HelpIcon tip="Lifecycle cost analysis: CAPEX, OPEX, replacement, disposal, NPV, LCOE, and payback period" />
+    <h2 class="section-title m-0" data-i18n="sidebar.tco.title">15. Total Cost of Ownership</h2>
+    <HelpIcon tip="Lifecycle cost analysis: CAPEX, OPEX, replacement, disposal, NPV, LCOE, and payback period" data-i18n-tip="sidebar.tco.helpTip" />
   </div>
 
   <div class="mb-2">
@@ -14,7 +14,7 @@ import HelpIcon from '../HelpIcon.astro';
         id="tco-run-btn"
         class="btn-primary text-[0.65rem] py-1 px-2.5"
       >
-        Calculate TCO
+        <span data-i18n="sidebar.tco.calculateTco">Calculate TCO</span>
       </button>
       <span id="tco-status-badge" class="text-[0.6rem] font-bold px-1.5 py-0.5 rounded hidden"></span>
     </div>
@@ -23,42 +23,42 @@ import HelpIcon from '../HelpIcon.astro';
     <div id="tco-inputs" class="rounded-md p-2 mb-2" style="background: var(--bg-tertiary); border-color: var(--border-primary); border-width: 1px; border-style: solid;">
       <div class="grid grid-cols-2 gap-2">
         <div class="flex flex-col">
-          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Pack Cost (EUR)</label>
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);" data-i18n="sidebar.tco.packCost">Pack Cost (EUR)</label>
           <input id="tco-pack-cost" type="number" value="500" min="0" max="100000" step="50"
             class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);" />
         </div>
         <div class="flex flex-col">
-          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Installation (EUR)</label>
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);" data-i18n="sidebar.tco.installation">Installation (EUR)</label>
           <input id="tco-install-cost" type="number" value="100" min="0" max="50000" step="25"
             class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);" />
         </div>
         <div class="flex flex-col">
-          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Electricity (EUR/kWh)</label>
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);" data-i18n="sidebar.tco.electricity">Electricity (EUR/kWh)</label>
           <input id="tco-electricity-cost" type="number" value="0.15" min="0" max="1" step="0.01"
             class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);" />
         </div>
         <div class="flex flex-col">
-          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Maintenance (EUR/yr)</label>
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);" data-i18n="sidebar.tco.maintenance">Maintenance (EUR/yr)</label>
           <input id="tco-maintenance-cost" type="number" value="50" min="0" max="5000" step="10"
             class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);" />
         </div>
         <div class="flex flex-col">
-          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Replacement Multiplier</label>
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);" data-i18n="sidebar.tco.replacementMultiplier">Replacement Multiplier</label>
           <input id="tco-replacement-mult" type="number" value="0.7" min="0.3" max="1.5" step="0.1"
             class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);" />
         </div>
         <div class="flex flex-col">
-          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Analysis Years</label>
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);" data-i18n="sidebar.tco.analysisYears">Analysis Years</label>
           <input id="tco-analysis-years" type="number" value="10" min="1" max="30" step="1"
             class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);" />
         </div>
         <div class="flex flex-col">
-          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Discount Rate (%)</label>
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);" data-i18n="sidebar.tco.discountRate">Discount Rate (%)</label>
           <input id="tco-discount-rate" type="number" value="5" min="0" max="20" step="0.5"
             class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);" />
         </div>
         <div class="flex flex-col">
-          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);">Roundtrip Efficiency (%)</label>
+          <label class="text-[0.58rem] font-bold mb-0.5" style="color: var(--text-muted);" data-i18n="sidebar.tco.roundtripEfficiency">Roundtrip Efficiency (%)</label>
           <input id="tco-efficiency" type="number" value="92" min="50" max="100" step="1"
             class="text-[0.65rem] px-1.5 py-1 rounded border" style="border-color: var(--border-primary); background: var(--bg-secondary); color: var(--text-primary);" />
         </div>
