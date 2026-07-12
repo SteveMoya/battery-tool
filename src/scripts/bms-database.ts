@@ -27,44 +27,70 @@ export interface BmsEntry {
 }
 
 export const BMS_DB: BmsEntry[] = [
-  // Daly Smart BMS
-  { name: 'Daly 7S-30S 60A', brand: 'Daly', sMin: 7, sMax: 30, chem: ['li-ion', 'lfp'], maxA: 60, balanceType: 'activo-capacitivo', balanceCurrent: 0.05, protocol: 'Bluetooth', smart: true, w: 52, d: 30, h: 14 },
-  { name: 'Daly 7S-30S 100A', brand: 'Daly', sMin: 7, sMax: 30, chem: ['li-ion', 'lfp'], maxA: 100, balanceType: 'activo-capacitivo', balanceCurrent: 0.05, protocol: 'Bluetooth', smart: true, w: 62, d: 36, h: 16 },
-  { name: 'Daly 7S-24S 20A', brand: 'Daly', sMin: 7, sMax: 24, chem: ['li-ion', 'lfp'], maxA: 20, balanceType: 'activo-capacitivo', balanceCurrent: 0.03, protocol: 'Bluetooth', smart: true, w: 42, d: 24, h: 10 },
-  { name: 'Daly 4S-8S 30A', brand: 'Daly', sMin: 4, sMax: 8, chem: ['li-ion'], maxA: 30, balanceType: 'activo-capacitivo', balanceCurrent: 0.03, protocol: 'Bluetooth', smart: true, w: 36, d: 22, h: 8 },
+  // ═══════════════════════════════════════════════
+  // JBD (Jiabaida) Smart BMS —最受欢迎 en AliExpress/Amazon
+  // Protocolo: UART 9600 baud, RS485, CAN, Bluetooth (Xiaoxiang App)
+  // App PC: "Jiabaida Tools" (Windows)
+  // ═══════════════════════════════════════════════
+  { name: 'JBD SP04S060 4S 60A', brand: 'JBD', sMin: 4, sMax: 4, chem: ['li-ion'], maxA: 60, balanceType: 'pasivo', balanceCurrent: 0, protocol: 'UART/Bluetooth', smart: false, w: 40, d: 22, h: 8, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+  { name: 'JBD SP22S003 6-22S 100A', brand: 'JBD', sMin: 6, sMax: 22, chem: ['li-ion', 'lfp'], maxA: 100, balanceType: 'pasivo', balanceCurrent: 0, protocol: 'UART/RS485/Bluetooth', smart: true, w: 55, d: 30, h: 12, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+  { name: 'JBD SP24S004 8-24S 200A', brand: 'JBD', sMin: 8, sMax: 24, chem: ['li-ion', 'lfp'], maxA: 200, balanceType: 'pasivo', balanceCurrent: 0, protocol: 'UART/RS485/CAN/Bluetooth', smart: true, w: 65, d: 38, h: 14, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+  { name: 'JBD AP21S001 6-21S 200A', brand: 'JBD', sMin: 6, sMax: 21, chem: ['lfp'], maxA: 200, balanceType: 'pasivo', balanceCurrent: 0, protocol: 'UART/RS485/CAN/Bluetooth', smart: true, w: 60, d: 34, h: 12, vCutoffCharge: 3.65, vCutoffDischarge: 2.5 },
+  { name: 'JBD DP24D002 8-24S 200A', brand: 'JBD', sMin: 8, sMax: 24, chem: ['lfp'], maxA: 200, balanceType: 'pasivo', balanceCurrent: 0, protocol: 'UART/RS485/CAN/Bluetooth', smart: true, w: 70, d: 40, h: 16, vCutoffCharge: 3.65, vCutoffDischarge: 2.5 },
 
-  // Jikong (JK) BMS
-  { name: 'JK BMS 8S-24S 60A', brand: 'JK', sMin: 8, sMax: 24, chem: ['li-ion', 'lfp', 'lto'], maxA: 60, balanceType: 'activo-inductivo', balanceCurrent: 2.0, protocol: 'Bluetooth', smart: true, w: 56, d: 32, h: 14 },
-  { name: 'JK BMS 8S-24S 100A', brand: 'JK', sMin: 8, sMax: 24, chem: ['li-ion', 'lfp', 'lto'], maxA: 100, balanceType: 'activo-inductivo', balanceCurrent: 2.0, protocol: 'Bluetooth', smart: true, w: 68, d: 38, h: 16 },
-  { name: 'JK BMS 8S-24S 200A', brand: 'JK', sMin: 8, sMax: 24, chem: ['li-ion', 'lfp'], maxA: 200, balanceType: 'activo-inductivo', balanceCurrent: 2.0, protocol: 'Bluetooth/CAN', smart: true, w: 82, d: 46, h: 18 },
+  // ═══════════════════════════════════════════════
+  // Daly Smart BMS — Protocolo: UART 9600, RS485 MODBUS RTU, CAN 250K
+  // App: "Daly BMS" (iOS/Android), PC Software (Windows)
+  // ═══════════════════════════════════════════════
+  { name: 'Daly 4S-8S 30A', brand: 'Daly', sMin: 4, sMax: 8, chem: ['li-ion'], maxA: 30, balanceType: 'activo-capacitivo', balanceCurrent: 0.03, protocol: 'UART/Bluetooth', smart: true, w: 36, d: 22, h: 8, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+  { name: 'Daly 7S-24S 20A', brand: 'Daly', sMin: 7, sMax: 24, chem: ['li-ion', 'lfp'], maxA: 20, balanceType: 'activo-capacitivo', balanceCurrent: 0.03, protocol: 'UART/RS485/Bluetooth', smart: true, w: 42, d: 24, h: 10, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+  { name: 'Daly 7S-30S 60A', brand: 'Daly', sMin: 7, sMax: 30, chem: ['li-ion', 'lfp'], maxA: 60, balanceType: 'activo-capacitivo', balanceCurrent: 0.05, protocol: 'UART/RS485/CAN/Bluetooth', smart: true, w: 52, d: 30, h: 14, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+  { name: 'Daly 7S-30S 100A', brand: 'Daly', sMin: 7, sMax: 30, chem: ['li-ion', 'lfp'], maxA: 100, balanceType: 'activo-capacitivo', balanceCurrent: 0.05, protocol: 'UART/RS485/CAN/Bluetooth', smart: true, w: 62, d: 36, h: 16, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+  { name: 'Daly 7S-30S 200A', brand: 'Daly', sMin: 7, sMax: 30, chem: ['li-ion', 'lfp'], maxA: 200, balanceType: 'activo-capacitivo', balanceCurrent: 0.05, protocol: 'UART/RS485/CAN/Bluetooth', smart: true, w: 82, d: 46, h: 18, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+  { name: 'Daly H-Series 15S 200A', brand: 'Daly', sMin: 15, sMax: 15, chem: ['lfp'], maxA: 200, balanceType: 'activo-capacitivo', balanceCurrent: 0.05, protocol: 'UART/RS485/CAN/Bluetooth', smart: false, w: 120, d: 65, h: 20, vCutoffCharge: 3.65, vCutoffDischarge: 2.5 },
+  { name: 'Daly D2-Series 3-24S 30A', brand: 'Daly', sMin: 3, sMax: 24, chem: ['li-ion', 'lfp'], maxA: 30, balanceType: 'pasivo', balanceCurrent: 0, protocol: 'UART/Bluetooth', smart: true, w: 38, d: 22, h: 8, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
 
-  // ANT BMS
-  { name: 'ANT BMS 7S-24S 60A', brand: 'ANT', sMin: 7, sMax: 24, chem: ['li-ion', 'lfp'], maxA: 60, balanceType: 'activo-capacitivo', balanceCurrent: 0.05, protocol: 'Bluetooth', smart: true, w: 50, d: 28, h: 12 },
-  { name: 'ANT BMS 7S-24S 100A', brand: 'ANT', sMin: 7, sMax: 24, chem: ['li-ion', 'lfp'], maxA: 100, balanceType: 'activo-capacitivo', balanceCurrent: 0.05, protocol: 'Bluetooth', smart: true, w: 60, d: 34, h: 14 },
-  { name: 'ANT BMS 7S-24S 150A', brand: 'ANT', sMin: 7, sMax: 24, chem: ['li-ion', 'lfp'], maxA: 150, balanceType: 'activo-capacitivo', balanceCurrent: 0.05, protocol: 'Bluetooth', smart: true, w: 72, d: 40, h: 16 },
+  // ═══════════════════════════════════════════════
+  // Jikong (JK) BMS — Balance activo inductivo 2A (el más potente)
+  // Protocolo: UART 9600 (JK02_32S), RS485, CAN, Bluetooth
+  // App: "JK BMS" (iOS/Android)
+  // ═══════════════════════════════════════════════
+  { name: 'JK BMS 8S-24S 60A', brand: 'JK', sMin: 8, sMax: 24, chem: ['li-ion', 'lfp', 'lto'], maxA: 60, balanceType: 'activo-inductivo', balanceCurrent: 2.0, protocol: 'UART/RS485/Bluetooth', smart: true, w: 56, d: 32, h: 14, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+  { name: 'JK BMS 8S-24S 100A', brand: 'JK', sMin: 8, sMax: 24, chem: ['li-ion', 'lfp', 'lto'], maxA: 100, balanceType: 'activo-inductivo', balanceCurrent: 2.0, protocol: 'UART/RS485/Bluetooth', smart: true, w: 68, d: 38, h: 16, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+  { name: 'JK BMS 8S-24S 200A', brand: 'JK', sMin: 8, sMax: 24, chem: ['li-ion', 'lfp'], maxA: 200, balanceType: 'activo-inductivo', balanceCurrent: 2.0, protocol: 'UART/RS485/CAN/Bluetooth', smart: true, w: 82, d: 46, h: 18, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+  { name: 'JK BMS 8S-24S 300A', brand: 'JK', sMin: 8, sMax: 24, chem: ['li-ion', 'lfp'], maxA: 300, balanceType: 'activo-inductivo', balanceCurrent: 2.0, protocol: 'UART/RS485/CAN/Bluetooth', smart: true, w: 100, d: 56, h: 22, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+  { name: 'JK BMS 8S-24S 60A (Na-Ion)', brand: 'JK', sMin: 8, sMax: 24, chem: ['li-ion', 'lfp', 'lto', 'na-ion'], maxA: 60, balanceType: 'activo-inductivo', balanceCurrent: 2.0, protocol: 'UART/RS485/Bluetooth', smart: true, w: 56, d: 32, h: 14, vCutoffCharge: 4.2, vCutoffDischarge: 1.5 },
+  { name: 'JK BMS 8S-20S 60A (LTO)', brand: 'JK', sMin: 8, sMax: 20, chem: ['lto', 'li-ion', 'lfp'], maxA: 60, balanceType: 'activo-inductivo', balanceCurrent: 2.0, protocol: 'UART/RS485/Bluetooth', smart: true, w: 56, d: 32, h: 14, vCutoffCharge: 2.8, vCutoffDischarge: 1.5 },
+  { name: 'JK BD6A24S10P 7-24S 100A', brand: 'JK', sMin: 7, sMax: 24, chem: ['li-ion', 'lfp', 'lto'], maxA: 100, balanceType: 'activo-inductivo', balanceCurrent: 0.6, protocol: 'UART/RS485/CAN/Bluetooth', smart: true, w: 62, d: 36, h: 14, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+  { name: 'JK BD6A24S20P 7-24S 200A', brand: 'JK', sMin: 7, sMax: 24, chem: ['li-ion', 'lfp', 'lto'], maxA: 200, balanceType: 'activo-inductivo', balanceCurrent: 0.6, protocol: 'UART/RS485/CAN/Bluetooth', smart: true, w: 78, d: 44, h: 16, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
 
+  // ═══════════════════════════════════════════════
+  // ANT BMS — Balance activo capacitivo 0.05A
+  // Protocolo: UART 9600, RS485, CAN 250K, Bluetooth
+  // App: "ANT BMS" (Android/iOS)
+  // ═══════════════════════════════════════════════
+  { name: 'ANT BMS 7S-24S 60A', brand: 'ANT', sMin: 7, sMax: 24, chem: ['li-ion', 'lfp'], maxA: 60, balanceType: 'activo-capacitivo', balanceCurrent: 0.05, protocol: 'UART/RS485/Bluetooth', smart: true, w: 50, d: 28, h: 12, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+  { name: 'ANT BMS 7S-24S 100A', brand: 'ANT', sMin: 7, sMax: 24, chem: ['li-ion', 'lfp'], maxA: 100, balanceType: 'activo-capacitivo', balanceCurrent: 0.05, protocol: 'UART/RS485/Bluetooth', smart: true, w: 60, d: 34, h: 14, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+  { name: 'ANT BMS 7S-24S 150A', brand: 'ANT', sMin: 7, sMax: 24, chem: ['li-ion', 'lfp'], maxA: 150, balanceType: 'activo-capacitivo', balanceCurrent: 0.05, protocol: 'UART/RS485/CAN/Bluetooth', smart: true, w: 72, d: 40, h: 16, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+  { name: 'ANT BMS 7S-32S 200A', brand: 'ANT', sMin: 7, sMax: 32, chem: ['li-ion', 'lfp'], maxA: 200, balanceType: 'activo-capacitivo', balanceCurrent: 0.05, protocol: 'UART/RS485/CAN/Bluetooth', smart: true, w: 80, d: 44, h: 18, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+  { name: 'ANT BMS 7S-32S 300A', brand: 'ANT', sMin: 7, sMax: 32, chem: ['li-ion', 'lfp'], maxA: 300, balanceType: 'activo-capacitivo', balanceCurrent: 0.05, protocol: 'UART/RS485/CAN/Bluetooth', smart: true, w: 95, d: 52, h: 20, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+
+  // ═══════════════════════════════════════════════
   // Xuanjing BMS
-  { name: 'Xuanjing 8S-24S 60A', brand: 'Xuanjing', sMin: 8, sMax: 24, chem: ['li-ion', 'lfp'], maxA: 60, balanceType: 'activo-capacitivo', balanceCurrent: 0.03, protocol: 'Bluetooth', smart: true, w: 48, d: 26, h: 12 },
-  { name: 'Xuanjing 8S-24S 100A', brand: 'Xuanjing', sMin: 8, sMax: 24, chem: ['li-ion', 'lfp'], maxA: 100, balanceType: 'activo-capacitivo', balanceCurrent: 0.03, protocol: 'Bluetooth', smart: true, w: 58, d: 32, h: 14 },
+  // ═══════════════════════════════════════════════
+  { name: 'Xuanjing 8S-24S 60A', brand: 'Xuanjing', sMin: 8, sMax: 24, chem: ['li-ion', 'lfp'], maxA: 60, balanceType: 'activo-capacitivo', balanceCurrent: 0.03, protocol: 'UART/RS485/Bluetooth', smart: true, w: 48, d: 26, h: 12, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+  { name: 'Xuanjing 8S-24S 100A', brand: 'Xuanjing', sMin: 8, sMax: 24, chem: ['li-ion', 'lfp'], maxA: 100, balanceType: 'activo-capacitivo', balanceCurrent: 0.03, protocol: 'UART/RS485/Bluetooth', smart: true, w: 58, d: 32, h: 14, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
 
-  // Fixed-count BMS (non-smart)
-  { name: 'BMS 13S Li-ion 40A', brand: 'Generic', sMin: 13, sMax: 13, chem: ['li-ion'], maxA: 40, balanceType: 'pasivo', balanceCurrent: 0, protocol: 'N/A', smart: false, w: 42, d: 20, h: 8 },
-  { name: 'BMS 13S Li-ion 60A', brand: 'Generic', sMin: 13, sMax: 13, chem: ['li-ion'], maxA: 60, balanceType: 'pasivo', balanceCurrent: 0, protocol: 'N/A', smart: false, w: 48, d: 24, h: 10 },
-  { name: 'BMS 16S Li-ion 60A', brand: 'Generic', sMin: 16, sMax: 16, chem: ['li-ion'], maxA: 60, balanceType: 'pasivo', balanceCurrent: 0, protocol: 'N/A', smart: false, w: 48, d: 24, h: 10 },
-  { name: 'BMS 14S LFP 60A', brand: 'Generic', sMin: 14, sMax: 14, chem: ['lfp'], maxA: 60, balanceType: 'pasivo', balanceCurrent: 0, protocol: 'N/A', smart: false, w: 48, d: 24, h: 10 },
-  { name: 'BMS 16S LFP 80A', brand: 'Generic', sMin: 16, sMax: 16, chem: ['lfp'], maxA: 80, balanceType: 'pasivo', balanceCurrent: 0, protocol: 'N/A', smart: false, w: 56, d: 28, h: 12 },
-  { name: 'BMS 8S Li-ion 30A', brand: 'Generic', sMin: 8, sMax: 8, chem: ['li-ion'], maxA: 30, balanceType: 'pasivo', balanceCurrent: 0, protocol: 'N/A', smart: false, w: 36, d: 18, h: 8 },
-  { name: 'BMS 10S Li-ion 30A', brand: 'Generic', sMin: 10, sMax: 10, chem: ['li-ion'], maxA: 30, balanceType: 'pasivo', balanceCurrent: 0, protocol: 'N/A', smart: false, w: 36, d: 18, h: 8 },
-
-  // High-current BMS
-  { name: 'JK BMS 8S-24S 300A', brand: 'JK', sMin: 8, sMax: 24, chem: ['li-ion', 'lfp'], maxA: 300, balanceType: 'activo-inductivo', balanceCurrent: 2.0, protocol: 'Bluetooth/CAN', smart: true, w: 100, d: 56, h: 22 },
-  { name: 'Daly 7S-30S 200A', brand: 'Daly', sMin: 7, sMax: 30, chem: ['li-ion', 'lfp'], maxA: 200, balanceType: 'activo-capacitivo', balanceCurrent: 0.05, protocol: 'Bluetooth/UART', smart: true, w: 82, d: 46, h: 18 },
-
-  // Na-Ion compatible
-  { name: 'JK BMS 8S-24S 60A (Na-Ion)', brand: 'JK', sMin: 8, sMax: 24, chem: ['li-ion', 'lfp', 'lto', 'na-ion'], maxA: 60, balanceType: 'activo-inductivo', balanceCurrent: 2.0, protocol: 'Bluetooth', smart: true, w: 56, d: 32, h: 14 },
-
-  // LTO compatible
-  { name: 'JK BMS 8S-20S 60A (LTO)', brand: 'JK', sMin: 8, sMax: 20, chem: ['lto', 'li-ion', 'lfp'], maxA: 60, balanceType: 'activo-inductivo', balanceCurrent: 2.0, protocol: 'Bluetooth', smart: true, w: 56, d: 32, h: 14 },
+  // ═══════════════════════════════════════════════
+  // Generic / Fixed-count BMS (non-smart)
+  // ═══════════════════════════════════════════════
+  { name: 'BMS 8S Li-ion 30A', brand: 'Generic', sMin: 8, sMax: 8, chem: ['li-ion'], maxA: 30, balanceType: 'pasivo', balanceCurrent: 0, protocol: 'N/A', smart: false, w: 36, d: 18, h: 8, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+  { name: 'BMS 10S Li-ion 30A', brand: 'Generic', sMin: 10, sMax: 10, chem: ['li-ion'], maxA: 30, balanceType: 'pasivo', balanceCurrent: 0, protocol: 'N/A', smart: false, w: 36, d: 18, h: 8, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+  { name: 'BMS 13S Li-ion 40A', brand: 'Generic', sMin: 13, sMax: 13, chem: ['li-ion'], maxA: 40, balanceType: 'pasivo', balanceCurrent: 0, protocol: 'N/A', smart: false, w: 42, d: 20, h: 8, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+  { name: 'BMS 13S Li-ion 60A', brand: 'Generic', sMin: 13, sMax: 13, chem: ['li-ion'], maxA: 60, balanceType: 'pasivo', balanceCurrent: 0, protocol: 'N/A', smart: false, w: 48, d: 24, h: 10, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+  { name: 'BMS 14S LFP 60A', brand: 'Generic', sMin: 14, sMax: 14, chem: ['lfp'], maxA: 60, balanceType: 'pasivo', balanceCurrent: 0, protocol: 'N/A', smart: false, w: 48, d: 24, h: 10, vCutoffCharge: 3.65, vCutoffDischarge: 2.5 },
+  { name: 'BMS 16S Li-ion 60A', brand: 'Generic', sMin: 16, sMax: 16, chem: ['li-ion'], maxA: 60, balanceType: 'pasivo', balanceCurrent: 0, protocol: 'N/A', smart: false, w: 48, d: 24, h: 10, vCutoffCharge: 4.2, vCutoffDischarge: 2.5 },
+  { name: 'BMS 16S LFP 80A', brand: 'Generic', sMin: 16, sMax: 16, chem: ['lfp'], maxA: 80, balanceType: 'pasivo', balanceCurrent: 0, protocol: 'N/A', smart: false, w: 56, d: 28, h: 12, vCutoffCharge: 3.65, vCutoffDischarge: 2.5 },
 ];
 
 /* ─────────────────────────────────────────────
