@@ -1,8 +1,6 @@
-<p align="center">
-  <img src="https://iili.io/C1OawHx.png" alt="BCA Tool — Battery Configuration & Analysis" width="100%">
-</p>
-
 # BCA Tool — Battery Configuration & Analysis
+
+<img width="1280" height="720" alt="C1OawHx" src="https://github.com/user-attachments/assets/386b1fbe-0bb1-4909-b390-ff95131fbaff" alt="BCA Tool — Battery Configuration & Analysis" width="100%" />
 
 Herramienta web para diseño, simulación y export de packs de baterías lithium. Stack: **Astro 7.7 + React 19 + Three.js 0.184 + Tailwind 4**, desplegado en Cloudflare Workers.
 
