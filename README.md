@@ -4,6 +4,12 @@
 
 Herramienta web para diseño, simulación y export de packs de baterías lithium. Stack: **Astro 7.7 + React 19 + Three.js 0.184 + Tailwind 4**, desplegado en Cloudflare Workers.
 
+## 🚀 Live Demo
+
+[![Deployed on Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)](https://baterry-tool.workers.dev)
+
+**🔗 [https://baterry-tool.workers.dev](https://baterry-tool.workers.dev)**
+
 ## Comandos
 
 ```sh
