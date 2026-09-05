@@ -1,3 +1,9 @@
+# Proyecto único (single-package workspace): se declara el paquete raíz.
+# SIN el campo `packages`, pnpm 10.11.1 (el que usa Cloudflare Workers)
+# aborta la instalación con "packages field missing or empty".
+packages:
+  - "."
+
 # Pre-approve build scripts for the packages C3 itself installs that need
 # them: `workerd` downloads the platform binary, `esbuild` and `sharp`
 # (via miniflare) download/build native bindings. Without these, pnpm 11+
